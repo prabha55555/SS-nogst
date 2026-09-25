@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Product Shortcuts - Santhamani Textiles</title>
+    <link rel="stylesheet" href="css/shortcut.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <link rel="stylesheet" href="css/sidebar.css">
+<link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+    <div class="main"></div>
+    <div class="container">
+        <div id="mobileHeader">
+            <button id="menuToggle" aria-label="Toggle Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <div class="controls" id="menuPanel">
+            <div class="nav-buttons">
+                <a href="index.html" class="nav-btn"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="purchase.html" class="nav-btn">
+                    <i class="fas fa-shopping-cart"></i> Purchase Bill
+                </a>
+                <a href="purchase-history.html" class="nav-btn">
+                    <i class="fas fa-history"></i> Purchase History
+                </a>
+                <a href="manage-suppliers.html" class="nav-btn">
+                    <i class="fas fa-truck-loading"></i> Add Supplier
+                </a>
+                <a href="supplier-details.html" class="nav-btn">
+                    <i class="fas fa-truck"></i> Supplier Details
+                </a>
+                <a href="purchase-shortcut.html" class="dashboard">
+                    <i class="fas fa-bolt"></i>  Product Shortcuts
+                </a>
+                <a href="purchase-recycle-bin.html" class="nav-btn">
+                    <i class="fas fa-trash-restore"></i> Recycle Bin
+                </a>
+            </div>
+        </div>
+        <div class="main-content-wrapper">
+            <div class="shortcut-management">
+                <div class="shortcut-header">
+                    <h2>Purchase Product Shortcuts</h2>
+                    <p>Create shortcuts for frequently used product descriptions</p>
+                </div>
+
+                <div class="shortcut-form">
+                    <h3>Add New Shortcut</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shortcutKey">Shortcut Key:</label>
+                            <input type="text" id="shortcutKey" placeholder="e.g., Lk, Ly d, Sj" maxlength="20">
+                        </div>
+                        <div class="form-group">
+                            <label for="fullDescription">Full Description:</label>
+                            <input type="text" id="fullDescription"
+                                placeholder="e.g., Loopknit, Lycra Derby, Single Jersey">
+                        </div>
+                        <div class="form-group">
+                            <label for="purchaseRate">Purchase Rate:</label>
+                            <input type="number" id="purchaseRate" placeholder="0.00" min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="saleRate">Sale Rate:</label>
+                            <input type="number" id="saleRate" placeholder="0.00" min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="profit">Profit:</label>
+                            <input type="number" id="profit" placeholder="0.00" readonly>
+                        </div>
+                        <button id="addShortcut" class="btn-primary">
+                            <i class="fas fa-plus"></i> Add Shortcut
+                        </button>
+                    </div>
+                </div>
+
+                <div class="shortcuts-list">
+                    <h3>Existing Shortcuts</h3>
+                    <div class="search-box">
+                        <input type="text" id="searchShortcuts" placeholder="Search shortcuts...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="table-container">
+                        <table id="shortcutsTable">
+                            <thead>
+                                <tr>
+                                    <th>Shortcut Key</th>
+                                    <th>Full Description</th>
+                                    <th>Purchase Rate</th>
+                                    <th>Sale Rate</th>
+                                    <th>Profit</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shortcutsTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Shortcut</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editShortcutKey">Shortcut Key:</label>
+                    <input type="text" id="editShortcutKey" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label for="editFullDescription">Full Description:</label>
+                    <input type="text" id="editFullDescription">
+                </div>
+                <div class="form-group">
+                    <label for="editPurchaseRate">Purchase Rate:</label>
+                    <input type="number" id="editPurchaseRate" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="editSaleRate">Sale Rate:</label>
+                    <input type="number" id="editSaleRate" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="editProfit">Profit:</label>
+                    <input type="number" id="editProfit" placeholder="0.00" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveEdit" class="btn-primary">Save Changes</button>
+                <button id="cancelEdit" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/db.js"></script>
+    <script src="js/purchase-shortcut.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+</body>
+
+</html>
+
+
+
