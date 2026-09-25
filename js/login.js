@@ -1,4 +1,4 @@
-﻿ document.addEventListener('DOMContentLoaded', function() {
+ document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
@@ -34,7 +34,7 @@
                 // Simulate API call delay
                 setTimeout(() => {
                     // Obfuscated check using base64 to prevent casual inspection
-                    if (btoa(username) === 'SlNOWQ==' && btoa(password) === 'MjcxODE1') {
+                    if (btoa(username) === 'U1NKU05Z' && btoa(password) === 'MjcxODE1') {
                         // Successful login
                         localStorage.setItem('isAuthenticated', 'true');
                         localStorage.setItem('username', username);
