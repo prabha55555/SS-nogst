@@ -123,23 +123,6 @@ class ShortcutManager {
             }
         });
 
-        // Calculate profit
-        const calculateProfit = () => {
-            const sale = parseFloat(document.getElementById('saleRate').value) || 0;
-            const purchase = parseFloat(document.getElementById('purchaseRate').value) || 0;
-            document.getElementById('profit').value = (sale - purchase).toFixed(2);
-        };
-        document.getElementById('saleRate').addEventListener('input', calculateProfit);
-        document.getElementById('purchaseRate').addEventListener('input', calculateProfit);
-
-        const calculateEditProfit = () => {
-            const sale = parseFloat(document.getElementById('editSaleRate').value) || 0;
-            const purchase = parseFloat(document.getElementById('editPurchaseRate').value) || 0;
-            document.getElementById('editProfit').value = (sale - purchase).toFixed(2);
-        };
-        document.getElementById('editSaleRate').addEventListener('input', calculateEditProfit);
-        document.getElementById('editPurchaseRate').addEventListener('input', calculateEditProfit);
-
         // Add loading state to form inputs
         this.setupFormLoadingStates();
     }
@@ -162,7 +145,6 @@ class ShortcutManager {
     async addShortcut() {
         const shortcutKey = document.getElementById('shortcutKey').value.trim();
         const fullDescription = document.getElementById('fullDescription').value.trim();
-        const saleRate = parseFloat(document.getElementById('saleRate').value) || 0;
         const purchaseRate = parseFloat(document.getElementById('purchaseRate').value) || 0;
 
         if (!shortcutKey || !fullDescription) {
@@ -184,7 +166,6 @@ class ShortcutManager {
             const shortcutData = {
                 shortcutKey: shortcutKey.toUpperCase(),
                 fullDescription: fullDescription,
-                saleRate: saleRate,
                 purchaseRate: purchaseRate,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
@@ -194,7 +175,6 @@ class ShortcutManager {
             // Clear form
             document.getElementById('shortcutKey').value = '';
             document.getElementById('fullDescription').value = '';
-            document.getElementById('saleRate').value = '';
             document.getElementById('purchaseRate').value = '';
             
             // Reload shortcuts (this will include the table skeleton while loading)
@@ -291,17 +271,12 @@ class ShortcutManager {
         }
 
         tableBody.innerHTML = shortcuts.map(shortcut => {
-            const saleRate = parseFloat(shortcut.saleRate || shortcut.rateAmount || 0);
             const purchaseRate = parseFloat(shortcut.purchaseRate || shortcut.rateAmount || 0);
-            const profit = saleRate - purchaseRate;
-            const profitColor = profit >= 0 ? '#2e7d32' : '#d32f2f';
             return `
             <tr>
                 <td><strong>${this.escapeHtml(shortcut.shortcutKey)}</strong></td>
                 <td>${this.escapeHtml(shortcut.fullDescription)}</td>
                 <td>₹${purchaseRate.toFixed(2)}</td>
-                <td>₹${saleRate.toFixed(2)}</td>
-                <td style="font-weight: bold; color: ${profitColor};">₹${profit.toFixed(2)}</td>
                 <td>
                     <div class="action-buttons">
                         <button class="btn-edit" onclick="shortcutManager.editShortcut('${shortcut.shortcutKey}')">
@@ -325,11 +300,8 @@ class ShortcutManager {
                 this.currentEditId = shortcutKey;
                 document.getElementById('editShortcutKey').value = shortcut.shortcutKey;
                 document.getElementById('editFullDescription').value = shortcut.fullDescription;
-                const sale = parseFloat(shortcut.saleRate || shortcut.rateAmount || 0);
                 const purchase = parseFloat(shortcut.purchaseRate || shortcut.rateAmount || 0);
-                document.getElementById('editSaleRate').value = sale;
                 document.getElementById('editPurchaseRate').value = purchase;
-                document.getElementById('editProfit').value = (sale - purchase).toFixed(2);
                 document.getElementById('editModal').style.display = 'block';
             }
             
@@ -361,7 +333,6 @@ class ShortcutManager {
     async saveEdit() {
         const shortcutKey = document.getElementById('editShortcutKey').value.trim();
         const fullDescription = document.getElementById('editFullDescription').value.trim();
-        const saleRate = parseFloat(document.getElementById('editSaleRate').value) || 0;
         const purchaseRate = parseFloat(document.getElementById('editPurchaseRate').value) || 0;
 
         if (!shortcutKey || !fullDescription) {
@@ -382,7 +353,6 @@ class ShortcutManager {
             const shortcutData = {
                 shortcutKey: shortcutKey.toUpperCase(),
                 fullDescription: fullDescription,
-                saleRate: saleRate,
                 purchaseRate: purchaseRate,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };

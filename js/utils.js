@@ -694,11 +694,75 @@ class Utils {
         document.getElementById('balanceDue').textContent = Utils.formatCurrency(balanceDue);
 
         // Update product amounts
+        let totalPurchaseAmount = 0;
         document.querySelectorAll('#productTableBody tr').forEach(row => {
             const qty = parseFloat(row.querySelector('.qty').value) || 0;
             const rate = parseFloat(row.querySelector('.rate').value) || 0;
             row.querySelector('.amount').textContent = Utils.formatCurrency(qty * rate);
+            
+            if (window.globalShortcutsCache) {
+                const desc = (row.querySelector('.product-description')?.value || '').toLowerCase().trim();
+                const shortcut = window.globalShortcutsCache.find(s => s.fullDescription.toLowerCase().trim() === desc);
+                if (shortcut) {
+                    const pRate = parseFloat(shortcut.purchaseRate || shortcut.rateAmount || 0);
+                    totalPurchaseAmount += (pRate * qty);
+                }
+            }
         });
+
+        // Update active product details
+        const totalEstRevenue = subtotal - totalPurchaseAmount;
+        Utils.updateActiveProductDetails(totalEstRevenue);
+    }
+
+    static activeRow = null;
+
+    static updateActiveProductDetails(totalEstRevenue = null) {
+        const nameDisplay = document.getElementById('activeProductName');
+        const purchaseDisplay = document.getElementById('activePurchaseRate');
+        const revenueDisplay = document.getElementById('activeRevenue');
+        
+        if (!nameDisplay || !purchaseDisplay || !revenueDisplay) return;
+
+        // If totalEstRevenue is not provided, compute it on the fly
+        if (totalEstRevenue === null) {
+            let totalPurchaseAmount = 0;
+            const subtotal = Utils.calculateSubtotal();
+            document.querySelectorAll('#productTableBody tr').forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                if (window.globalShortcutsCache) {
+                    const desc = (row.querySelector('.product-description')?.value || '').toLowerCase().trim();
+                    const shortcut = window.globalShortcutsCache.find(s => s.fullDescription.toLowerCase().trim() === desc);
+                    if (shortcut) {
+                        const pRate = parseFloat(shortcut.purchaseRate || shortcut.rateAmount || 0);
+                        totalPurchaseAmount += (pRate * qty);
+                    }
+                }
+            });
+            totalEstRevenue = subtotal - totalPurchaseAmount;
+        }
+
+        // Always show the bill's total revenue, even if no row is active
+        revenueDisplay.textContent = Utils.formatCurrency(totalEstRevenue);
+        revenueDisplay.style.color = totalEstRevenue >= 0 ? '#2e7d32' : '#d32f2f';
+
+        if (!Utils.activeRow || !window.globalShortcutsCache) {
+            nameDisplay.textContent = 'Select a product...';
+            purchaseDisplay.textContent = '₹0.00';
+            return;
+        }
+
+        const desc = (Utils.activeRow.querySelector('.product-description')?.value || '').trim();
+        const shortcut = window.globalShortcutsCache.find(s => s.fullDescription.toLowerCase().trim() === desc.toLowerCase());
+        
+        if (shortcut && desc !== '') {
+            nameDisplay.textContent = desc;
+            const pRate = parseFloat(shortcut.purchaseRate || shortcut.rateAmount || 0);
+            purchaseDisplay.textContent = Utils.formatCurrency(pRate);
+        } else {
+            nameDisplay.textContent = desc !== '' ? desc : 'Select a product...';
+            purchaseDisplay.textContent = 'Unknown (Not in shortcuts)';
+        }
     }
 
 

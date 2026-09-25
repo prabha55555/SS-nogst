@@ -568,8 +568,19 @@ body {
 /* --- 7. Payment Calculation Section --- */
 .calculation-section {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     margin-bottom: 20px;
+    gap: 20px;
+}
+
+.revenue-calculation {
+    text-align: left;
+    padding-right: 20px;
+    color: #555;
+    font-size: 0.9em;
+    flex: 1;
+    border-right: 2px dashed #ddd;
+    margin-right: 20px;
 }
 
 .payment-calculation {
@@ -895,7 +906,16 @@ body {
         max-width: 100%;
     }
     .calculation-section {
+        flex-direction: column;
         justify-content: center;
+        gap: 20px;
+    }
+    .revenue-calculation {
+        border-right: none;
+        padding-right: 0;
+        margin-right: 0;
+        border-bottom: 2px dashed #ddd;
+        padding-bottom: 15px;
     }
     .payment-calculation {
         max-width: 100%;

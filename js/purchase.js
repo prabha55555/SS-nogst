@@ -294,19 +294,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }));
                 }
 
-                invoiceData.products.forEach(product => {
-                    const matchedShortcut = shortcuts.find(s =>
-                        s.fullDescription.toLowerCase() === product.description.trim().toLowerCase()
-                    );
-
-                    if (matchedShortcut) {
-                        const currentRate = parseFloat(matchedShortcut.purchaseRate) || parseFloat(matchedShortcut.rateAmount) || 0;
-                        if (currentRate !== parseFloat(product.rate)) {
-                            const updateData = { purchaseRate: parseFloat(product.rate) };
-                            savePromises.push(db.firestore.collection('shortcuts').doc(matchedShortcut.shortcutKey).update(updateData));
-                        }
-                    }
-                });
+                // (Removed checking products for rate updates because purchase rate is constant)
                 if (savePromises.length > 0) {
                     await Promise.all(savePromises);
                 }

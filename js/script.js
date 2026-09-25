@@ -277,7 +277,7 @@ async function showAutoCompleteSuggestions(query, dropdown, input) {
 
         if (matches.length > 0) {
             dropdown.innerHTML = matches.map(shortcut => `
-                <div class="autocomplete-item" data-shortcut="${shortcut.shortcutKey}" data-full="${shortcut.fullDescription}" data-rate="${shortcut.saleRate || shortcut.rateAmount || 0}">
+                <div class="autocomplete-item" data-shortcut="${shortcut.shortcutKey}" data-full="${shortcut.fullDescription}">
                     <strong>${shortcut.shortcutKey}</strong> → ${shortcut.fullDescription}
                 </div>
             `).join('');
@@ -289,16 +289,6 @@ async function showAutoCompleteSuggestions(query, dropdown, input) {
                 item.addEventListener('mousedown', (e) => {
                     e.preventDefault();
                     input.value = item.dataset.full;
-                    // Apply Rate Amount
-                    const row = input.closest('tr');
-                    if (row && item.dataset.rate) {
-                        const rateInput = row.querySelector('.rate');
-                        if (rateInput) {
-                            rateInput.value = item.dataset.rate;
-                            updateRowAmount(row);
-                            Utils.updateCalculations();
-                        }
-                    }
                     dropdown.style.display = 'none';
                     input.dispatchEvent(new Event('input', { bubbles: true }));
                 });
@@ -348,8 +338,9 @@ async function getAllShortcuts() {
             shortcuts.push(doc.data());
         });
 
-        // Sort shortcuts alphabetically by shortcut key
-        return shortcuts.sort((a, b) => a.shortcutKey.localeCompare(b.shortcutKey));
+        const sortedShortcuts = shortcuts.sort((a, b) => a.shortcutKey.localeCompare(b.shortcutKey));
+        window.globalShortcutsCache = sortedShortcuts;
+        return sortedShortcuts;
 
     } catch (error) {
         console.error('Error getting shortcuts from Firebase:', error);
@@ -427,21 +418,7 @@ async function saveBill() {
             }
         }
 
-        // Check products for rate updates
-        const shortcuts = await getAllShortcuts();
-        invoiceData.products.forEach(product => {
-            const matchedShortcut = shortcuts.find(s => 
-                s.fullDescription.toLowerCase() === product.description.trim().toLowerCase()
-            );
-            
-            if (matchedShortcut) {
-                const currentRate = parseFloat(matchedShortcut.saleRate) || parseFloat(matchedShortcut.rateAmount) || 0;
-                if (currentRate !== parseFloat(product.rate)) {
-                    const updateData = { saleRate: parseFloat(product.rate) };
-                    savePromises.push(db.firestore.collection('shortcuts').doc(matchedShortcut.shortcutKey).update(updateData));
-                }
-            }
-        });
+        // (Removed checking products for rate updates because sale rate is manual now)
 
         // Execute all save operations concurrently
         await Promise.all(savePromises);
@@ -563,6 +540,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Initialize database
         await db.init();
         
+        // Cache shortcuts immediately
+        await getAllShortcuts();
+        
         // Populate customer datalist
         const customers = await db.getAllCustomers();
         const customerList = document.getElementById('customerList');
@@ -601,6 +581,21 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Add event listeners
         document.getElementById('addRow').addEventListener('click', addProductRow);
+        
+        // Track active row for product info panel
+        document.getElementById('productTableBody').addEventListener('focusin', function(e) {
+            const row = e.target.closest('tr');
+            if (row) {
+                Utils.activeRow = row;
+                Utils.updateActiveProductDetails();
+            }
+        });
+        
+        // Also track input events on the table to update active info live
+        document.getElementById('productTableBody').addEventListener('input', function(e) {
+            Utils.updateCalculations(); // This will also call updateActiveProductDetails
+        });
+
         document.getElementById('saveBill').addEventListener('click', saveBill);
         document.getElementById('resetForm').addEventListener('click', resetForm);
         document.getElementById('logoutBtn').addEventListener('click', logout);
