@@ -78,23 +78,28 @@ class RevenueManager {
         const tbody = document.getElementById('revenueTableBody');
         if (data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No revenue data found.</td></tr>';
-            document.getElementById('totalRevenueAmount').textContent = '₹0.00';
+            const totalEl = document.getElementById('totalRevenueAmount');
+            totalEl.textContent = '₹0.00';
+            totalEl.style.color = '#333';
             return;
         }
 
         let totalRevenue = 0;
         tbody.innerHTML = data.map(item => {
             totalRevenue += item.revenueAmount;
+            const textColor = item.revenueAmount >= 0 ? '#2e7d32' : '#d32f2f';
             return `
                 <tr>
-                    <td>${item.billNo}</td>
+                    <td><a href="invoice-history.html?search=${item.billNo}" style="color: #2a5298; text-decoration: none; font-weight: bold;">${item.billNo}</a></td>
                     <td>${item.customerName}</td>
-                    <td>₹${item.revenueAmount.toFixed(2)}</td>
+                    <td style="font-weight: bold; color: ${textColor};">₹${item.revenueAmount.toFixed(2)}</td>
                 </tr>
             `;
         }).join('');
 
-        document.getElementById('totalRevenueAmount').textContent = `₹${totalRevenue.toFixed(2)}`;
+        const totalEl = document.getElementById('totalRevenueAmount');
+        totalEl.textContent = `₹${totalRevenue.toFixed(2)}`;
+        totalEl.style.color = totalRevenue >= 0 ? '#2e7d32' : '#d32f2f';
     }
 
     setupEventListeners() {

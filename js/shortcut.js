@@ -294,13 +294,14 @@ class ShortcutManager {
             const saleRate = parseFloat(shortcut.saleRate || shortcut.rateAmount || 0);
             const purchaseRate = parseFloat(shortcut.purchaseRate || shortcut.rateAmount || 0);
             const profit = saleRate - purchaseRate;
+            const profitColor = profit >= 0 ? '#2e7d32' : '#d32f2f';
             return `
             <tr>
                 <td><strong>${this.escapeHtml(shortcut.shortcutKey)}</strong></td>
                 <td>${this.escapeHtml(shortcut.fullDescription)}</td>
-                <td>₹${saleRate.toFixed(2)}</td>
                 <td>₹${purchaseRate.toFixed(2)}</td>
-                <td>₹${profit.toFixed(2)}</td>
+                <td>₹${saleRate.toFixed(2)}</td>
+                <td style="font-weight: bold; color: ${profitColor};">₹${profit.toFixed(2)}</td>
                 <td>
                     <div class="action-buttons">
                         <button class="btn-edit" onclick="shortcutManager.editShortcut('${shortcut.shortcutKey}')">
