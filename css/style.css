@@ -420,7 +420,7 @@ body {
 .product-table-container {
     margin-bottom: 20px;
     border-radius: 6px;
-    overflow-x: auto;
+    overflow: visible;
     border: 2px solid var(--border-light);
 }
 
@@ -528,7 +528,7 @@ body {
     top: 100%;
     left: 0;
     right: 0;
-    z-index: 100;
+    z-index: 9999;
     background-color: var(--bg-white);
     border: 1px solid var(--primary-color);
     border-top: none;

@@ -1138,6 +1138,27 @@ async function displayInvoices(invoices) {
                     ` : `
                         <p><strong>Balance Due:</strong> ₹${Utils.formatCurrency(invoice.balanceDue)}</p>
                     `}
+                    <details class="view-products-details" style="margin-top: 10px;">
+                        <summary style="cursor: pointer; color: var(--primary-color); font-weight: 600;">View Details</summary>
+                        <table style="width: 100%; margin-top: 5px; font-size: 0.9em; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #ddd;">
+                                    <th style="text-align: left; padding: 4px;">Product</th>
+                                    <th style="text-align: right; padding: 4px;">Qty</th>
+                                    <th style="text-align: right; padding: 4px;">Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${invoice.products && invoice.products.length > 0 ? invoice.products.map(p => `
+                                    <tr style="border-bottom: 1px solid #eee;">
+                                        <td style="text-align: left; padding: 4px;">${p.description}</td>
+                                        <td style="text-align: right; padding: 4px;">${p.qty}</td>
+                                        <td style="text-align: right; padding: 4px;">&#8377;${Utils.formatCurrency(p.rate)}</td>
+                                    </tr>
+                                `).join('') : '<tr><td colspan="3" style="text-align: center; padding: 4px;">No products found</td></tr>'}
+                            </tbody>
+                        </table>
+                    </details>
                 </div>
                 <div class="invoice-actions-container">
                     <div class="primary-actions">

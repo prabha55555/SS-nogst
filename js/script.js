@@ -465,6 +465,7 @@ async function resetForm() {
         setTimeout(() => {
             Utils.resetForm();
             window.isBillSaved = false; // Reset saved state
+            document.getElementById('saveBill').innerHTML = '<i class="fas fa-save"></i> Save Bill';
             hideLoading('content');
 
             // Refresh suggestions after reset
@@ -513,6 +514,9 @@ async function loadInvoiceForEditing(invoiceNo) {
             Utils.setFormData(invoiceData);
             document.getElementById('invoiceNo').readOnly = true;
             window.isBillSaved = true; // Loaded bill is considered saved
+
+            // Change button text to indicate update mode
+            document.getElementById('saveBill').innerHTML = '<i class="fas fa-save"></i> Update Bill';
 
             hideLoading('content');
             showButtonSuccess('saveBill');
