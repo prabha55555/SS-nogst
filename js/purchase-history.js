@@ -196,7 +196,7 @@ async function displaysupplierStatementResults(supplierName, invoices) {
     });
 
     // OPTIMIZATION: Fetch all returns once
-    const allReturns = await db.getAllReturns();
+    const allReturns = await db.getAllPurchaseReturns();
     const returnsByInvoice = {};
     allReturns.forEach(r => {
         if (!returnsByInvoice[r.invoiceNo]) returnsByInvoice[r.invoiceNo] = [];
@@ -210,7 +210,7 @@ async function displaysupplierStatementResults(supplierName, invoices) {
         return {
             ...invoice,
             totalReturns,
-            adjustedBalanceDue: invoice.balanceDue - totalReturns
+            adjustedBalanceDue: (invoice.payment?.balanceDue !== undefined ? (parseFloat(invoice.payment.balanceDue) || 0) : (parseFloat(invoice.balanceDue) || 0)) - totalReturns
         };
     });
 
@@ -382,7 +382,7 @@ async function generateCombinedPDFStatement(supplierName, invoices) {
         });
 
         // OPTIMIZATION: Fetch all returns and payments once
-        const allReturns = await db.getAllReturns();
+        const allReturns = await db.getAllPurchaseReturns();
         const allPayments = await db.getAllPayments();
         
         const returnsByInvoice = {};
@@ -405,7 +405,7 @@ async function generateCombinedPDFStatement(supplierName, invoices) {
             return {
                 ...invoice,
                 totalReturns,
-                adjustedBalanceDue: invoice.balanceDue - totalReturns,
+                adjustedBalanceDue: (invoice.payment?.balanceDue !== undefined ? (parseFloat(invoice.payment.balanceDue) || 0) : (parseFloat(invoice.balanceDue) || 0)) - totalReturns,
                 returns,
                 payments
             };
@@ -772,7 +772,7 @@ async function generateCombinedPDFStatementEasy(supplierName, invoices) {
         let totalReturnAmt = 0;
 
         // OPTIMIZATION: Fetch all returns once
-        const allReturns = await db.getAllReturns();
+        const allReturns = await db.getAllPurchaseReturns();
         const returnsByInvoice = {};
         allReturns.forEach(r => {
             if (!returnsByInvoice[r.invoiceNo]) returnsByInvoice[r.invoiceNo] = [];
@@ -1062,7 +1062,7 @@ async function displayInvoices(invoices) {
     let htmlContent = '';
 
     // OPTIMIZATION: Fetch all returns once
-    const allReturns = await db.getAllReturns();
+    const allReturns = await db.getAllPurchaseReturns();
     const returnsByInvoice = {};
     allReturns.forEach(r => {
         if (!returnsByInvoice[r.invoiceNo]) returnsByInvoice[r.invoiceNo] = [];
@@ -1104,7 +1104,8 @@ async function displayInvoices(invoices) {
             const returns = returnsByInvoice[invoice.invoiceNo] || [];
             const payments = paymentsByInvoice[invoice.invoiceNo] || [];
             const totalReturns = returns.reduce((sum, r) => sum + (parseFloat(r.returnAmount) || 0), 0);
-            const adjustedBalanceDue = invoice.balanceDue - totalReturns;
+            const invoiceBalanceDue = invoice.payment?.balanceDue !== undefined ? (parseFloat(invoice.payment.balanceDue) || 0) : (parseFloat(invoice.balanceDue) || 0);
+            const adjustedBalanceDue = invoiceBalanceDue - totalReturns;
 
             return {
                 ...invoice,
@@ -1184,13 +1185,21 @@ async function displayInvoices(invoices) {
                         <button class="btn-delete" onclick="deletePurchaseBill('${invoice.invoiceNo}')">Delete</button>
                         ${invoice.invoiceNo === latestInvoicePersupplier[invoice.supplierName] ? 
                             `<button class="btn-payment" onclick="addPayment('${invoice.invoiceNo}')">Add Payment</button>` : ''}
+                        <button class="btn-return" onclick="addReturn('${invoice.invoiceNo}')">Add Return</button>
                         <button class="btn-statement" onclick="generateStatement('${invoice.invoiceNo}')">Download Statement</button>
                     </div>
-                    ${(amountPaid > 0) ? `
+                    ${(amountPaid > 0 || invoice.totalReturns > 0) ? `
                     <div class="secondary-actions">
+                        ${amountPaid > 0 ? `
                         <button class="btn-payment-history" onclick="viewPaymentHistory('${invoice.invoiceNo}')">
-                            <i class="fas fa-history"></i> Payment History (₹${Utils.formatCurrency(amountPaid)})
+                            <i class="fas fa-history"></i> Payment History (&#8377;${Utils.formatCurrency(amountPaid)})
                         </button>
+                        ` : ''}
+                        ${invoice.totalReturns > 0 ? `
+                        <button class="btn-return-status" onclick="viewReturnStatus('${invoice.invoiceNo}')">
+                            <i class="fas fa-undo"></i> View Returns (&#8377;${Utils.formatCurrency(invoice.totalReturns)})
+                        </button>
+                        ` : ''}
                     </div>
                     ` : ''}
                 </div>
@@ -1263,7 +1272,7 @@ async function shareCombinedStatementViaWhatsApp(supplierName) {
         });
 
         // OPTIMIZATION: Fetch all returns once
-        const allReturns = await db.getAllReturns();
+        const allReturns = await db.getAllPurchaseReturns();
         const returnsByInvoice = {};
         allReturns.forEach(r => {
             if (!returnsByInvoice[r.invoiceNo]) returnsByInvoice[r.invoiceNo] = [];
@@ -1278,7 +1287,7 @@ async function shareCombinedStatementViaWhatsApp(supplierName) {
                 ...invoice,
                 totalReturns,
                 returns,
-                adjustedBalanceDue: invoice.balanceDue - totalReturns
+                adjustedBalanceDue: (invoice.payment?.balanceDue !== undefined ? (parseFloat(invoice.payment.balanceDue) || 0) : (parseFloat(invoice.balanceDue) || 0)) - totalReturns
             };
         });
 
@@ -1408,7 +1417,7 @@ _This is an automated statement. Please contact us for any queries._`;
 // Share individual invoice via WhatsApp with Mobile-Optimized Box Alignment & Full Details
 async function shareInvoiceViaWhatsApp(invoiceNo) {
     try {
-        const invoiceData = await db.getInvoice(invoiceNo);
+        const invoiceData = await db.getPurchaseBill(invoiceNo);
         const payments = await db.getPaymentsByInvoice(invoiceNo);
 
         if (!invoiceData) {
@@ -1611,7 +1620,7 @@ async function addPayment(invoiceNo) {
 
                 showLoading('Processing Payment', 'Updating invoice and supplier records...');
 
-                const invoiceData = await db.getInvoice(invoiceNo);
+                const invoiceData = await db.getPurchaseBill(invoiceNo);
                 if (invoiceData) {
                     // Update invoice payment breakdown
                     const currentPaymentBreakdown = invoiceData.paymentBreakdown || {
@@ -1733,7 +1742,7 @@ async function addPayment(invoiceNo) {
 async function viewPaymentHistory(invoiceNo) {
     try {
         const payments = await db.getPaymentsByInvoice(invoiceNo);
-        const invoiceData = await db.getInvoice(invoiceNo);
+        const invoiceData = await db.getPurchaseBill(invoiceNo);
 
         if (payments.length === 0) {
             Utils.showToast('Notification', 'No payment records found for this invoice.', 'info');
@@ -1888,7 +1897,7 @@ async function undoAllPayments(invoiceNo) {
         }
 
         // Get invoice data
-        const invoiceData = await db.getInvoice(invoiceNo);
+        const invoiceData = await db.getPurchaseBill(invoiceNo);
         const totalPaymentAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
         // Delete all payment records
@@ -1954,15 +1963,16 @@ async function deletePayment(paymentId) {
 // SIMPLER SOLUTION: Store products in dialog dataset
 async function addReturn(invoiceNo) {
     try {
-        const invoiceData = await db.getInvoice(invoiceNo);
+        const invoiceData = await db.getPurchaseBill(invoiceNo);
         if (!invoiceData) {
             Utils.showToast('Error', 'Invoice not found!', 'error');
             return;
         }
 
         // Calculate current returns to get adjusted balance
-        const totalReturns = await Utils.calculateTotalReturns(invoiceNo);
-        const currentAdjustedBalance = invoiceData.balanceDue - totalReturns;
+        const totalReturns = await Utils.calculateTotalPurchaseReturns(invoiceNo);
+        const invoiceBalanceDue = invoiceData.payment?.balanceDue !== undefined ? (parseFloat(invoiceData.payment.balanceDue) || 0) : (parseFloat(invoiceData.balanceDue) || 0);
+        const currentAdjustedBalance = invoiceBalanceDue - totalReturns;
 
         // Create return dialog
         const returnDialog = document.createElement('div');
@@ -1998,7 +2008,7 @@ async function addReturn(invoiceNo) {
                     <div class="return-summary">
                         <div class="summary-item">
                             <span>Original Balance Due:</span>
-                            <span>₹${Utils.formatCurrency(invoiceData.balanceDue)}</span>
+                            <span>&#8377;${Utils.formatCurrency(invoiceData.payment?.balanceDue !== undefined ? (parseFloat(invoiceData.payment.balanceDue) || 0) : (parseFloat(invoiceData.balanceDue) || 0))}</span>
                         </div>
                         ${totalReturns > 0 ? `
                         <div class="summary-item">
@@ -2196,7 +2206,7 @@ async function saveReturn(invoiceNo) {
     }
 
     try {
-        const invoiceData = await db.getInvoice(invoiceNo);
+        const invoiceData = await db.getPurchaseBill(invoiceNo);
         const returnDate = document.getElementById('returnDate').value;
         const returnItems = document.querySelectorAll('.return-item');
 
@@ -2258,8 +2268,9 @@ async function saveReturn(invoiceNo) {
         }
 
         // Validate that return amount doesn't exceed current balance
-        const currentReturns = await Utils.calculateTotalReturns(invoiceNo);
-        const currentBalance = invoiceData.balanceDue - currentReturns;
+        const currentReturns = await Utils.calculateTotalPurchaseReturns(invoiceNo);
+        const invoiceBalanceDue = invoiceData.payment?.balanceDue !== undefined ? (parseFloat(invoiceData.payment.balanceDue) || 0) : (parseFloat(invoiceData.balanceDue) || 0);
+        const currentBalance = invoiceBalanceDue - currentReturns;
 
         if (totalReturnAmount > currentBalance) {
             Utils.showToast('Error', `Return amount (₹${Utils.formatCurrency(totalReturnAmount)}) cannot exceed current balance (₹${Utils.formatCurrency(currentBalance)})`, 'error');
@@ -2277,11 +2288,11 @@ async function saveReturn(invoiceNo) {
                 ...returnItem,
                 createdAt: new Date().toISOString()
             };
-            await db.saveReturn(returnData);
+            await db.savePurchaseReturn(returnData);
         }
 
         // Update invoice with return information
-        await Utils.updateInvoiceWithReturns(invoiceNo);
+        await Utils.updatePurchaseBillWithReturns(invoiceNo);
 
         // Update all subsequent invoices
         await Utils.updateSubsequentInvoices(invoiceData.supplierName, invoiceNo);
@@ -2307,7 +2318,7 @@ async function saveReturn(invoiceNo) {
 // Helper function to get already returned quantity for a product
 async function getAlreadyReturnedQty(invoiceNo, productDescription) {
     try {
-        const returns = await db.getReturnsByInvoice(invoiceNo);
+        const returns = await db.getPurchaseReturnsByInvoice(invoiceNo);
         const productReturns = returns.filter(returnItem =>
             returnItem.description === productDescription
         );
@@ -2322,8 +2333,8 @@ async function getAlreadyReturnedQty(invoiceNo, productDescription) {
 // View return status with undo option
 async function viewReturnStatus(invoiceNo) {
     try {
-        const returns = await db.getReturnsByInvoice(invoiceNo);
-        const invoiceData = await db.getInvoice(invoiceNo);
+        const returns = await db.getPurchaseReturnsByInvoice(invoiceNo);
+        const invoiceData = await db.getPurchaseBill(invoiceNo);
 
         if (returns.length === 0) {
             Utils.showToast('Notification', 'No return records found for this invoice.', 'info');
@@ -2416,13 +2427,13 @@ async function undoReturn(returnId, invoiceNo) {
     try {
         showLoading('Undoing Return', 'Reverting return and recalculating balance...');
         // Delete the return record
-        await db.deleteReturn(returnId);
+        await db.deletePurchaseReturn(returnId);
 
         // Update invoice with recalculated returns
-        await Utils.updateInvoiceWithReturns(invoiceNo);
+        await Utils.updatePurchaseBillWithReturns(invoiceNo);
 
         // Get invoice data for Supplier Name
-        const invoiceData = await db.getInvoice(invoiceNo);
+        const invoiceData = await db.getPurchaseBill(invoiceNo);
 
         // Update all subsequent invoices
         await Utils.updateSubsequentInvoices(invoiceData.supplierName, invoiceNo);
@@ -2455,7 +2466,7 @@ async function undoAllReturns(invoiceNo) {
 
     try {
         showLoading('Undoing All Returns', 'Reverting all returns and recalculating balance...');
-        const returns = await db.getReturnsByInvoice(invoiceNo);
+        const returns = await db.getPurchaseReturnsByInvoice(invoiceNo);
 
         if (returns.length === 0) {
             Utils.showToast('Notification', 'No returns found for this invoice.', 'info');
@@ -2464,14 +2475,14 @@ async function undoAllReturns(invoiceNo) {
 
         // Delete all return records
         for (const returnItem of returns) {
-            await db.deleteReturn(returnItem.id);
+            await db.deletePurchaseReturn(returnItem.id);
         }
 
         // Update invoice with recalculated returns (should be 0 now)
-        await Utils.updateInvoiceWithReturns(invoiceNo);
+        await Utils.updatePurchaseBillWithReturns(invoiceNo);
 
         // Get invoice data for Supplier Name
-        const invoiceData = await db.getInvoice(invoiceNo);
+        const invoiceData = await db.getPurchaseBill(invoiceNo);
 
         // Update all subsequent invoices
         await Utils.updateSubsequentInvoices(invoiceData.supplierName, invoiceNo);
@@ -2500,7 +2511,7 @@ async function undoAllReturns(invoiceNo) {
 // Generate statement for an invoice with PDF download
 async function generateStatement(invoiceNo) {
     try {
-        const invoiceData = await db.getInvoice(invoiceNo);
+        const invoiceData = await db.getPurchaseBill(invoiceNo);
         const payments = await db.getPaymentsByInvoice(invoiceNo);
 
         if (invoiceData) {
@@ -2520,8 +2531,9 @@ async function generateStatement(invoiceNo) {
 async function generatePDFStatement(invoiceData, payments, share = false) {
     try {
         // Calculate returns for this invoice
-        const totalReturns = await Utils.calculateTotalReturns(invoiceData.invoiceNo);
-        const adjustedBalanceDue = invoiceData.balanceDue - totalReturns;
+        const totalReturns = await Utils.calculateTotalPurchaseReturns(invoiceData.invoiceNo);
+        const invoiceBalanceDue = invoiceData.payment?.balanceDue !== undefined ? (parseFloat(invoiceData.payment.balanceDue) || 0) : (parseFloat(invoiceData.balanceDue) || 0);
+        const adjustedBalanceDue = invoiceBalanceDue - totalReturns;
 
         // Create PDF document
         const { jsPDF } = window.jspdf;
@@ -2689,7 +2701,7 @@ async function generatePDFStatement(invoiceData, payments, share = false) {
             yPos += 7;
 
             // Get return details
-            const returns = await db.getReturnsByInvoice(invoiceData.invoiceNo);
+            const returns = await db.getPurchaseReturnsByInvoice(invoiceData.invoiceNo);
 
             if (returns.length > 0) {
                 const returnTableHeaders = [['Date', 'Product', 'Qty', 'Rate', 'Amount']];
@@ -2958,7 +2970,7 @@ function viewInvoice(invoiceNo) {
 // Generate PDF for a specific invoice
 async function generateInvoicePDF(invoiceNo) {
     try {
-        const invoiceData = await db.getInvoice(invoiceNo);
+        const invoiceData = await db.getPurchaseBill(invoiceNo);
         if (invoiceData) {
             // Temporarily set form data to generate PDF
             const originalData = Utils.getFormData();
@@ -2989,8 +3001,8 @@ window.deletePurchaseBill = async function(invoiceNo) {
     try {
         const payments = await db.getPurchasePaymentsByInvoice(invoiceNo);
         const cleanPayments = await db.getPurchasePaymentsByInvoice(cleanInvoiceNo);
-        const returns = await db.getReturnsByInvoice(invoiceNo);
-        const cleanReturns = await db.getReturnsByInvoice(cleanInvoiceNo);
+        const returns = await db.getPurchaseReturnsByInvoice(invoiceNo);
+        const cleanReturns = await db.getPurchaseReturnsByInvoice(cleanInvoiceNo);
 
         const hasPayments = (payments && payments.length > 0) || (cleanPayments && cleanPayments.length > 0);
         const hasReturns = (returns && returns.length > 0) || (cleanReturns && cleanReturns.length > 0);
@@ -4152,7 +4164,7 @@ async function generatePDFStatement(invoiceData, payments, share = false) {
     try {
         // Calculate returns for this invoice
         const totalReturns = 0; // We don't have purchase returns yet
-        const invoiceBalanceDue = invoiceData.payment?.balanceDue !== undefined ? invoiceData.payment.balanceDue : (invoiceData.balanceDue || 0);
+        const invoiceBalanceDue = invoiceData.payment?.balanceDue !== undefined ? (parseFloat(invoiceData.payment.balanceDue) || 0) : (parseFloat(invoiceData.balanceDue) || 0);
         const adjustedBalanceDue = invoiceBalanceDue - totalReturns;
 
         // Create PDF document

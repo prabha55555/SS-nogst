@@ -2,6 +2,8 @@
 class Utils {
     // Format currency
     static formatCurrency(amount) {
+        const parsedAmount = parseFloat(amount);
+        if (isNaN(parsedAmount)) amount = 0;
         return new Intl.NumberFormat('en-IN', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
@@ -77,6 +79,32 @@ class Utils {
             }
         } catch (error) {
             console.error('Error updating invoice with returns:', error);
+        }
+    }
+
+    static async calculateTotalPurchaseReturns(invoiceNo) {
+        try {
+            const returns = await db.getPurchaseReturnsByInvoice(invoiceNo);
+            return returns.reduce((total, returnItem) => total + (parseFloat(returnItem.returnAmount) || 0), 0);
+        } catch (error) {
+            console.error('Error calculating purchase returns for invoice:', invoiceNo, error);
+            return 0;
+        }
+    }
+
+    static async updatePurchaseBillWithReturns(invoiceNo) {
+        try {
+            const totalReturns = await Utils.calculateTotalPurchaseReturns(invoiceNo);
+            const invoiceData = await db.getPurchaseBill(invoiceNo);
+
+            if (invoiceData) {
+                const invoiceBalanceDue = invoiceData.payment?.balanceDue !== undefined ? (parseFloat(invoiceData.payment.balanceDue) || 0) : (parseFloat(invoiceData.balanceDue) || 0);
+                invoiceData.totalReturns = totalReturns;
+                invoiceData.adjustedBalanceDue = invoiceBalanceDue - totalReturns;
+                await db.savePurchaseBill(invoiceData);
+            }
+        } catch (error) {
+            console.error('Error updating purchase bill with returns:', error);
         }
     }
     // Calculate customer's previous balance

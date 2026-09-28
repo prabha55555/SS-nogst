@@ -1,3 +1,4 @@
+
 // Recycle Bin Functionality
 class RecycleBinManager {
     constructor() {

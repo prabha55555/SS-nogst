@@ -1271,6 +1271,7 @@ class Database {
     }
 
     async cleanupOrphanedData() {
+        return; // Disabled by user request: do not delete customers/suppliers when their bills are deleted
         this._checkInit();
         try {
             // 1. Get all active sales invoices
@@ -1404,6 +1405,95 @@ class Database {
             console.log(`Supplier ${phone} deleted successfully`);
         } catch (error) {
             console.error('Error deleting supplier from Firebase:', error);
+            throw error;
+        }
+    }
+
+    // --- Purchase Returns Methods ---
+
+    async savePurchaseReturn(returnData) {
+        this._checkInit();
+        try {
+            const returnId = returnData.id || `purchasereturn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            await this.firestore.collection('purchaseReturns').doc(returnId).set({
+                ...returnData,
+                id: returnId,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            this._cache.purchaseReturns = null;
+            console.log('Purchase Return saved successfully to Firebase');
+            return returnId;
+        } catch (error) {
+            console.error('Error saving purchase return:', error);
+            throw error;
+        }
+    }
+
+    async getPurchaseReturnsByInvoice(invoiceNo) {
+        this._checkInit();
+        try {
+            if (this._cache.purchaseReturns) {
+                return this._cache.purchaseReturns.filter(r => r.invoiceNo === invoiceNo);
+            }
+            const querySnapshot = await this.firestore.collection('purchaseReturns')
+                .where('invoiceNo', '==', invoiceNo)
+                .get();
+            const returns = [];
+            querySnapshot.forEach((doc) => {
+                returns.push(doc.data());
+            });
+            return returns;
+        } catch (error) {
+            console.error('Error getting purchase returns by invoice:', error);
+            throw error;
+        }
+    }
+
+    async getAllPurchaseReturns() {
+        this._checkInit();
+        if (this._cache.purchaseReturns) return this._cache.purchaseReturns;
+        try {
+            const querySnapshot = await this.firestore.collection('purchaseReturns').get();
+            const returns = [];
+            querySnapshot.forEach((doc) => {
+                returns.push(doc.data());
+            });
+            this._cache.purchaseReturns = returns;
+            return returns;
+        } catch (error) {
+            console.error('Error getting all purchase returns:', error);
+            throw error;
+        }
+    }
+
+    async deletePurchaseReturn(returnId) {
+        this._checkInit();
+        try {
+            await this.firestore.collection('purchaseReturns').doc(returnId.toString()).delete();
+            this._cache.purchaseReturns = null;
+            console.log('Purchase Return deleted successfully from Firebase');
+        } catch (error) {
+            console.error('Error deleting purchase return:', error);
+            throw error;
+        }
+    }
+
+    async deletePurchaseReturnsByInvoice(invoiceNo) {
+        this._checkInit();
+        try {
+            const returnsQuery = await this.firestore.collection('purchaseReturns')
+                .where('invoiceNo', '==', invoiceNo)
+                .get();
+            
+            const deletePromises = [];
+            returnsQuery.forEach((doc) => {
+                deletePromises.push(doc.ref.delete());
+            });
+            
+            await Promise.all(deletePromises);
+            this._cache.purchaseReturns = null;
+        } catch (error) {
+            console.error('Error deleting purchase returns:', error);
             throw error;
         }
     }
