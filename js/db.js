@@ -17,8 +17,13 @@ class Database {
             suppliers: null,
             purchaseInvoices: null,
             expenses: null,
-            openingStocks: null
+            openingStocks: null,
+            purchasePayments: null,
+            purchaseReturns: null
         };
+
+        // Promise cache to prevent duplicate simultaneous network requests
+        this._promises = {};
 
         // Firebase configuration
         this.firebaseConfig = {
@@ -69,6 +74,26 @@ class Database {
         if (!this.initialized) {
             throw new Error('Database not initialized. Call init() first.');
         }
+    }
+
+    async _fetchWithPromiseCache(cacheKey, fetchFunction) {
+        if (this._cache[cacheKey]) return this._cache[cacheKey];
+        if (this._promises[cacheKey]) return this._promises[cacheKey];
+        
+        this._promises[cacheKey] = (async () => {
+            try {
+                const result = await fetchFunction();
+                this._cache[cacheKey] = result;
+                return result;
+            } catch (error) {
+                this._promises[cacheKey] = null;
+                throw error;
+            } finally {
+                this._promises[cacheKey] = null;
+            }
+        })();
+        
+        return this._promises[cacheKey];
     }
 
     // Save invoice to Firebase
@@ -249,24 +274,23 @@ class Database {
 
     async getAllPurchaseBills() {
         this._checkInit();
-        if (this._cache.purchaseInvoices) return this._cache.purchaseInvoices;
-
-        try {
-            const querySnapshot = await this.firestore.collection('purchase_invoices')
-                .orderBy('timestamp', 'desc')
-                .get();
+        return this._fetchWithPromiseCache('purchaseInvoices', async () => {
+            try {
+                const querySnapshot = await this.firestore.collection('purchase_invoices')
+                    .orderBy('timestamp', 'desc')
+                    .get();
+                    
+                const invoices = [];
+                querySnapshot.forEach((doc) => {
+                    invoices.push(doc.data());
+                });
                 
-            const invoices = [];
-            querySnapshot.forEach((doc) => {
-                invoices.push(doc.data());
-            });
-            
-            this._cache.purchaseInvoices = invoices;
-            return invoices;
-        } catch (error) {
-            console.error('Error getting purchase invoices from Firebase:', error);
-            return [];
-        }
+                return invoices;
+            } catch (error) {
+                console.error('Error getting purchase invoices from Firebase:', error);
+                return [];
+            }
+        });
     }
 
     async deletePurchaseBill(invoiceNo) {
@@ -317,19 +341,19 @@ class Database {
 
     async getAllPurchasePayments() {
         this._checkInit();
-        if (this._cache.purchasePayments) return this._cache.purchasePayments;
-        try {
-            const querySnapshot = await this.firestore.collection('purchase_payments').get();
-            const payments = [];
-            querySnapshot.forEach((doc) => {
-                payments.push(doc.data());
-            });
-            this._cache.purchasePayments = payments;
-            return payments;
-        } catch (error) {
-            console.error('Error getting all purchase payments from Firebase:', error);
-            return [];
-        }
+        return this._fetchWithPromiseCache('purchasePayments', async () => {
+            try {
+                const querySnapshot = await this.firestore.collection('purchase_payments').get();
+                const payments = [];
+                querySnapshot.forEach((doc) => {
+                    payments.push(doc.data());
+                });
+                return payments;
+            } catch (error) {
+                console.error('Error getting all purchase payments from Firebase:', error);
+                return [];
+            }
+        });
     }
 
     async getPurchasePaymentsByInvoice(invoiceNo) {
@@ -664,26 +688,25 @@ class Database {
     // Get all invoices
     async getAllInvoices() {
         this._checkInit();
-        if (this._cache.invoices) return this._cache.invoices;
-        try {
-            const querySnapshot = await this.firestore.collection('invoices').get();
-            const invoices = [];
-            querySnapshot.forEach((doc) => {
-                invoices.push(doc.data());
-            });
+        return this._fetchWithPromiseCache('invoices', async () => {
+            try {
+                const querySnapshot = await this.firestore.collection('invoices').get();
+                const invoices = [];
+                querySnapshot.forEach((doc) => {
+                    invoices.push(doc.data());
+                });
 
-            // Sort by invoice date descending (newest first)
-            const sortedInvoices = invoices.sort((a, b) => {
-                const dateA = a.invoiceDate ? new Date(a.invoiceDate) : new Date(0);
-                const dateB = b.invoiceDate ? new Date(b.invoiceDate) : new Date(0);
-                return dateB - dateA;
-            });
-            this._cache.invoices = sortedInvoices;
-            return sortedInvoices;
-        } catch (error) {
-            console.error('Error getting all invoices from Firebase:', error);
-            throw error;
-        }
+                // Sort by invoice date descending (newest first)
+                return invoices.sort((a, b) => {
+                    const dateA = a.invoiceDate ? new Date(a.invoiceDate) : new Date(0);
+                    const dateB = b.invoiceDate ? new Date(b.invoiceDate) : new Date(0);
+                    return dateB - dateA;
+                });
+            } catch (error) {
+                console.error('Error getting all invoices from Firebase:', error);
+                throw error;
+            }
+        });
     }
 
     // Get invoice by invoice number
@@ -756,19 +779,19 @@ class Database {
     // Get all payments
     async getAllPayments() {
         this._checkInit();
-        if (this._cache.payments) return this._cache.payments;
-        try {
-            const querySnapshot = await this.firestore.collection('payments').get();
-            const payments = [];
-            querySnapshot.forEach((doc) => {
-                payments.push(doc.data());
-            });
-            this._cache.payments = payments;
-            return payments;
-        } catch (error) {
-            console.error('Error getting all payments from Firebase:', error);
-            return [];
-        }
+        return this._fetchWithPromiseCache('payments', async () => {
+            try {
+                const querySnapshot = await this.firestore.collection('payments').get();
+                const payments = [];
+                querySnapshot.forEach((doc) => {
+                    payments.push(doc.data());
+                });
+                return payments;
+            } catch (error) {
+                console.error('Error getting all payments from Firebase:', error);
+                return [];
+            }
+        });
     }
 
     // In your db.js - Update the deleteInvoice method
@@ -941,19 +964,19 @@ class Database {
     // Get all returns
     async getAllReturns() {
         this._checkInit();
-        if (this._cache.returns) return this._cache.returns;
-        try {
-            const querySnapshot = await this.firestore.collection('returns').get();
-            const returns = [];
-            querySnapshot.forEach((doc) => {
-                returns.push(doc.data());
-            });
-            this._cache.returns = returns;
-            return returns;
-        } catch (error) {
-            console.error('Error getting all returns from Firebase:', error);
-            return [];
-        }
+        return this._fetchWithPromiseCache('returns', async () => {
+            try {
+                const querySnapshot = await this.firestore.collection('returns').get();
+                const returns = [];
+                querySnapshot.forEach((doc) => {
+                    returns.push(doc.data());
+                });
+                return returns;
+            } catch (error) {
+                console.error('Error getting all returns from Firebase:', error);
+                return [];
+            }
+        });
     }
 
     // Migration function to export existing IndexedDB data
@@ -1451,19 +1474,19 @@ class Database {
 
     async getAllPurchaseReturns() {
         this._checkInit();
-        if (this._cache.purchaseReturns) return this._cache.purchaseReturns;
-        try {
-            const querySnapshot = await this.firestore.collection('purchaseReturns').get();
-            const returns = [];
-            querySnapshot.forEach((doc) => {
-                returns.push(doc.data());
-            });
-            this._cache.purchaseReturns = returns;
-            return returns;
-        } catch (error) {
-            console.error('Error getting all purchase returns:', error);
-            throw error;
-        }
+        return this._fetchWithPromiseCache('purchaseReturns', async () => {
+            try {
+                const querySnapshot = await this.firestore.collection('purchaseReturns').get();
+                const returns = [];
+                querySnapshot.forEach((doc) => {
+                    returns.push(doc.data());
+                });
+                return returns;
+            } catch (error) {
+                console.error('Error getting all purchase returns:', error);
+                throw error;
+            }
+        });
     }
 
     async deletePurchaseReturn(returnId) {
