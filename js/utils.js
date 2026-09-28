@@ -194,14 +194,27 @@ class Utils {
 
         // Check if at least one product has description
         let hasProduct = false;
+        let allProductsValid = true;
         document.querySelectorAll('.product-description').forEach(input => {
-            if (input.value.trim()) {
+            const desc = input.value.trim();
+            if (desc) {
                 hasProduct = true;
+                if (window.globalShortcutsCache) {
+                    const shortcut = window.globalShortcutsCache.find(s => s.fullDescription.toLowerCase().trim() === desc.toLowerCase());
+                    if (!shortcut) {
+                        allProductsValid = false;
+                    }
+                }
             }
         });
 
         if (!hasProduct) {
             Utils.showToast('Empty Bill', 'Please add at least one item to the bill before saving or generating.', 'error');
+            return false;
+        }
+
+        if (!allProductsValid) {
+            Utils.showToast('Invalid Product', 'Please select products only from the suggestions list.', 'error');
             return false;
         }
 

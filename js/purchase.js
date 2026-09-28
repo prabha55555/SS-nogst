@@ -237,6 +237,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Gather products
             const products = [];
+            const shortcuts = await getAllShortcuts();
+            let allProductsValid = true;
             const rows = document.querySelectorAll('#productTableBody tr');
             for (const row of rows) {
                 const description = row.querySelector('.product-description').value.trim();
@@ -244,12 +246,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const rate = parseFloat(row.querySelector('.rate').value) || 0;
 
                 if (description && qty > 0) {
+                    const isValid = shortcuts.some(s => s.fullDescription.toLowerCase().trim() === description.toLowerCase());
+                    if (!isValid) {
+                        allProductsValid = false;
+                    }
                     products.push({ description, qty, rate, amount: qty * rate });
                 }
             }
 
             if (products.length === 0) {
                 showMessage("Please add at least one product with a valid quantity.", "error");
+                return;
+            }
+
+            if (!allProductsValid) {
+                showMessage("Please select products only from the suggestions list.", "error");
                 return;
             }
 
@@ -675,6 +686,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const grandTotal = document.getElementById('grandTotal').textContent;
 
             const products = [];
+            const shortcuts = await getAllShortcuts();
+            let allProductsValid = true;
             const rows = document.querySelectorAll('#productTableBody tr');
             for (const row of rows) {
                 const description = row.querySelector('.product-description').value.trim();
@@ -682,12 +695,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const rate = parseFloat(row.querySelector('.rate').value) || 0;
 
                 if (description && qty > 0) {
+                    const isValid = shortcuts.some(s => s.fullDescription.toLowerCase().trim() === description.toLowerCase());
+                    if (!isValid) {
+                        allProductsValid = false;
+                    }
                     products.push({ description, qty, rate, amount: qty * rate });
                 }
             }
 
             if (products.length === 0) {
                 showMessage("Please add at least one product before sharing.", "error");
+                return;
+            }
+
+            if (!allProductsValid) {
+                showMessage("Please select products only from the suggestions list.", "error");
                 return;
             }
 

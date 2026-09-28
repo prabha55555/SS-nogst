@@ -143,9 +143,13 @@ class ShortcutManager {
     }
 
     async addShortcut() {
-        const shortcutKey = document.getElementById('shortcutKey').value.trim();
-        const fullDescription = document.getElementById('fullDescription').value.trim();
+        let shortcutKey = document.getElementById('shortcutKey').value.trim();
+        let fullDescription = document.getElementById('fullDescription').value.trim();
         const purchaseRate = parseFloat(document.getElementById('purchaseRate').value) || 0;
+
+        if (fullDescription) {
+            fullDescription = fullDescription.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+        }
 
         if (!shortcutKey || !fullDescription) {
             Utils.showToast('Warning', 'Please enter both shortcut key and full description', 'warning');
@@ -331,9 +335,13 @@ class ShortcutManager {
     }
 
     async saveEdit() {
-        const shortcutKey = document.getElementById('editShortcutKey').value.trim();
-        const fullDescription = document.getElementById('editFullDescription').value.trim();
+        let shortcutKey = document.getElementById('editShortcutKey').value.trim();
+        let fullDescription = document.getElementById('editFullDescription').value.trim();
         const purchaseRate = parseFloat(document.getElementById('editPurchaseRate').value) || 0;
+
+        if (fullDescription) {
+            fullDescription = fullDescription.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+        }
 
         if (!shortcutKey || !fullDescription) {
             Utils.showToast('Warning', 'Please enter both shortcut key and full description', 'warning');
