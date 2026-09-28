@@ -1109,6 +1109,7 @@ async function displayInvoices(invoices) {
 
             return {
                 ...invoice,
+                returns,
                 totalReturns,
                 adjustedBalanceDue,
                 payments,

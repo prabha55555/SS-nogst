@@ -1063,6 +1063,14 @@ async function displayInvoices(invoices) {
         returnsByInvoice[r.invoiceNo].push(r);
     });
 
+    // OPTIMIZATION: Fetch all payments once
+    const allPayments = await db.getAllPayments();
+    const paymentsByInvoice = {};
+    allPayments.forEach(p => {
+        if (!paymentsByInvoice[p.invoiceNo]) paymentsByInvoice[p.invoiceNo] = [];
+        paymentsByInvoice[p.invoiceNo].push(p);
+    });
+
     // Determine the latest invoice for each customer to show "Add Payment" only for the latest bill
     const allGlobalInvoices = await db.getAllInvoices();
     allGlobalInvoices.sort((a, b) => {
@@ -1085,14 +1093,17 @@ async function displayInvoices(invoices) {
 
     // Generate HTML for each date group
     for (const group of groupedInvoices) {
-        // Calculate returns for all invoices in this date group first
+        // Calculate returns and payments for all invoices in this date group first
         const invoicesWithReturns = group.invoices.map((invoice) => {
             const returns = returnsByInvoice[invoice.invoiceNo] || [];
+            const payments = paymentsByInvoice[invoice.invoiceNo] || [];
             const totalReturns = returns.reduce((sum, r) => sum + (parseFloat(r.returnAmount) || 0), 0);
             const adjustedBalanceDue = invoice.balanceDue - totalReturns;
 
             return {
                 ...invoice,
+                returns,
+                payments,
                 totalReturns,
                 adjustedBalanceDue,
                 isCurrentAdjustedBalance: true
