@@ -69,14 +69,14 @@ function displaySuppliers(suppliers) {
                 <span id="display-address-${safeId}">${escapeHtml(s.address || 'N/A')}</span>
                 <input id="edit-address-${safeId}" type="text" value="${escapeHtml(s.address || '')}" style="display:none; width:100%; padding:4px;">
             </td>
-            <td>
-                <button class="btn-primary" id="edit-btn-${safeId}" onclick="startEdit('${safeId}')" style="padding: 5px 10px;">
+            <td style="white-space: nowrap; text-align: center;">
+                <button class="btn-primary" id="edit-btn-${safeId}" onclick="startEdit('${safeId}')" style="padding: 6px 12px; width: 85px; text-align: center;">
                     <i class="fas fa-edit"></i> Edit
                 </button>
-                <button class="btn-primary" id="save-btn-${safeId}" onclick="saveEdit('${safeId}', '${escapeHtml(s.phone)}', '${escapeHtml(s.name)}')" style="display:none; background-color: #2ecc71; padding: 5px 10px;">
+                <button class="btn-primary" id="save-btn-${safeId}" onclick="saveEdit('${safeId}', '${escapeHtml(s.phone)}', '${escapeHtml(s.name)}')" style="display:none; background-color: #2ecc71; padding: 6px 12px; width: 85px; text-align: center;">
                     <i class="fas fa-save"></i> Save
                 </button>
-                <button class="btn-danger" onclick="deleteSupplier('${escapeHtml(s.phone)}')" style="padding: 5px 10px; margin-left: 5px;">
+                <button class="btn-danger" onclick="deleteSupplier('${escapeHtml(s.phone)}')" style="padding: 6px 12px; width: 85px; text-align: center; margin-left: 5px;">
                     <i class="fas fa-trash"></i> Delete
                 </button>
             </td>
