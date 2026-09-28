@@ -145,7 +145,6 @@ class ShortcutManager {
     async addShortcut() {
         let shortcutKey = document.getElementById('shortcutKey').value.trim();
         let fullDescription = document.getElementById('fullDescription').value.trim();
-        const purchaseRate = parseFloat(document.getElementById('purchaseRate').value) || 0;
 
         if (fullDescription) {
             fullDescription = fullDescription.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
@@ -170,7 +169,6 @@ class ShortcutManager {
             const shortcutData = {
                 shortcutKey: shortcutKey.toUpperCase(),
                 fullDescription: fullDescription,
-                purchaseRate: purchaseRate,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
 
@@ -179,7 +177,6 @@ class ShortcutManager {
             // Clear form
             document.getElementById('shortcutKey').value = '';
             document.getElementById('fullDescription').value = '';
-            document.getElementById('purchaseRate').value = '';
             
             // Reload shortcuts (this will include the table skeleton while loading)
             await this.loadShortcuts();
@@ -275,12 +272,10 @@ class ShortcutManager {
         }
 
         tableBody.innerHTML = shortcuts.map(shortcut => {
-            const purchaseRate = parseFloat(shortcut.purchaseRate || shortcut.rateAmount || 0);
             return `
             <tr>
                 <td><strong>${this.escapeHtml(shortcut.shortcutKey)}</strong></td>
                 <td>${this.escapeHtml(shortcut.fullDescription)}</td>
-                <td>₹${purchaseRate.toFixed(2)}</td>
                 <td>
                     <div class="action-buttons">
                         <button class="btn-edit" onclick="shortcutManager.editShortcut('${shortcut.shortcutKey}')">
@@ -304,8 +299,6 @@ class ShortcutManager {
                 this.currentEditId = shortcutKey;
                 document.getElementById('editShortcutKey').value = shortcut.shortcutKey;
                 document.getElementById('editFullDescription').value = shortcut.fullDescription;
-                const purchase = parseFloat(shortcut.purchaseRate || shortcut.rateAmount || 0);
-                document.getElementById('editPurchaseRate').value = purchase;
                 document.getElementById('editModal').style.display = 'block';
             }
             
@@ -337,7 +330,6 @@ class ShortcutManager {
     async saveEdit() {
         let shortcutKey = document.getElementById('editShortcutKey').value.trim();
         let fullDescription = document.getElementById('editFullDescription').value.trim();
-        const purchaseRate = parseFloat(document.getElementById('editPurchaseRate').value) || 0;
 
         if (fullDescription) {
             fullDescription = fullDescription.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
@@ -361,7 +353,6 @@ class ShortcutManager {
             const shortcutData = {
                 shortcutKey: shortcutKey.toUpperCase(),
                 fullDescription: fullDescription,
-                purchaseRate: purchaseRate,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
 

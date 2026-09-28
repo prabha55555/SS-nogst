@@ -437,16 +437,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const selectedItem = dropdown.querySelector('.autocomplete-item.highlighted');
                     if (selectedItem) {
                         input.value = selectedItem.dataset.full;
-                        const row = input.closest('tr');
-                        if (row && selectedItem.dataset.rate) {
-                            const rateInput = row.querySelector('.rate');
-                            if (rateInput) {
-                                rateInput.value = selectedItem.dataset.rate;
-                                const qty = parseFloat(row.querySelector('.qty').value) || 0;
-                                const rate = parseFloat(rateInput.value) || 0;
-                                row.querySelector('.amount').textContent = (qty * rate).toFixed(2); updateCalculations();
-                            }
-                        }
                         dropdown.style.display = 'none';
                         input.dispatchEvent(new Event('input', { bubbles: true }));
                     }
@@ -493,16 +483,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const selectedItem = dropdown.querySelector('.autocomplete-item.highlighted');
                     if (selectedItem) {
                         input.value = selectedItem.dataset.full;
-                        const row = input.closest('tr');
-                        if (row && selectedItem.dataset.rate) {
-                            const rateInput = row.querySelector('.rate');
-                            if (rateInput) {
-                                rateInput.value = selectedItem.dataset.rate;
-                                const qty = parseFloat(row.querySelector('.qty').value) || 0;
-                                const rate = parseFloat(rateInput.value) || 0;
-                                row.querySelector('.amount').textContent = (qty * rate).toFixed(2); updateCalculations();
-                            }
-                        }
                         dropdown.style.display = 'none';
                         input.dispatchEvent(new Event('input', { bubbles: true }));
                     }
@@ -571,7 +551,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (matches.length > 0) {
                 dropdown.innerHTML = matches.map(shortcut => `
-                    <div class="autocomplete-item" data-shortcut="${shortcut.shortcutKey}" data-full="${shortcut.fullDescription}" data-rate="${shortcut.purchaseRate || shortcut.rateAmount || 0}">
+                    <div class="autocomplete-item" data-shortcut="${shortcut.shortcutKey}" data-full="${shortcut.fullDescription}">
                         <strong>${shortcut.shortcutKey}</strong> → ${shortcut.fullDescription}
                     </div>
                 `).join('');
@@ -582,16 +562,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     item.addEventListener('mousedown', (e) => {
                         e.preventDefault();
                         input.value = item.dataset.full;
-                        const row = input.closest('tr');
-                        if (row && item.dataset.rate) {
-                            const rateInput = row.querySelector('.rate');
-                            if (rateInput) {
-                                rateInput.value = item.dataset.rate;
-                                const qty = parseFloat(row.querySelector('.qty').value) || 0;
-                                const rate = parseFloat(rateInput.value) || 0;
-                                row.querySelector('.amount').textContent = (qty * rate).toFixed(2); updateCalculations();
-                            }
-                        }
                         dropdown.style.display = 'none';
                         input.dispatchEvent(new Event('input', { bubbles: true }));
                     });

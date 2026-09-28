@@ -29,7 +29,7 @@
                     <i class="fas fa-bolt"></i> Product Shortcuts
                 </a>
                 <a href="stocks.html" class="nav-btn"><i class="fas fa-boxes"></i> Available Stocks</a>
-                <a href="revenue.html" class="nav-btn"><i class="fas fa-chart-line"></i> Revenue</a>
+
                 <a href="expenses.html" class="nav-btn"><i class="fas fa-money-bill-wave"></i> Other Expenses</a>
             </div>
         </div>
@@ -52,10 +52,6 @@
                             <input type="text" id="fullDescription"
                                 placeholder="e.g., Loopknit, Lycra Derby, Single Jersey">
                         </div>
-                        <div class="form-group">
-                            <label for="purchaseRate">Purchase Rate:</label>
-                            <input type="number" id="purchaseRate" placeholder="0.00" min="0" step="0.01">
-                        </div>
 
                         <button id="addShortcut" class="btn-primary">
                             <i class="fas fa-plus"></i> Add Shortcut
@@ -75,7 +71,6 @@
                                 <tr>
                                     <th>Shortcut Key</th>
                                     <th>Full Description</th>
-                                    <th>Purchase Rate</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -102,18 +97,6 @@
                 <div class="form-group">
                     <label for="editFullDescription">Full Description:</label>
                     <input type="text" id="editFullDescription">
-                </div>
-                <div class="form-group">
-                    <label for="editPurchaseRate">Purchase Rate:</label>
-                    <input type="number" id="editPurchaseRate" min="0" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="editSaleRate">Sale Rate:</label>
-                    <input type="number" id="editSaleRate" min="0" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="editProfit">Profit:</label>
-                    <input type="number" id="editProfit" placeholder="0.00" readonly>
                 </div>
             </div>
             <div class="modal-footer">

@@ -582,18 +582,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Add event listeners
         document.getElementById('addRow').addEventListener('click', addProductRow);
         
-        // Track active row for product info panel
-        document.getElementById('productTableBody').addEventListener('focusin', function(e) {
-            const row = e.target.closest('tr');
-            if (row) {
-                Utils.activeRow = row;
-                Utils.updateActiveProductDetails();
-            }
-        });
+        // Removed active product details tracking
         
-        // Also track input events on the table to update active info live
+        // Handle input events on the table for dynamic calculations
         document.getElementById('productTableBody').addEventListener('input', function(e) {
-            Utils.updateCalculations(); // This will also call updateActiveProductDetails
+            Utils.updateCalculations();
         });
 
         document.getElementById('saveBill').addEventListener('click', saveBill);
