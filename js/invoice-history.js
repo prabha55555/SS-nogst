@@ -1116,6 +1116,9 @@ async function displayInvoices(invoices) {
 
         // Add individual invoices for this date
         htmlContent += invoicesWithReturns.map(invoice => {
+            const payments = invoice.payments || [];
+            const returns = invoice.returns || [];
+
             // Calculate previous bill amount
             const previousBillAmount = (invoice.previousBalance || 0) + (invoice.manualPreviousBalance || 0);
 
@@ -1173,18 +1176,68 @@ async function displayInvoices(invoices) {
                         </button>
                     </div>
                     ${(invoice.amountPaid > 0 || invoice.totalReturns > 0) ? `
-                    <div class="secondary-actions">
-                        ${invoice.amountPaid > 0 ? `
-                            <button class="btn-payment-history" onclick="viewPaymentHistory('${invoice.invoiceNo}')">
-                                <i class="fas fa-history"></i> Payment History (₹${Utils.formatCurrency(invoice.amountPaid)})
-                            </button>
-                        ` : ''}
-                        ${invoice.totalReturns > 0 ? `
-                            <button class="btn-return-status" onclick="viewReturnStatus('${invoice.invoiceNo}')">
-                                <i class="fas fa-history"></i> View/Undo Returns (₹${Utils.formatCurrency(invoice.totalReturns)})
-                            </button>
-                        ` : ''}
-                    </div>
+                    <div class="history-details-container" style="margin-top: 15px; padding-top: 10px;">
+                          ${invoice.amountPaid > 0 ? `
+                          <details class="payment-history-details" style="margin-bottom: 10px;">
+                              <summary style="cursor: pointer; color: #2e7d32; font-weight: 600; padding: 5px; background: #e8f5e9; border-radius: 4px; display: inline-block;">
+                                  <i class="fas fa-history"></i> Payment History (&#8377;${Utils.formatCurrency(invoice.amountPaid)})
+                              </summary>
+                              <div style="margin-top: 10px; font-size: 0.9em; border: 1px solid #c8e6c9; padding: 10px; border-radius: 4px; background: #fff;">
+                                  ${payments.map(payment => `
+                                      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px; margin-bottom: 8px;">
+                                          <div>
+                                              <div><strong>Date:</strong> ${new Date(payment.paymentDate || payment.date).toLocaleString('en-IN')}</div>
+                                              <div style="color: #2e7d32; font-weight: bold;"><strong>Amount:</strong> &#8377;${Utils.formatCurrency(payment.amount)}</div>
+                                              <div><strong>Method:</strong> ${payment.paymentMethod ? payment.paymentMethod.toUpperCase() : 'N/A'}</div>
+                                              ${payment.notes ? `<div><strong>Notes:</strong> ${payment.notes}</div>` : ''}
+                                              ${payment.paymentType === 'initial' ? '<span class="badge" style="background-color: #007bff; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em;">Initial Payment</span>' : ''}
+                                          </div>
+                                          <button onclick="undoPayment('${payment.id}', '${invoice.invoiceNo}')" style="background: none; border: none; color: #dc3545; cursor: pointer; padding: 5px;" title="Undo Payment">
+                                              <i class="fas fa-undo"></i>
+                                          </button>
+                                      </div>
+                                  `).join('')}
+                                  <div style="margin-top: 10px; font-weight: bold; color: #2e7d32;">
+                                      Total Amount Paid: &#8377;${Utils.formatCurrency(payments.reduce((sum, p) => sum + p.amount, 0))}
+                                  </div>
+                                  <div style="margin-top: 10px;">
+                                      <button onclick="undoAllPayments('${invoice.invoiceNo}')" style="background: #fff3f3; color: #dc3545; border: 1px solid #dc3545; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
+                                          <i class="fas fa-trash-restore"></i> Undo All Payments
+                                      </button>
+                                  </div>
+                              </div>
+                          </details>
+                          ` : ''}
+                          ${invoice.totalReturns > 0 ? `
+                          <details class="return-history-details">
+                              <summary style="cursor: pointer; color: #dc3545; font-weight: 600; padding: 5px; background: #ffebee; border-radius: 4px; display: inline-block;">
+                                  <i class="fas fa-history"></i> Return History (&#8377;${Utils.formatCurrency(invoice.totalReturns)})
+                              </summary>
+                              <div style="margin-top: 10px; font-size: 0.9em; border: 1px solid #ffcdd2; padding: 10px; border-radius: 4px; background: #fff;">
+                                  ${returns.map(ret => `
+                                      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f5c6cb; padding-bottom: 8px; margin-bottom: 8px;">
+                                          <div>
+                                              <div><strong>Date:</strong> ${new Date(ret.returnDate || ret.date).toLocaleString('en-IN')}</div>
+                                              <div style="color: #dc3545; font-weight: bold;"><strong>Amount:</strong> -&#8377;${Utils.formatCurrency(ret.returnAmount)}</div>
+                                              <div><strong>Reason:</strong> ${ret.reason || 'N/A'}</div>
+                                          </div>
+                                          <button onclick="undoReturn('${ret.id}', '${invoice.invoiceNo}')" style="background: none; border: none; color: #dc3545; cursor: pointer; padding: 5px;" title="Undo Return">
+                                              <i class="fas fa-undo"></i>
+                                          </button>
+                                      </div>
+                                  `).join('')}
+                                  <div style="margin-top: 10px; font-weight: bold; color: #dc3545;">
+                                      Total Return Amount: -&#8377;${Utils.formatCurrency(returns.reduce((sum, r) => sum + (parseFloat(r.returnAmount) || 0), 0))}
+                                  </div>
+                                  <div style="margin-top: 10px;">
+                                      <button onclick="undoAllReturns('${invoice.invoiceNo}')" style="background: #fff; color: #dc3545; border: 1px solid #dc3545; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
+                                          <i class="fas fa-trash-restore"></i> Undo All Returns
+                                      </button>
+                                  </div>
+                              </div>
+                          </details>
+                          ` : ''}
+                      </div>
                     ` : ''}
                 </div>
             </div>
