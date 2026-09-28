@@ -1182,24 +1182,14 @@ async function displayInvoices(invoices) {
                             </tbody>
                         </table>
                     </details>
-                </div>
-                <div class="invoice-actions-container">
-                    <div class="primary-actions">
-                        <button class="btn-edit" onclick="editInvoice('${invoice.invoiceNo}')">Edit</button>
-                        <button class="btn-delete" onclick="deletePurchaseBill('${invoice.invoiceNo}')">Delete</button>
-                        ${invoice.invoiceNo === latestInvoicePersupplier[invoice.supplierName] ? 
-                            `<button class="btn-payment" onclick="addPayment('${invoice.invoiceNo}')">Add Payment</button>` : ''}
-                        <button class="btn-return" onclick="addReturn('${invoice.invoiceNo}')">Add Return</button>
-                        <button class="btn-statement" onclick="generateStatement('${invoice.invoiceNo}')">Download Statement</button>
-                    </div>
                     ${(amountPaid > 0 || invoice.totalReturns > 0) ? `
-                    <div class="history-details-container" style="margin-top: 15px; padding-top: 10px;">
+                    <div class="history-details-container" style="margin-top: 10px;">
                           ${invoice.amountPaid > 0 ? `
-                          <details class="payment-history-details" style="margin-bottom: 10px;">
-                              <summary style="cursor: pointer; color: #2e7d32; font-weight: 600; padding: 5px; background: #e8f5e9; border-radius: 4px; display: inline-block;">
-                                  <i class="fas fa-history"></i> Payment History (&#8377;${Utils.formatCurrency(invoice.amountPaid)})
+                          <details class="payment-history-details" style="margin-bottom: 5px;">
+                              <summary style="cursor: pointer; color: #2e7d32; font-weight: 600;">
+                                  Payment History (&#8377;${Utils.formatCurrency(invoice.amountPaid)})
                               </summary>
-                              <div style="margin-top: 10px; font-size: 0.9em; border: 1px solid #c8e6c9; padding: 10px; border-radius: 4px; background: #fff;">
+                              <div style="margin-top: 5px; font-size: 0.9em; border: 1px solid #c8e6c9; padding: 10px; border-radius: 4px; background: #fff;">
                                   ${payments.map(payment => `
                                       <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px; margin-bottom: 8px;">
                                           <div>
@@ -1226,11 +1216,11 @@ async function displayInvoices(invoices) {
                           </details>
                           ` : ''}
                           ${invoice.totalReturns > 0 ? `
-                          <details class="return-history-details">
-                              <summary style="cursor: pointer; color: #dc3545; font-weight: 600; padding: 5px; background: #ffebee; border-radius: 4px; display: inline-block;">
-                                  <i class="fas fa-history"></i> Return History (&#8377;${Utils.formatCurrency(invoice.totalReturns)})
+                          <details class="return-history-details" style="margin-bottom: 5px;">
+                              <summary style="cursor: pointer; color: #dc3545; font-weight: 600;">
+                                  Return History (&#8377;${Utils.formatCurrency(invoice.totalReturns)})
                               </summary>
-                              <div style="margin-top: 10px; font-size: 0.9em; border: 1px solid #ffcdd2; padding: 10px; border-radius: 4px; background: #fff;">
+                              <div style="margin-top: 5px; font-size: 0.9em; border: 1px solid #ffcdd2; padding: 10px; border-radius: 4px; background: #fff;">
                                   ${returns.map(ret => `
                                       <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f5c6cb; padding-bottom: 8px; margin-bottom: 8px;">
                                           <div>
@@ -1256,6 +1246,16 @@ async function displayInvoices(invoices) {
                           ` : ''}
                       </div>
                     ` : ''}
+                </div>
+                <div class="invoice-actions-container">
+                    <div class="primary-actions">
+                        <button class="btn-edit" onclick="editInvoice('${invoice.invoiceNo}')">Edit</button>
+                        <button class="btn-delete" onclick="deletePurchaseBill('${invoice.invoiceNo}')">Delete</button>
+                        ${invoice.invoiceNo === latestInvoicePersupplier[invoice.supplierName] ? 
+                            `<button class="btn-payment" onclick="addPayment('${invoice.invoiceNo}')">Add Payment</button>` : ''}
+                        <button class="btn-return" onclick="addReturn('${invoice.invoiceNo}')">Add Return</button>
+                        <button class="btn-statement" onclick="generateStatement('${invoice.invoiceNo}')">Download Statement</button>
+                    </div>
                 </div>
             </div>
             `;
