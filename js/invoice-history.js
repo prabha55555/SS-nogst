@@ -1563,34 +1563,27 @@ async function addPayment(invoiceNo) {
         <div class="payment-dialog">
             <h3>Add Payment - Invoice #${invoiceNo}</h3>
             <div class="payment-form">
-                <div style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 8px 0; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e9ecef; border-left: 3px solid #28a745;">
-                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #495057; font-size: 13px; min-width: 100px;">
-                            <i class="fas fa-money-bill-wave" style="width: 16px; text-align: center; color: #6c757d;"></i>
-                            CASH:
-                        </div>
-                        <input type="number" id="cashPayment" step="0.01" min="0" placeholder="0.00" value="0" style="width: 120px; padding: 6px 8px; border: 1px solid #ced4da; border-radius: 4px; text-align: right; font-size: 13px;">
+                <div class="payment-methods-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin: 15px 0; padding: 15px; background: #f4f6f8; border-radius: 8px; border: 1px solid #e0e4e8;">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label style="font-size: 12px; font-weight: 600; color: #495057; display: flex; align-items: center; gap: 6px;"><i class="fas fa-money-bill-wave" style="color: #28a745;"></i> CASH</label>
+                        <input type="number" id="cashPayment" step="0.01" min="0" placeholder="0.00" value="0" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; text-align: right;">
                     </div>
                     
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 8px 0; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e9ecef; border-left: 3px solid #007bff;">
-                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #495057; font-size: 13px; min-width: 100px;">
-                            <i class="fas fa-mobile-alt" style="width: 16px; text-align: center; color: #6c757d;"></i>
-                            UPI:
-                        </div>
-                        <input type="number" id="upiPayment" step="0.01" min="0" placeholder="0.00" value="0" style="width: 120px; padding: 6px 8px; border: 1px solid #ced4da; border-radius: 4px; text-align: right; font-size: 13px;">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label style="font-size: 12px; font-weight: 600; color: #495057; display: flex; align-items: center; gap: 6px;"><i class="fas fa-mobile-alt" style="color: #007bff;"></i> UPI</label>
+                        <input type="number" id="upiPayment" step="0.01" min="0" placeholder="0.00" value="0" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; text-align: right;">
                     </div>
                     
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 8px 0; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e9ecef; border-left: 3px solid #6f42c1;">
-                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #495057; font-size: 13px; min-width: 100px;">
-                            <i class="fas fa-university" style="width: 16px; text-align: center; color: #6c757d;"></i>
-                            ACCOUNT:
-                        </div>
-                        <input type="number" id="accountPayment" step="0.01" min="0" placeholder="0.00" value="0" style="width: 120px; padding: 6px 8px; border: 1px solid #ced4da; border-radius: 4px; text-align: right; font-size: 13px;">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label style="font-size: 12px; font-weight: 600; color: #495057; display: flex; align-items: center; gap: 6px;"><i class="fas fa-university" style="color: #6f42c1;"></i> ACCOUNT</label>
+                        <input type="number" id="accountPayment" step="0.01" min="0" placeholder="0.00" value="0" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; text-align: right;">
                     </div>
                     
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding: 10px 12px; background: #e7f3ff; border-radius: 6px; border: 1px solid #b3d9ff; font-weight: bold; font-size: 14px;">
-                        <label style="color: #2c3e50;">Total Payment:</label>
-                        <span id="totalPaymentAmount" style="color: #007bff; font-size: 15px;">₹0.00</span>
+                    <div style="display: flex; flex-direction: column; justify-content: flex-end;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: #e7f3ff; padding: 8px 12px; border-radius: 4px; border: 1px solid #b3d9ff; height: 38px;">
+                            <span style="font-size: 13px; font-weight: bold; color: #2c3e50;">Total:</span>
+                            <span id="totalPaymentAmount" style="color: #007bff; font-weight: bold; font-size: 15px;">₹0.00</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -2143,39 +2136,39 @@ function addReturnItem(originalProducts = []) {
                 </button>
             </div>
             
-            <div class="return-item-fields">
-                <div class="form-group">
-                    <label for="productDescription${itemIndex}">Product Description:</label>
-                    <select id="productDescription${itemIndex}" class="product-description-select" onchange="updateReturnProductInfo(${itemIndex})">
+            <div class="return-item-fields" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; background: #f8f9fa; padding: 12px; border-radius: 6px; border: 1px solid #e9ecef; margin-bottom: 10px;">
+                <div class="form-group" style="flex: 3; min-width: 200px; margin-bottom: 0;">
+                    <label for="productDescription${itemIndex}" style="font-size: 12px;">Product Description:</label>
+                    <select id="productDescription${itemIndex}" class="product-description-select" onchange="updateReturnProductInfo(${itemIndex})" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px;">
                         <option value="">-- Select from invoice or enter custom --</option>
                         ${originalProducts.map(product =>
         `<option value="${product.description}" data-rate="${product.rate}" data-maxqty="${product.qty}">
-                                ${product.description} (Available: ${product.qty} @ ₹${Utils.formatCurrency(product.rate)})
+                                ${product.description} (Avail: ${product.qty} @ ₹${Utils.formatCurrency(product.rate)})
                             </option>`
     ).join('')}
                         <option value="custom">-- Enter Custom Product --</option>
                     </select>
-                    <input type="text" id="customProduct${itemIndex}" class="custom-product-input" placeholder="Enter custom product description" style="display: none;">
+                    <input type="text" id="customProduct${itemIndex}" class="custom-product-input" placeholder="Enter custom product" style="display: none; width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px; margin-top: 5px;">
                 </div>
 
-                <div class="form-group">
-                    <label for="returnQty${itemIndex}">Quantity:</label>
-                    <input type="number" id="returnQty${itemIndex}" class="return-qty" min="0" step="1" value="0" onchange="calculateReturnAmount(${itemIndex})">
+                <div class="form-group" style="flex: 1; min-width: 70px; margin-bottom: 0;">
+                    <label for="returnQty${itemIndex}" style="font-size: 12px;">Qty:</label>
+                    <input type="number" id="returnQty${itemIndex}" class="return-qty" min="0" step="1" value="0" onchange="calculateReturnAmount(${itemIndex})" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px;">
                 </div>
 
-                <div class="form-group">
-                    <label for="returnRate${itemIndex}">Rate (₹):</label>
-                    <input type="number" id="returnRate${itemIndex}" class="return-rate" min="0" step="0.01" value="0" onchange="calculateReturnAmount(${itemIndex})">
+                <div class="form-group" style="flex: 1.5; min-width: 90px; margin-bottom: 0;">
+                    <label for="returnRate${itemIndex}" style="font-size: 12px;">Rate (₹):</label>
+                    <input type="number" id="returnRate${itemIndex}" class="return-rate" min="0" step="0.01" value="0" onchange="calculateReturnAmount(${itemIndex})" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px;">
                 </div>
 
-                <div class="form-group">
-                    <label for="returnAmount${itemIndex}">Return Amount (₹):</label>
-                    <input type="number" id="returnAmount${itemIndex}" class="return-amount" readonly value="0">
+                <div class="form-group" style="flex: 1.5; min-width: 90px; margin-bottom: 0;">
+                    <label for="returnAmount${itemIndex}" style="font-size: 12px;">Amount (₹):</label>
+                    <input type="number" id="returnAmount${itemIndex}" class="return-amount" readonly value="0" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px; background: #e9ecef;">
                 </div>
 
-                <div class="form-group">
-                    <label for="returnReason${itemIndex}">Reason for Return:</label>
-                    <textarea id="returnReason${itemIndex}" class="return-reason" placeholder="Enter reason for return"></textarea>
+                <div class="form-group" style="flex: 2; min-width: 120px; margin-bottom: 0;">
+                    <label for="returnReason${itemIndex}" style="font-size: 12px;">Reason:</label>
+                    <input type="text" id="returnReason${itemIndex}" class="return-reason" placeholder="Reason for return" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px;">
                 </div>
             </div>
         </div>
