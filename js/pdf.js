@@ -209,7 +209,7 @@ class PDFGenerator {
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%) rotate(-45deg);
-                    font-size: 75px;
+                    font-size: 130px;
                     color: rgba(200, 200, 200, 0.15);
                     font-weight: 900;
                     white-space: pre;
@@ -442,7 +442,7 @@ class PDFGenerator {
                         <div class="company-details">
                             <h2>SANTHAMANI TEXTILES</h2>
 
-                            <p>No.16/1, 25A, Thirumalai Nagar South, 1st Street, TIRUPUR - 641 602. | <span style="white-space: nowrap;">CELL: 90872 93268</span></p>
+                            <p>No.16/1, 25A, Thirumalai Nagar South, 1st Street, TIRUPUR - 641 602. | <span style="white-space: nowrap;">CELL: 90872 93268, 9092779599</span></p>
                             
                         </div>
                     </div>
@@ -529,7 +529,7 @@ class PDFGenerator {
                     <div class="amount-in-words" style="flex: 1; margin-right: 20px; align-self: flex-end; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background: #fdfdfd;">
                         <p style="margin: 0 0 5px 0; font-size: 13px;"><strong>Amount in words:</strong></p>
                         <p style="margin: 0 0 15px 0; font-size: 13px; font-style: italic;">${Utils.numberToWords(invoiceData.grandTotal)}</p>
-                        <p style="margin: 0; font-weight: bold; font-size: 14px;">G-pay No : 90872 93268</p>
+                        <p style="margin: 0; font-weight: bold; font-size: 14px;">G-pay No : 90872 93268, 9092779599</p>
                     </div>
                     <div class="payment-calculation">
                         <h3>PAYMENT SUMMARY</h3>
@@ -837,7 +837,7 @@ class PDFGenerator {
 *CONTACT INFORMATION*
 ?? *SANTHAMANI TEXTILES*
 ?? Palladam
-?? 90872 93268
+?? 90872 93268, 9092779599
 
 _Automated invoice statement._`;
 

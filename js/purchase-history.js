@@ -340,7 +340,7 @@ async function generateCombinedPDFStatement(supplierName, invoices) {
             const logoBase64 = PDFGenerator.getImageBase64();
             // Watermark
             doc.setGState(new doc.GState({opacity: 0.1}));
-            doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 40, pageHeight / 2 - 40, 80, 80);
+            doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 75, pageHeight / 2 - 75, 150, 150);
             doc.setGState(new doc.GState({opacity: 1.0}));
             // Logo in header
             doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 15, yPos, 30, 25);
@@ -357,7 +357,7 @@ async function generateCombinedPDFStatement(supplierName, invoices) {
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...grayColor);
         doc.text('No.16/1, 25A, Thirumalai Nagar South, 1st Street, TIRUPUR - 641 602.', pageWidth / 2, yPos + 5, { align: 'center' });
-        doc.text('Cell: 90872 93268', pageWidth / 2, yPos + 10, { align: 'center' });
+        doc.text('Cell: 90872 93268, 9092779599', pageWidth / 2, yPos + 10, { align: 'center' });
 
         yPos += 20;
 
@@ -639,7 +639,7 @@ async function generateCombinedPDFStatement(supplierName, invoices) {
         doc.setTextColor(...grayColor);
         doc.text('This is a computer-generated statement. No signature is required.', pageWidth / 2, yPos, { align: 'center' });
         yPos += 4;
-        doc.text('For any queries, please contact: 90872 93268', pageWidth / 2, yPos, { align: 'center' });
+        doc.text('For any queries, please contact: 90872 93268, 9092779599', pageWidth / 2, yPos, { align: 'center' });
         yPos += 4;
         doc.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, pageWidth / 2, yPos, { align: 'center' });
         yPos += 4;
@@ -706,7 +706,7 @@ async function generateCombinedPDFStatementEasy(supplierName, invoices) {
             const logoBase64 = PDFGenerator.getImageBase64();
             // Watermark
             doc.setGState(new doc.GState({opacity: 0.1}));
-            doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 40, pageHeight / 2 - 40, 80, 80);
+            doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 75, pageHeight / 2 - 75, 150, 150);
             doc.setGState(new doc.GState({opacity: 1.0}));
             // Logo in header
             doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 15, yPos, 30, 25);
@@ -723,7 +723,7 @@ async function generateCombinedPDFStatementEasy(supplierName, invoices) {
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...grayColor);
         doc.text('No.16/1, 25A, Thirumalai Nagar South, 1st Street, TIRUPUR - 641 602.', pageWidth / 2, yPos + 5, { align: 'center' });
-        doc.text('Cell: 90872 93268', pageWidth / 2, yPos + 10, { align: 'center' });
+        doc.text('Cell: 90872 93268, 9092779599', pageWidth / 2, yPos + 10, { align: 'center' });
 
         yPos += 20;
 
@@ -894,7 +894,7 @@ async function generateCombinedPDFStatementEasy(supplierName, invoices) {
         doc.setTextColor(...grayColor);
         doc.text('This is a computer-generated statement. No signature is required.', pageWidth / 2, footerY, { align: 'center' });
         footerY += 4;
-        doc.text('For any queries, please contact: 90872 93268', pageWidth / 2, footerY, { align: 'center' });
+        doc.text('For any queries, please contact: 90872 93268, 9092779599', pageWidth / 2, footerY, { align: 'center' });
         footerY += 4;
         doc.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, pageWidth / 2, footerY, { align: 'center' });
 
@@ -1450,7 +1450,7 @@ ${invoicesWithReturns.map(invoice =>
 ────────────────────────────────
 🏢 *SANTHAMANI TEXTILES*
 📍 Palladam
-📞 *Phone: 90872 93268*
+📞 *Phone: 90872 93268, 9092779599*
 
 _This is an automated statement. Please contact us for any queries._`;
 
@@ -2594,7 +2594,7 @@ async function generatePDFStatement(invoiceData, payments, share = false) {
             const logoBase64 = PDFGenerator.getImageBase64();
             // Watermark
             doc.setGState(new doc.GState({opacity: 0.1}));
-            doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 40, pageHeight / 2 - 40, 80, 80);
+            doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 75, pageHeight / 2 - 75, 150, 150);
             doc.setGState(new doc.GState({opacity: 1.0}));
             // Logo in header
             doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 15, yPos, 30, 25);
@@ -2611,7 +2611,7 @@ async function generatePDFStatement(invoiceData, payments, share = false) {
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...grayColor);
         doc.text('No.16/1, 25A, Thirumalai Nagar South, 1st Street, TIRUPUR - 641 602.', pageWidth / 2, yPos + 5, { align: 'center' });
-        doc.text('Cell: 90872 93268', pageWidth / 2, yPos + 10, { align: 'center' });
+        doc.text('Cell: 90872 93268, 9092779599', pageWidth / 2, yPos + 10, { align: 'center' });
 
         yPos += 20;
 
@@ -2838,7 +2838,7 @@ async function generatePDFStatement(invoiceData, payments, share = false) {
         doc.setTextColor(...grayColor);
         doc.text('This is a computer-generated statement. No signature is required.', pageWidth / 2, yPos, { align: 'center' });
         yPos += 4;
-        doc.text('For any queries, please contact: 90872 93268', pageWidth / 2, yPos, { align: 'center' });
+        doc.text('For any queries, please contact: 90872 93268, 9092779599', pageWidth / 2, yPos, { align: 'center' });
         yPos += 4;
         doc.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, pageWidth / 2, yPos, { align: 'center' });
         yPos += 4;
@@ -3927,7 +3927,7 @@ async function generateCombinedSupplierPDFStatement(supplierName, invoices) {
             const logoBase64 = PDFGenerator.getImageBase64();
             // Watermark
             doc.setGState(new doc.GState({opacity: 0.1}));
-            doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 40, pageHeight / 2 - 40, 80, 80);
+            doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 75, pageHeight / 2 - 75, 150, 150);
             doc.setGState(new doc.GState({opacity: 1.0}));
             // Logo in header
             doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 15, yPos, 30, 25);
@@ -3944,7 +3944,7 @@ async function generateCombinedSupplierPDFStatement(supplierName, invoices) {
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...grayColor);
         doc.text('No.16/1, 25A, Thirumalai Nagar South, 1st Street, TIRUPUR - 641 602.', pageWidth / 2, yPos + 5, { align: 'center' });
-        doc.text('Cell: 90872 93268', pageWidth / 2, yPos + 10, { align: 'center' });
+        doc.text('Cell: 90872 93268, 9092779599', pageWidth / 2, yPos + 10, { align: 'center' });
 
         yPos += 20;
 
@@ -4224,7 +4224,7 @@ async function generatePDFStatement(invoiceData, payments, share = false) {
             const logoBase64 = PDFGenerator.getImageBase64();
             // Watermark
             doc.setGState(new doc.GState({opacity: 0.1}));
-            doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 40, pageHeight / 2 - 40, 80, 80);
+            doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 75, pageHeight / 2 - 75, 150, 150);
             doc.setGState(new doc.GState({opacity: 1.0}));
             // Logo in header
             doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 15, yPos, 30, 25);
@@ -4241,7 +4241,7 @@ async function generatePDFStatement(invoiceData, payments, share = false) {
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...grayColor);
         doc.text('No.16/1, 25A, Thirumalai Nagar South, 1st Street, TIRUPUR - 641 602.', pageWidth / 2, yPos + 5, { align: 'center' });
-        doc.text('Cell: 90872 93268', pageWidth / 2, yPos + 10, { align: 'center' });
+        doc.text('Cell: 90872 93268, 9092779599', pageWidth / 2, yPos + 10, { align: 'center' });
 
         yPos += 20;
 
