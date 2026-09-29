@@ -1207,11 +1207,7 @@ async function displayInvoices(invoices) {
                                   <div style="margin-top: 10px; font-weight: bold; color: #2e7d32;">
                                       Total Amount Paid: &#8377;${Utils.formatCurrency(payments.reduce((sum, p) => sum + p.amount, 0))}
                                   </div>
-                                  <div style="margin-top: 10px;">
-                                      <button onclick="undoAllPayments('${invoice.invoiceNo}')" style="background: #fff3f3; color: #dc3545; border: 1px solid #dc3545; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
-                                          <i class="fas fa-trash-restore"></i> Undo All Payments
-                                      </button>
-                                  </div>
+                                  
                               </div>
                           </details>
                           ` : ''}
@@ -1225,6 +1221,9 @@ async function displayInvoices(invoices) {
                                       <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f5c6cb; padding-bottom: 8px; margin-bottom: 8px;">
                                           <div>
                                               <div><strong>Date:</strong> ${new Date(ret.returnDate || ret.date).toLocaleString('en-IN')}</div>
+                                               ${ret.description ? `<div><strong>Product:</strong> ${ret.description}</div>` : ''}
+                                               ${ret.qty ? `<div><strong>Qty:</strong> ${ret.qty}</div>` : ''}
+                                               ${ret.rate ? `<div><strong>Rate:</strong> &#8377;${Utils.formatCurrency(ret.rate)}</div>` : ''}
                                               <div style="color: #dc3545; font-weight: bold;"><strong>Amount:</strong> -&#8377;${Utils.formatCurrency(ret.returnAmount)}</div>
                                               <div><strong>Reason:</strong> ${ret.reason || 'N/A'}</div>
                                           </div>
@@ -1236,11 +1235,7 @@ async function displayInvoices(invoices) {
                                   <div style="margin-top: 10px; font-weight: bold; color: #dc3545;">
                                       Total Return Amount: -&#8377;${Utils.formatCurrency(returns.reduce((sum, r) => sum + (parseFloat(r.returnAmount) || 0), 0))}
                                   </div>
-                                  <div style="margin-top: 10px;">
-                                      <button onclick="undoAllReturns('${invoice.invoiceNo}')" style="background: #fff; color: #dc3545; border: 1px solid #dc3545; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
-                                          <i class="fas fa-trash-restore"></i> Undo All Returns
-                                      </button>
-                                  </div>
+                                  
                               </div>
                           </details>
                           ` : ''}
@@ -1842,9 +1837,7 @@ async function viewPaymentHistory(invoiceNo) {
                     </div>
                     
                     <div class="bulk-actions">
-                        <button class="btn-undo-all-payments" onclick="undoAllPayments('${invoiceNo}')">
-                            <i class="fas fa-trash-restore"></i> Undo All Payments for This Invoice
-                        </button>
+                        
                     </div>
                 </div>
         `;
@@ -2429,9 +2422,7 @@ async function viewReturnStatus(invoiceNo) {
                     </div>
                     
                     <div class="bulk-actions">
-                        <button class="btn-undo-all-returns" onclick="undoAllReturns('${invoiceNo}')">
-                            <i class="fas fa-trash-restore"></i> Undo All Returns for This Invoice
-                        </button>
+                        
                     </div>
                 </div>
         `;
@@ -3614,9 +3605,7 @@ async function viewPaymentHistory(invoiceNo) {
                     </div>
                     
                     <div class="bulk-actions">
-                        <button class="btn-undo-all-payments" onclick="undoAllPayments('${invoiceNo}')">
-                            <i class="fas fa-trash-restore"></i> Undo All Payments for This Purchase Bill
-                        </button>
+                        
                     </div>
                 </div>
         `;
