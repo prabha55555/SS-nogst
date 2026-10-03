@@ -1159,21 +1159,69 @@ async function displayInvoices(invoices) {
                     <h3>Invoice #${String(invoice.invoiceNo).replace('P-','')}</h3>
                     <p><strong>supplier:</strong> ${invoice.supplierName}</p>
                     
-                    <p><strong>Current Bill Amount:</strong> ₹${Utils.formatCurrency(invoice.subtotal || invoice.grandTotal)}</p>
-                    <p><strong>Previous Balance:</strong> ₹${Utils.formatCurrency(previousBillAmount)}</p>
-                    ${invoice.discountAmount || invoice.discount ? `<p><strong>Discount Amount:</strong> -₹${Utils.formatCurrency(invoice.discountAmount || invoice.discount)}</p>` : ''}
-                    <p><strong>Total Amount:</strong> ₹${Utils.formatCurrency(invoice.grandTotal)}</p>
-                    ${payments.some(p => p.paymentType === 'initial') ? `<p><strong>Initial Amount Paid:</strong> ₹${Utils.formatCurrency(payments.filter(p => p.paymentType === 'initial').reduce((sum, p) => sum + p.amount, 0))}</p>` : ''}
-                    ${additionalPayments.length > 0 ? `<p><strong>Additional Amount Paid:</strong> ${additionalPaymentsStr}</p>` : ''}
-                    <p><strong>Total Amount Paid:</strong> ₹${Utils.formatCurrency(amountPaid)} 
-                        ${invoice.paymentMethod && payments.length === 0 ? `<span class="payment-method-badge payment-method-${invoice.paymentMethod}">${invoice.paymentMethod.toUpperCase()}</span>` : ''}
-                    </p>
-                    ${invoice.totalReturns > 0 ? `
-                        <p><strong>Return Amount:</strong> <span style="color: #dc3545;">-₹${Utils.formatCurrency(invoice.totalReturns)}</span></p>
-                        <p><strong>Current Adjusted Balance Due:</strong> ₹${Utils.formatCurrency(invoice.adjustedBalanceDue)}</p>
-                    ` : `
-                        <p><strong>Balance Due:</strong> ₹${Utils.formatCurrency(balanceDue)}</p>
-                    `}
+                    <div class="financial-summary-box" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 12px; margin-top: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #dee2e6;">
+                            <span style="color: #495057;">Current Bill Amount:</span>
+                            <span style="font-weight: 600;">₹${Utils.formatCurrency(invoice.subtotal || invoice.grandTotal)}</span>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="color: #495057;">Previous Balance:</span>
+                            <span style="font-weight: 600; color: #dc3545;">₹${Utils.formatCurrency(previousBillAmount)}</span>
+                        </div>
+
+                        ${invoice.discountAmount || invoice.discount ? `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="color: #495057;">Discount Amount:</span>
+                            <span style="font-weight: 600; color: #28a745;">-₹${Utils.formatCurrency(invoice.discountAmount || invoice.discount)}</span>
+                        </div>
+                        ` : ''}
+
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #ced4da;">
+                            <span style="color: #212529; font-weight: 600;">Total Amount:</span>
+                            <span style="font-weight: bold; color: #212529; font-size: 1.1em;">₹${Utils.formatCurrency(invoice.grandTotal)}</span>
+                        </div>
+
+                        <div style="background: #e8f5e9; padding: 10px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #c8e6c9;">
+                            ${payments.some(p => p.paymentType === 'initial') ? `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9em;">
+                                <span style="color: #2e7d32;">Initial Amount Paid:</span>
+                                <span style="font-weight: 600; color: #2e7d32;">₹${Utils.formatCurrency(payments.filter(p => p.paymentType === 'initial').reduce((sum, p) => sum + p.amount, 0))}</span>
+                            </div>
+                            ` : ''}
+                            
+                            ${additionalPayments.length > 0 ? `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9em;">
+                                <span style="color: #2e7d32;">Additional Amount Paid:</span>
+                                <span style="font-weight: 600; color: #2e7d32;">${additionalPaymentsStr}</span>
+                            </div>
+                            ` : ''}
+
+                            <div style="display: flex; justify-content: space-between; border-top: 1px solid #a5d6a7; padding-top: 6px; margin-top: ${payments.length > 0 ? '6px' : '0'};">
+                                <span style="color: #1b5e20; font-weight: 600;">Total Amount Paid:</span>
+                                <span style="font-weight: bold; color: #1b5e20;">
+                                    ₹${Utils.formatCurrency(amountPaid)}
+                                    ${invoice.paymentMethod && payments.length === 0 ? `<span class="badge" style="background-color: #28a745; margin-left: 5px; font-size: 0.75em; padding: 2px 6px; border-radius: 4px; color: white;">${invoice.paymentMethod.toUpperCase()}</span>` : ''}
+                                </span>
+                            </div>
+                        </div>
+
+                        ${invoice.totalReturns > 0 ? `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="color: #495057;">Return Amount:</span>
+                            <span style="font-weight: 600; color: #28a745;">-₹${Utils.formatCurrency(invoice.totalReturns)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 2px solid #dee2e6;">
+                            <span style="color: #dc3545; font-weight: bold; font-size: 1.1em;">Current Adjusted Balance Due:</span>
+                            <span style="font-weight: bold; color: #dc3545; font-size: 1.2em;">₹${Utils.formatCurrency(invoice.adjustedBalanceDue)}</span>
+                        </div>
+                        ` : `
+                        <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 2px solid #dee2e6;">
+                            <span style="color: #dc3545; font-weight: bold; font-size: 1.1em;">Balance Due:</span>
+                            <span style="font-weight: bold; color: #dc3545; font-size: 1.2em;">₹${Utils.formatCurrency(balanceDue)}</span>
+                        </div>
+                        `}
+                    </div>
                     <details class="view-products-details" style="margin-top: 10px;">
                         <summary style="cursor: pointer; color: var(--primary-color); font-weight: 600;">View Details</summary>
                         <table style="width: 100%; margin-top: 5px; font-size: 0.9em; border-collapse: collapse;">
