@@ -1,4 +1,4 @@
-﻿
+
 document.addEventListener('DOMContentLoaded', async () => {
     await db.init();
     await loadRevenueTracking();
@@ -35,20 +35,47 @@ async function loadRevenueTracking() {
         // Compute revenue and profit per bill
         const revenueData = invoices.map(invoice => {
             let totalCost = 0;
+            let totalBillProfit = 0;
+            let detailsHtml = '';
+            
             if (invoice.products && Array.isArray(invoice.products)) {
                 invoice.products.forEach(p => {
-                    totalCost += (parseFloat(p.qty) || 0) * getAvgCost(p.description);
+                    const desc = p.description || 'Unknown Item';
+                    const qty = parseFloat(p.qty) || 0;
+                    const sellingRate = parseFloat(p.rate) || 0;
+                    
+                    const costRate = getAvgCost(desc);
+                    const productCost = qty * costRate;
+                    totalCost += productCost;
+                    
+                    const profitPerUnit = sellingRate - costRate;
+                    const totalProfitForProduct = profitPerUnit * qty;
+                    totalBillProfit += totalProfitForProduct;
+                    
+                    detailsHtml += `<div style="margin-bottom: 4px; white-space: nowrap;">
+                        ${desc} (&#8377;${Utils.formatCurrency(sellingRate)} - &#8377;${Utils.formatCurrency(costRate)}) 
+                        &#8377;${Utils.formatCurrency(profitPerUnit)} &times; ${qty} = <strong>&#8377;${Utils.formatCurrency(totalProfitForProduct)}</strong>
+                    </div>`;
                 });
             }
             
-            const revenue = invoice.grandTotal || 0;
-            const profit = revenue - totalCost;
+            const discount = parseFloat(invoice.discountAmount) || parseFloat(invoice.discount) || 0;
+            if (discount > 0) {
+                detailsHtml += `<div style="margin-bottom: 4px; white-space: nowrap; color: #d32f2f;">
+                    Discount: -&#8377;${Utils.formatCurrency(discount)}
+                </div>`;
+            }
+            
+            const profit = totalBillProfit - discount;
             
             return {
                 billNo: String(invoice.invoiceNo).replace('INV-', ''),
                 rawBillNo: invoice.invoiceNo,
                 name: invoice.customerName || 'Unknown',
                 profit: profit,
+                revenue: invoice.subtotal || totalBillProfit + totalCost,
+                cost: totalCost,
+                detailsHtml: detailsHtml,
                 date: invoice.invoiceDate || invoice.date || 'Unknown'
             };
         });
@@ -65,6 +92,9 @@ async function loadRevenueTracking() {
                     <td><a href="sales.html?edit=${data.rawBillNo}" style="color: #2a5298; text-decoration: none; font-weight: bold; cursor: pointer;">#${data.billNo}</a></td>
                     <td>${data.date}</td>
                     <td>${data.name}</td>
+                    <td style="font-size: 0.85em; color: #333; line-height: 1.4;">
+                        ${data.detailsHtml}
+                    </td>
                     <td style="color: ${data.profit >= 0 ? '#2e7d32' : '#d32f2f'}; font-weight: 600;">
                         &#8377;${Utils.formatCurrency(data.profit)}
                     </td>
@@ -74,11 +104,11 @@ async function loadRevenueTracking() {
         });
         
         if (revenueData.length === 0) {
-            html = '<tr><td colspan="4" style="text-align:center;">No bills found.</td></tr>';
+            html = '<tr><td colspan="5" style="text-align:center;">No bills found.</td></tr>';
         } else {
             html += `
                 <tr style="background-color: #f8f9fa; font-weight: bold;">
-                    <td colspan="3" style="text-align: right;">Total Net Profit:</td>
+                    <td colspan="4" style="text-align: right;">Total Net Profit:</td>
                     <td style="color: ${totalProfit >= 0 ? '#2e7d32' : '#d32f2f'};">
                         &#8377;${Utils.formatCurrency(totalProfit)}
                     </td>
@@ -90,7 +120,7 @@ async function loadRevenueTracking() {
         
     } catch (error) {
         console.error("Error loading revenue:", error);
-        tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Error loading data.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:red;">Error loading data.</td></tr>';
     }
 }
 
