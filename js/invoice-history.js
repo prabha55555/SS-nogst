@@ -1133,6 +1133,18 @@ async function displayInvoices(invoices) {
             // Calculate previous bill amount
             const previousBillAmount = (invoice.previousBalance || 0) + (invoice.manualPreviousBalance || 0);
 
+            const additionalPayments = payments.filter(p => p.paymentType !== 'initial');
+            let additionalPaymentsStr = '';
+            if (additionalPayments.length > 0) {
+                if (additionalPayments.length > 1) {
+                    const amounts = additionalPayments.map(p => Utils.formatCurrency(p.amount));
+                    const total = additionalPayments.reduce((sum, p) => sum + p.amount, 0);
+                    additionalPaymentsStr = `${amounts.join(' + ')} = ₹${Utils.formatCurrency(total)}`;
+                } else {
+                    additionalPaymentsStr = `₹${Utils.formatCurrency(additionalPayments[0].amount)}`;
+                }
+            }
+
             return `
             <div class="invoice-item">
                 <div class="invoice-info">
@@ -1143,8 +1155,10 @@ async function displayInvoices(invoices) {
                     <p><strong>Previous Balance:</strong> ₹${Utils.formatCurrency(previousBillAmount)}</p>
                     ${invoice.discountAmount ? `<p><strong>Discount Amount:</strong> -₹${Utils.formatCurrency(invoice.discountAmount)}</p>` : ''}
                     <p><strong>Total Amount:</strong> ₹${Utils.formatCurrency(invoice.grandTotal)}</p>
-                    <p><strong>Amount Paid:</strong> ₹${Utils.formatCurrency(invoice.amountPaid)} 
-                        ${invoice.paymentMethod ? `<span class="payment-method-badge payment-method-${invoice.paymentMethod}">${invoice.paymentMethod.toUpperCase()}</span>` : ''}
+                    ${payments.some(p => p.paymentType === 'initial') ? `<p><strong>Initial Amount Paid:</strong> ₹${Utils.formatCurrency(payments.filter(p => p.paymentType === 'initial').reduce((sum, p) => sum + p.amount, 0))}</p>` : ''}
+                    ${additionalPayments.length > 0 ? `<p><strong>Additional Amount Paid:</strong> ${additionalPaymentsStr}</p>` : ''}
+                    <p><strong>Total Amount Paid:</strong> ₹${Utils.formatCurrency(invoice.amountPaid)} 
+                        ${invoice.paymentMethod && payments.length === 0 ? `<span class="payment-method-badge payment-method-${invoice.paymentMethod}">${invoice.paymentMethod.toUpperCase()}</span>` : ''}
                     </p>
                     ${invoice.totalReturns > 0 ? `
                         <p><strong>Return Amount:</strong> <span style="color: #dc3545;">-₹${Utils.formatCurrency(invoice.totalReturns)}</span></p>
@@ -1188,7 +1202,7 @@ async function displayInvoices(invoices) {
                                               <div style="color: #2e7d32; font-weight: bold;"><strong>Amount:</strong> &#8377;${Utils.formatCurrency(payment.amount)}</div>
                                               <div><strong>Method:</strong> ${payment.paymentMethod ? payment.paymentMethod.toUpperCase() : 'N/A'}</div>
                                               ${payment.notes ? `<div><strong>Notes:</strong> ${payment.notes}</div>` : ''}
-                                              ${payment.paymentType === 'initial' ? '<span class="badge" style="background-color: #007bff; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em;">Initial Payment</span>' : ''}
+                                              ${payment.paymentType === 'initial' ? '<span class="badge" style="background-color: #007bff; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em;">Initial Payment</span>' : '<span class="badge" style="background-color: #28a745; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em;">Additional Payment</span>'}
                                           </div>
                                           <button onclick="undoPayment('${payment.id}', '${invoice.invoiceNo}')" style="background: none; border: none; color: #dc3545; cursor: pointer; padding: 5px;" title="Undo Payment">
                                               <i class="fas fa-undo"></i>
