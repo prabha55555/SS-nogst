@@ -1183,21 +1183,17 @@ async function displayInvoices(invoices) {
                         </div>
 
                         <div style="background: #e8f5e9; padding: 10px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #c8e6c9;">
-                            ${payments.some(p => p.paymentType === 'initial') ? `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9em;">
                                 <span style="color: #2e7d32;">Initial Amount Paid:</span>
-                                <span style="font-weight: 600; color: #2e7d32;">₹${Utils.formatCurrency(payments.filter(p => p.paymentType === 'initial').reduce((sum, p) => sum + p.amount, 0))}</span>
+                                <span style="font-weight: 600; color: #2e7d32;">${payments.some(p => p.paymentType === 'initial') ? '₹' + Utils.formatCurrency(payments.filter(p => p.paymentType === 'initial').reduce((sum, p) => sum + p.amount, 0)) : '-'}</span>
                             </div>
-                            ` : ''}
                             
-                            ${additionalPayments.length > 0 ? `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9em;">
                                 <span style="color: #2e7d32;">Additional Amount Paid:</span>
-                                <span style="font-weight: 600; color: #2e7d32;">${additionalPaymentsStr}</span>
+                                <span style="font-weight: 600; color: #2e7d32;">${additionalPayments.length > 0 ? additionalPaymentsStr : '-'}</span>
                             </div>
-                            ` : ''}
 
-                            <div style="display: flex; justify-content: space-between; border-top: 1px solid #a5d6a7; padding-top: 6px; margin-top: ${payments.length > 0 ? '6px' : '0'};">
+                            <div style="display: flex; justify-content: space-between; border-top: 1px solid #a5d6a7; padding-top: 6px; margin-top: 6px;">
                                 <span style="color: #1b5e20; font-weight: 600;">Total Amount Paid:</span>
                                 <span style="font-weight: bold; color: #1b5e20;">
                                     ₹${Utils.formatCurrency(amountPaid)}
