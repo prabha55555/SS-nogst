@@ -1305,6 +1305,7 @@ async function displayInvoices(invoices) {
                     </div>
                 </div>
             </div>
+            <hr style="border: 0; border-top: 4px solid #343a40; margin: 30px 0; border-radius: 2px;">
             `;
         }).join('');
 
