@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
+        if (typeof showLoading === 'function') {
+            showLoading('Loading Billing System', 'Initializing database and loading form...', 'content');
+        }
+
         await db.init();
         console.log("Database initialized for Purchase");
 
@@ -17,6 +21,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             supplierList.innerHTML = suppliers.map(s => '<option value="' + (s.phone || '') + '">' + (s.name || '') + ' - ' + (s.phone || '') + '</option>').join('');
         }
     } catch (error) {
+        if (typeof hideLoading === 'function') {
+            hideLoading('global');
+        }
         console.error("Failed to initialize database:", error);
         showMessage("Failed to connect to database. Please check your connection.", "error");
     }
@@ -93,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    updatePurchaseInvoiceSuggestions();
+    await updatePurchaseInvoiceSuggestions();
 
     document.getElementById('applySuggestion').addEventListener('click', () => {
         const suggestedNumber = document.getElementById('nextInvoiceNo').dataset.suggestedNumber;
@@ -286,6 +293,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             try {
+                if (typeof showLoading === 'function') {
+                    showLoading('Saving Bill', 'Please wait while we save your invoice...', 'content');
+                }
                 savePurchaseBillBtn.disabled = true;
                 savePurchaseBillBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
@@ -357,6 +367,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.error("Error saving purchase bill:", error);
                 showMessage("Error saving purchase bill.", "error");
             } finally {
+                if (typeof hideLoading === 'function') {
+                    hideLoading('content');
+                }
                 savePurchaseBillBtn.disabled = false;
                 savePurchaseBillBtn.innerHTML = '<i class="fas fa-file-invoice"></i> Save Purchase Bill';
             }
@@ -756,4 +769,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    if (typeof hideLoading === 'function') {
+        hideLoading('content');
+    }
 });
+
+// Loading utility functions
+function showLoading(message = 'Loading...', subtext = '', target = 'global') {
+    let container;
+    let className;
+    let idName;
+    
+    if (target === 'content') {
+        container = document.querySelector('.main-content-wrapper');
+        className = 'content-loading-overlay';
+        idName = 'contentLoading';
+    } else {
+        container = document.body;
+        className = 'loading-overlay';
+        idName = 'globalLoading';
+    }
+
+    if (!container) return;
+
+    hideLoading(target);
+
+    const loadingHTML = `
+        <div class="${className}" id="${idName}">
+            <div class="professional-spinner"></div>
+            <div class="spinner-text">${message}</div>
+            ${subtext ? `<div class="spinner-subtext">${subtext}</div>` : ''}
+        </div>
+    `;
+
+    if (target === 'content') {
+        container.insertAdjacentHTML('afterbegin', loadingHTML);
+    } else {
+        container.insertAdjacentHTML('beforeend', loadingHTML);
+    }
+}
+
+function hideLoading(target = 'global') {
+    const idName = target === 'content' ? 'contentLoading' : 'globalLoading';
+    const existingLoader = document.getElementById(idName);
+    if (existingLoader) {
+        existingLoader.remove();
+    }
+}
