@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadRevenueTracking();
 });
 
+let allRevenueData = [];
+
 async function loadRevenueTracking() {
     const tableBody = document.getElementById('revenueTableBody');
     
@@ -83,10 +85,21 @@ async function loadRevenueTracking() {
         // Sort in order (by bill no ascending)
         revenueData.sort((a, b) => parseInt(a.billNo) - parseInt(b.billNo));
         
-        let html = '';
-        let totalProfit = 0;
+        allRevenueData = revenueData;
+        renderRevenue(allRevenueData);
         
-        revenueData.forEach(data => {
+    } catch (error) {
+        console.error("Error loading revenue:", error);
+        tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:red;">Error loading data.</td></tr>';
+    }
+}
+
+function renderRevenue(revenueToRender) {
+    const tableBody = document.getElementById('revenueTableBody');
+    let html = '';
+    let totalProfit = 0;
+        
+        revenueToRender.forEach(data => {
             html += `
                 <tr>
                     <td><a href="sales.html?edit=${data.rawBillNo}" style="color: #2a5298; text-decoration: none; font-weight: bold; cursor: pointer;">#${data.billNo}</a></td>
@@ -103,7 +116,7 @@ async function loadRevenueTracking() {
             totalProfit += data.profit;
         });
         
-        if (revenueData.length === 0) {
+        if (revenueToRender.length === 0) {
             html = '<tr><td colspan="5" style="text-align:center;">No bills found.</td></tr>';
         } else {
             html += `
@@ -117,10 +130,41 @@ async function loadRevenueTracking() {
         }
         
         tableBody.innerHTML = html;
-        
-    } catch (error) {
-        console.error("Error loading revenue:", error);
-        tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:red;">Error loading data.</td></tr>';
-    }
 }
+
+// Search functionality
+document.addEventListener('DOMContentLoaded', () => {
+    const searchDateInput = document.getElementById('searchDateInput');
+    const searchNameInput = document.getElementById('searchNameInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+    function filterRevenue() {
+        const dateTerm = searchDateInput.value.toLowerCase().trim();
+        const nameTerm = searchNameInput.value.toLowerCase().trim();
+        
+        if (!dateTerm && !nameTerm) {
+            renderRevenue(allRevenueData);
+            return;
+        }
+
+        const filtered = allRevenueData.filter(data => {
+            const matchesDate = !dateTerm || (data.date && data.date.includes(dateTerm));
+            const matchesName = !nameTerm || (data.name && data.name.toLowerCase().includes(nameTerm));
+            return matchesDate && matchesName;
+        });
+        
+        renderRevenue(filtered);
+    }
+
+    if (searchDateInput) searchDateInput.addEventListener('input', filterRevenue);
+    if (searchNameInput) searchNameInput.addEventListener('input', filterRevenue);
+    
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', () => {
+            searchDateInput.value = '';
+            searchNameInput.value = '';
+            renderRevenue(allRevenueData);
+        });
+    }
+});
 
