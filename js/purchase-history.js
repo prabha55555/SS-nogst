@@ -1157,7 +1157,7 @@ async function displayInvoices(invoices) {
             <div class="invoice-item">
                 <div class="invoice-info">
                     <h3>Invoice #${String(invoice.invoiceNo).replace('P-','')}</h3>
-                    <p><strong>supplier:</strong> ${invoice.supplierName}</p>
+                    <p><strong>Supplier:</strong> ${invoice.supplierName}</p>
                     
                     <div class="financial-summary-box" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 12px; margin-top: 15px; margin-bottom: 15px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #dee2e6;">

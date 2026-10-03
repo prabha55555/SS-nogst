@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
+        if (typeof showLoading === 'function') {
+            showLoading('Loading Purchase Edit System', 'Initializing database and loading form...', 'content');
+        }
+
         await db.init();
         console.log("Database initialized for Purchase");
     } catch (error) {
@@ -701,7 +705,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const invoiceId = urlParams.get('id');
     
     if (invoiceId) {
-        loadPurchaseBill(invoiceId);
+        await loadPurchaseBill(invoiceId);
     }
     
     async function loadPurchaseBill(id) {
@@ -799,8 +803,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             updateCalculations();
             
+            if (typeof hideLoading === 'function') {
+                hideLoading('content');
+            }
+            
         } catch (err) {
             console.error("Failed to load invoice:", err);
+            if (typeof hideLoading === 'function') {
+                hideLoading('global');
+            }
             showMessage("Failed to load invoice data.", "error");
         }
     }
@@ -863,4 +874,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    if (typeof hideLoading === 'function') {
+        hideLoading('content');
+    }
+
 });
+
+// Loading utility functions
+function showLoading(message = 'Loading...', subtext = '', target = 'global') {
+    let container;
+    let className;
+    let idName;
+    
+    if (target === 'content') {
+        container = document.querySelector('.main-content-wrapper');
+        className = 'content-loading-overlay';
+        idName = 'contentLoading';
+    } else {
+        container = document.body;
+        className = 'loading-overlay';
+        idName = 'globalLoading';
+    }
+
+    if (!container) return;
+
+    hideLoading(target);
+
+    const loadingHTML = `
+        <div class="${className}" id="${idName}">
+            <div class="professional-spinner"></div>
+            <div class="spinner-text">${message}</div>
+            ${subtext ? `<div class="spinner-subtext">${subtext}</div>` : ''}
+        </div>
+    `;
+
+    if (target === 'content') {
+        container.insertAdjacentHTML('afterbegin', loadingHTML);
+    } else {
+        container.insertAdjacentHTML('beforeend', loadingHTML);
+    }
+}
+
+function hideLoading(target = 'global') {
+    const idName = target === 'content' ? 'contentLoading' : 'globalLoading';
+    const existingLoader = document.getElementById(idName);
+    if (existingLoader) {
+        existingLoader.remove();
+    }
+}
