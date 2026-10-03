@@ -382,8 +382,8 @@ async function saveBill() {
 
         if (isEditing) {
             try {
-                const existingPayments = await db.getPaymentsByInvoice(invoiceData.invoiceNo);
-                const initialPayments = existingPayments.filter(p => p.paymentType === 'initial');
+                const existinupiments = await db.getPaymentsByInvoice(invoiceData.invoiceNo);
+                const initialPayments = existinupiments.filter(p => p.paymentType === 'initial');
                 const deletePromises = initialPayments.map(p => 
                     db.firestore.collection('payments').doc(p.id).delete()
                 );
@@ -413,11 +413,11 @@ async function saveBill() {
             // Save UPI payment
             if (paymentBreakdown.upi > 0) {
                 const upiPaymentData = {
-                    id: `payment_${invoiceData.invoiceNo}_initial_gpay`,
+                    id: `payment_${invoiceData.invoiceNo}_initial_upi`,
                     invoiceNo: invoiceData.invoiceNo,
                     paymentDate: new Date().toISOString().split('T')[0],
                     amount: paymentBreakdown.upi,
-                    paymentMethod: 'gpay',
+                    paymentMethod: 'upi',
                     paymentType: 'initial'
                 };
                 savePromises.push(db.savePayment(upiPaymentData));
@@ -539,7 +539,7 @@ async function loadInvoiceForEditing(invoiceNo) {
 
                 const breakdown = initialPayments.reduce((acc, p) => {
                     const method = (p.paymentMethod || 'cash').toLowerCase();
-                    if (method === 'upi' || method === 'gpay') acc.upi += p.amount;
+                    if (method === 'upi' || method === 'upi') acc.upi += p.amount;
                     else if (method === 'account' || method === 'bank') acc.account += p.amount;
                     else acc.cash += p.amount;
                     return acc;

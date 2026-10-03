@@ -1761,7 +1761,7 @@ async function addPayment(invoiceNo) {
                             invoiceNo: invoiceNo,
                             paymentDate: paymentDate,
                             amount: upiAmount,
-                            paymentMethod: 'gpay',
+                            paymentMethod: 'upi',
                             paymentType: 'additional'
                         };
                         await db.savePurchasePayment(upiPaymentData);
@@ -3531,7 +3531,7 @@ async function addPayment(invoiceNo) {
                             invoiceNo: invoiceNo,
                             paymentDate: paymentDate,
                             amount: upiAmount,
-                            paymentMethod: 'gpay',
+                            paymentMethod: 'upi',
                             paymentType: 'additional'
                         });
                     }

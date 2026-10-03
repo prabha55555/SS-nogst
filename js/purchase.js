@@ -311,11 +311,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                     if (paymentBreakdown.upi > 0) {
                         savePromises.push(db.savePurchasePayment({
-                            id: `purchase_payment_${invoiceData.invoiceNo}_initial_gpay`,
+                            id: `purchase_payment_${invoiceData.invoiceNo}_initial_upi`,
                             invoiceNo: invoiceData.invoiceNo,
                             paymentDate: invoiceData.invoiceDate,
                             amount: paymentBreakdown.upi,
-                            paymentMethod: 'gpay',
+                            paymentMethod: 'upi',
                             paymentType: 'initial'
                         }));
                     }

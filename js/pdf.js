@@ -579,7 +579,7 @@ class PDFGenerator {
                         <div class="payment-row">
                             <label>Payment Method:</label>
                             <span style="font-weight: bold; ${invoiceData.paymentMethod === 'cash' ? 'color: #27ae60;' : 'color: #3498db;'}">
-                                ${invoiceData.paymentMethod === 'cash' ? 'CASH' : (invoiceData.paymentMethod === 'gpay' ? 'GPAY' : 'ACCOUNT')}
+                                ${invoiceData.paymentMethod === 'cash' ? 'CASH' : (invoiceData.paymentMethod === 'upi' ? 'UPI' : 'ACCOUNT')}
                             </span>
                         </div>
                         `}
