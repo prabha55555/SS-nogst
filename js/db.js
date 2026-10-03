@@ -341,27 +341,22 @@ class Database {
 
     async getAllPurchasePayments() {
         this._checkInit();
-        return this._fetchWithPromiseCache('purchasePayments', async () => {
-            try {
-                const querySnapshot = await this.firestore.collection('purchase_payments').get();
-                const payments = [];
-                querySnapshot.forEach((doc) => {
-                    payments.push(doc.data());
-                });
-                return payments;
-            } catch (error) {
-                console.error('Error getting all purchase payments from Firebase:', error);
-                return [];
-            }
-        });
+        try {
+            const querySnapshot = await this.firestore.collection('purchase_payments').get();
+            const payments = [];
+            querySnapshot.forEach((doc) => {
+                payments.push(doc.data());
+            });
+            return payments;
+        } catch (error) {
+            console.error('Error getting all purchase payments from Firebase:', error);
+            return [];
+        }
     }
 
     async getPurchasePaymentsByInvoice(invoiceNo) {
         this._checkInit();
         try {
-            if (this._cache.purchasePayments) {
-                return this._cache.purchasePayments.filter(p => p.invoiceNo === invoiceNo);
-            }
             const querySnapshot = await this.firestore.collection('purchase_payments').where('invoiceNo', '==', invoiceNo).get();
             const payments = [];
             querySnapshot.forEach((doc) => {
@@ -425,6 +420,11 @@ class Database {
 
                 await this.savePurchaseBill(invoiceData);
                 console.log(`Updated purchase invoice ${invoiceNo} after payment deletion`);
+                
+                // Update subsequent invoices
+                if (window.Utils && typeof window.Utils.updateSubsequentInvoices === 'function') {
+                    await window.Utils.updateSubsequentInvoices(invoiceData.supplierName, invoiceNo);
+                }
             }
         } catch (error) {
             console.error('Error updating purchase invoice after payment deletion:', error);
@@ -758,9 +758,6 @@ class Database {
     async getPaymentsByInvoice(invoiceNo) {
         this._checkInit();
         try {
-            if (this._cache.payments) {
-                return this._cache.payments.filter(p => p.invoiceNo === invoiceNo);
-            }
             const querySnapshot = await this.firestore.collection('payments')
                 .where('invoiceNo', '==', invoiceNo)
                 .get();
@@ -779,19 +776,17 @@ class Database {
     // Get all payments
     async getAllPayments() {
         this._checkInit();
-        return this._fetchWithPromiseCache('payments', async () => {
-            try {
-                const querySnapshot = await this.firestore.collection('payments').get();
-                const payments = [];
-                querySnapshot.forEach((doc) => {
-                    payments.push(doc.data());
-                });
-                return payments;
-            } catch (error) {
-                console.error('Error getting all payments from Firebase:', error);
-                return [];
-            }
-        });
+        try {
+            const querySnapshot = await this.firestore.collection('payments').get();
+            const payments = [];
+            querySnapshot.forEach((doc) => {
+                payments.push(doc.data());
+            });
+            return payments;
+        } catch (error) {
+            console.error('Error getting all payments from Firebase:', error);
+            return [];
+        }
     }
 
     // In your db.js - Update the deleteInvoice method
@@ -943,9 +938,6 @@ class Database {
     async getReturnsByInvoice(invoiceNo) {
         this._checkInit();
         try {
-            if (this._cache.returns) {
-                return this._cache.returns.filter(r => r.invoiceNo === invoiceNo);
-            }
             const querySnapshot = await this.firestore.collection('returns')
                 .where('invoiceNo', '==', invoiceNo)
                 .get();
@@ -1455,9 +1447,6 @@ class Database {
     async getPurchaseReturnsByInvoice(invoiceNo) {
         this._checkInit();
         try {
-            if (this._cache.purchaseReturns) {
-                return this._cache.purchaseReturns.filter(r => r.invoiceNo === invoiceNo);
-            }
             const querySnapshot = await this.firestore.collection('purchaseReturns')
                 .where('invoiceNo', '==', invoiceNo)
                 .get();

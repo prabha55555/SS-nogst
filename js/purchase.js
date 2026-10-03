@@ -291,9 +291,48 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 await db.savePurchaseBill(invoiceData);
 
+                // Save initial purchase payments
+                const savePromises = [];
+                const isEditing = !!window.isEditingPurchase; // Need to ensure it detects edit correctly, but purchase.js might not have edit. Wait, edit-purchase.js exists separately. So purchase.js is ONLY creation!
+
+                const paymentBreakdown = invoiceData.payment;
+                const totalPaid = paymentBreakdown.totalPaid;
+                
+                if (totalPaid > 0) {
+                    if (paymentBreakdown.cash > 0) {
+                        savePromises.push(db.savePurchasePayment({
+                            id: `purchase_payment_${invoiceData.invoiceNo}_initial_cash`,
+                            invoiceNo: invoiceData.invoiceNo,
+                            paymentDate: invoiceData.invoiceDate,
+                            amount: paymentBreakdown.cash,
+                            paymentMethod: 'cash',
+                            paymentType: 'initial'
+                        }));
+                    }
+                    if (paymentBreakdown.upi > 0) {
+                        savePromises.push(db.savePurchasePayment({
+                            id: `purchase_payment_${invoiceData.invoiceNo}_initial_gpay`,
+                            invoiceNo: invoiceData.invoiceNo,
+                            paymentDate: invoiceData.invoiceDate,
+                            amount: paymentBreakdown.upi,
+                            paymentMethod: 'gpay',
+                            paymentType: 'initial'
+                        }));
+                    }
+                    if (paymentBreakdown.account > 0) {
+                        savePromises.push(db.savePurchasePayment({
+                            id: `purchase_payment_${invoiceData.invoiceNo}_initial_account`,
+                            invoiceNo: invoiceData.invoiceNo,
+                            paymentDate: invoiceData.invoiceDate,
+                            amount: paymentBreakdown.account,
+                            paymentMethod: 'account',
+                            paymentType: 'initial'
+                        }));
+                    }
+                }
+
                 // Check products for rate updates
                 const shortcuts = await getAllShortcuts();
-                const savePromises = [];
 
                 // Save supplier details for future auto-fill
                 if (supplierPhone) {

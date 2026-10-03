@@ -236,12 +236,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 discount: parseFloat(document.getElementById('discountAmount').value) || 0,
                 grandTotal: parseFloat(document.getElementById('grandTotal').textContent) || 0,
                 payment: {
-                    cash: Math.max(0, (parseFloat(document.getElementById('cashPaid').value) || 0) - (window.additionalPaymentsBreakdown?.cash || 0)),
-                    upi: Math.max(0, (parseFloat(document.getElementById('upiPaid').value) || 0) - (window.additionalPaymentsBreakdown?.upi || 0)),
-                    account: Math.max(0, (parseFloat(document.getElementById('accountPaid').value) || 0) - (window.additionalPaymentsBreakdown?.account || 0)),
-                    totalPaid: Math.max(0, (parseFloat(document.getElementById('cashPaid').value) || 0) - (window.additionalPaymentsBreakdown?.cash || 0)) + 
-                               Math.max(0, (parseFloat(document.getElementById('upiPaid').value) || 0) - (window.additionalPaymentsBreakdown?.upi || 0)) + 
-                               Math.max(0, (parseFloat(document.getElementById('accountPaid').value) || 0) - (window.additionalPaymentsBreakdown?.account || 0)),
+                    cash: parseFloat(document.getElementById('cashPaid').value) || 0,
+                    upi: parseFloat(document.getElementById('upiPaid').value) || 0,
+                    account: parseFloat(document.getElementById('accountPaid').value) || 0,
+                    totalPaid: (parseFloat(document.getElementById('cashPaid').value) || 0) + 
+                               (parseFloat(document.getElementById('upiPaid').value) || 0) + 
+                               (parseFloat(document.getElementById('accountPaid').value) || 0) +
+                               (window.additionalPaymentsTotal || 0),
                     balanceDue: parseFloat(document.getElementById('balanceDue').textContent) || 0
                 },
                 amountPaid: parseFloat(document.getElementById('totalAmountPaid').textContent) || 0,
@@ -253,6 +254,62 @@ document.addEventListener('DOMContentLoaded', async () => {
                 savePurchaseBillBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
                 await db.savePurchaseBill(invoiceData);
+
+                // Handle initial payments
+                try {
+                    const existingPayments = await db.getPurchasePaymentsByInvoice(invoiceData.invoiceNo);
+                    const initialPayments = existingPayments.filter(p => p.paymentType === 'initial');
+                    const deletePromises = initialPayments.map(p => 
+                        db.firestore.collection('purchase_payments').doc(p.id).delete()
+                    );
+                    if (deletePromises.length > 0) {
+                        await Promise.all(deletePromises);
+                        db._cache.purchasePayments = null;
+                    }
+                } catch (err) {
+                    console.error("Error clearing old initial payments:", err);
+                }
+
+                const savePromises = [];
+                const paymentBreakdown = invoiceData.payment;
+                const totalPaid = paymentBreakdown.totalPaid;
+
+                if (totalPaid > 0) {
+                    if (paymentBreakdown.cash > 0) {
+                        savePromises.push(db.savePurchasePayment({
+                            id: `purchase_payment_${invoiceData.invoiceNo}_initial_cash`,
+                            invoiceNo: invoiceData.invoiceNo,
+                            paymentDate: invoiceData.invoiceDate,
+                            amount: paymentBreakdown.cash,
+                            paymentMethod: 'cash',
+                            paymentType: 'initial'
+                        }));
+                    }
+                    if (paymentBreakdown.upi > 0) {
+                        savePromises.push(db.savePurchasePayment({
+                            id: `purchase_payment_${invoiceData.invoiceNo}_initial_gpay`,
+                            invoiceNo: invoiceData.invoiceNo,
+                            paymentDate: invoiceData.invoiceDate,
+                            amount: paymentBreakdown.upi,
+                            paymentMethod: 'gpay',
+                            paymentType: 'initial'
+                        }));
+                    }
+                    if (paymentBreakdown.account > 0) {
+                        savePromises.push(db.savePurchasePayment({
+                            id: `purchase_payment_${invoiceData.invoiceNo}_initial_account`,
+                            invoiceNo: invoiceData.invoiceNo,
+                            paymentDate: invoiceData.invoiceDate,
+                            amount: paymentBreakdown.account,
+                            paymentMethod: 'account',
+                            paymentType: 'initial'
+                        }));
+                    }
+                }
+                
+                if (savePromises.length > 0) {
+                    await Promise.all(savePromises);
+                }
 
                 // Save supplier details for future auto-fill
                 if (supplierPhone) {
@@ -613,7 +670,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const accountPaid = parseFloat(document.getElementById('accountPaid').value) || 0;
 
         // Calculate Total Paid
-        const totalPaid = cashPaid + upiPaid + accountPaid;
+        const totalPaid = cashPaid + upiPaid + accountPaid + (window.additionalPaymentsTotal || 0);
         document.getElementById('totalAmountPaid').textContent = totalPaid.toFixed(2);
 
         // Calculate Balance Due
@@ -666,8 +723,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Fetch additional payments first
             try {
                 const payments = await db.getPurchasePaymentsByInvoice(cleanInvoiceNo);
-                window.additionalPaymentsTotal = payments.reduce((sum, p) => sum + p.amount, 0);
-                window.additionalPaymentsBreakdown = payments.reduce((acc, p) => {
+                const initialPayments = payments.filter(p => p.paymentType === 'initial');
+                const additionalPayments = payments.filter(p => p.paymentType !== 'initial');
+
+                window.initialPaymentsBreakdown = initialPayments.reduce((acc, p) => {
+                    const method = (p.paymentMethod || 'CASH').toUpperCase();
+                    if (method === 'UPI' || method === 'GPAY') acc.upi += p.amount;
+                    else if (method === 'ACCOUNT' || method === 'BANK') acc.account += p.amount;
+                    else acc.cash += p.amount;
+                    return acc;
+                }, { cash: 0, upi: 0, account: 0 });
+
+                window.additionalPaymentsTotal = additionalPayments.reduce((sum, p) => sum + p.amount, 0);
+                window.additionalPaymentsBreakdown = additionalPayments.reduce((acc, p) => {
                     const method = (p.paymentMethod || 'CASH').toUpperCase();
                     if (method === 'UPI' || method === 'GPAY') acc.upi += p.amount;
                     else if (method === 'ACCOUNT' || method === 'BANK') acc.account += p.amount;
@@ -675,7 +743,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return acc;
                 }, { cash: 0, upi: 0, account: 0 });
             } catch (e) {
-                console.error("Error fetching additional payments", e);
+                console.error("Error fetching payments", e);
+                window.initialPaymentsBreakdown = { cash: 0, upi: 0, account: 0 };
                 window.additionalPaymentsTotal = 0;
                 window.additionalPaymentsBreakdown = { cash: 0, upi: 0, account: 0 };
             }
@@ -724,9 +793,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (previousBalanceEl) previousBalanceEl.textContent = Utils.formatCurrency(invoice.previousBalance || 0);
             const manualPreviousBalanceEl = document.getElementById('manualPreviousBalance');
             if (manualPreviousBalanceEl) manualPreviousBalanceEl.value = invoice.manualPreviousBalance !== undefined ? invoice.manualPreviousBalance : '';
-            document.getElementById('cashPaid').value = invoice.payment?.cash || invoice.amountPaid || '';
-            document.getElementById('upiPaid').value = invoice.payment?.upi || '';
-            document.getElementById('accountPaid').value = invoice.payment?.account || '';
+            document.getElementById('cashPaid').value = window.initialPaymentsBreakdown?.cash || '';
+            document.getElementById('upiPaid').value = window.initialPaymentsBreakdown?.upi || '';
+            document.getElementById('accountPaid').value = window.initialPaymentsBreakdown?.account || '';
             
             updateCalculations();
             

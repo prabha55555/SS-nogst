@@ -705,7 +705,7 @@ class Utils {
         const upiPaid = parseFloat(document.getElementById('upiPaid').value) || 0;
         const accountPaid = parseFloat(document.getElementById('accountPaid').value) || 0;
 
-        return cashPaid + upiPaid + accountPaid;
+        return cashPaid + upiPaid + accountPaid + (window.additionalPaymentsTotal || 0);
     }
 
     // Get payment breakdown as object

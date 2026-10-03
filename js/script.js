@@ -380,10 +380,27 @@ async function saveBill() {
         const paymentBreakdown = invoiceData.paymentBreakdown;
         const totalPaid = invoiceData.amountPaid;
 
+        if (isEditing) {
+            try {
+                const existingPayments = await db.getPaymentsByInvoice(invoiceData.invoiceNo);
+                const initialPayments = existingPayments.filter(p => p.paymentType === 'initial');
+                const deletePromises = initialPayments.map(p => 
+                    db.firestore.collection('payments').doc(p.id).delete()
+                );
+                if (deletePromises.length > 0) {
+                    await Promise.all(deletePromises);
+                    db._cache.payments = null;
+                }
+            } catch (err) {
+                console.error("Error clearing old initial payments:", err);
+            }
+        }
+
         if (totalPaid > 0) {
             // Save cash payment
             if (paymentBreakdown.cash > 0) {
                 const cashPaymentData = {
+                    id: `payment_${invoiceData.invoiceNo}_initial_cash`,
                     invoiceNo: invoiceData.invoiceNo,
                     paymentDate: new Date().toISOString().split('T')[0],
                     amount: paymentBreakdown.cash,
@@ -396,6 +413,7 @@ async function saveBill() {
             // Save UPI payment
             if (paymentBreakdown.upi > 0) {
                 const upiPaymentData = {
+                    id: `payment_${invoiceData.invoiceNo}_initial_gpay`,
                     invoiceNo: invoiceData.invoiceNo,
                     paymentDate: new Date().toISOString().split('T')[0],
                     amount: paymentBreakdown.upi,
@@ -408,6 +426,7 @@ async function saveBill() {
             // Save account payment
             if (paymentBreakdown.account > 0) {
                 const accountPaymentData = {
+                    id: `payment_${invoiceData.invoiceNo}_initial_account`,
                     invoiceNo: invoiceData.invoiceNo,
                     paymentDate: new Date().toISOString().split('T')[0],
                     amount: paymentBreakdown.account,
@@ -511,6 +530,27 @@ async function loadInvoiceForEditing(invoiceNo) {
 
         const invoiceData = await db.getInvoice(invoiceNo);
         if (invoiceData) {
+            try {
+                const payments = await db.getPaymentsByInvoice(invoiceNo);
+                const initialPayments = payments.filter(p => p.paymentType === 'initial');
+                const additionalPayments = payments.filter(p => p.paymentType !== 'initial');
+
+                window.additionalPaymentsTotal = additionalPayments.reduce((sum, p) => sum + p.amount, 0);
+
+                const breakdown = initialPayments.reduce((acc, p) => {
+                    const method = (p.paymentMethod || 'cash').toLowerCase();
+                    if (method === 'upi' || method === 'gpay') acc.upi += p.amount;
+                    else if (method === 'account' || method === 'bank') acc.account += p.amount;
+                    else acc.cash += p.amount;
+                    return acc;
+                }, { cash: 0, upi: 0, account: 0 });
+
+                invoiceData.paymentBreakdown = breakdown;
+            } catch (e) {
+                console.error("Error loading true payment history", e);
+                window.additionalPaymentsTotal = 0;
+            }
+
             Utils.setFormData(invoiceData);
             document.getElementById('invoiceNo').readOnly = true;
             window.isBillSaved = true; // Loaded bill is considered saved

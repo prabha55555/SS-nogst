@@ -1467,7 +1467,7 @@ _This is an automated statement. Please contact us for any queries._`;
 async function shareInvoiceViaWhatsApp(invoiceNo) {
     try {
         const invoiceData = await db.getPurchaseBill(invoiceNo);
-        const payments = await db.getPaymentsByInvoice(invoiceNo);
+        const payments = await db.getPurchasePaymentsByInvoice(invoiceNo);
 
         if (!invoiceData) {
             Utils.showToast('Error', 'Invoice not found!', 'error');
@@ -1684,7 +1684,7 @@ async function addPayment(invoiceNo) {
                     invoiceData.balanceDue = invoiceData.grandTotal - newAmountPaid;
                     invoiceData.paymentBreakdown = updatedPaymentBreakdown;
 
-                    await db.saveInvoice(invoiceData);
+                    await db.savePurchaseBill(invoiceData);
 
                     // Save individual payment records
                     if (cashAmount > 0) {
@@ -1695,7 +1695,7 @@ async function addPayment(invoiceNo) {
                             paymentMethod: 'cash',
                             paymentType: 'additional'
                         };
-                        await db.savePayment(cashPaymentData);
+                        await db.savePurchasePayment(cashPaymentData);
                     }
 
                     if (upiAmount > 0) {
@@ -1706,7 +1706,7 @@ async function addPayment(invoiceNo) {
                             paymentMethod: 'gpay',
                             paymentType: 'additional'
                         };
-                        await db.savePayment(upiPaymentData);
+                        await db.savePurchasePayment(upiPaymentData);
                     }
 
                     if (accountAmount > 0) {
@@ -1717,7 +1717,7 @@ async function addPayment(invoiceNo) {
                             paymentMethod: 'account',
                             paymentType: 'additional'
                         };
-                        await db.savePayment(accountPaymentData);
+                        await db.savePurchasePayment(accountPaymentData);
                     }
 
                     // Update all subsequent invoices
@@ -1783,7 +1783,7 @@ async function addPayment(invoiceNo) {
 // In invoice-history.js - Update viewPaymentHistory function
 async function viewPaymentHistory(invoiceNo) {
     try {
-        const payments = await db.getPaymentsByInvoice(invoiceNo);
+        const payments = await db.getPurchasePaymentsByInvoice(invoiceNo);
         const invoiceData = await db.getPurchaseBill(invoiceNo);
 
         if (payments.length === 0) {
@@ -1877,7 +1877,7 @@ async function undoPayment(paymentId, invoiceNo) {
     try {
         showLoading('Undoing Payment', 'Reverting payment and recalculating balance...');
         // Get payment details before deleting
-        const payments = await db.getPaymentsByInvoice(invoiceNo);
+        const payments = await db.getPurchasePaymentsByInvoice(invoiceNo);
 
         // Try to find the payment by different ID formats
         let paymentToDelete = payments.find(p => p.id === paymentId);
@@ -1899,7 +1899,7 @@ async function undoPayment(paymentId, invoiceNo) {
         console.log('Found payment to delete:', paymentToDelete);
 
         // Delete the payment record
-        await db.deletePayment(paymentToDelete.id);
+        await db.deletePurchasePayment(paymentToDelete.id);
 
         Utils.showToast('Success', `Payment of ₹${Utils.formatCurrency(paymentToDelete.amount)} has been successfully undone!`, 'success');
 
@@ -1929,7 +1929,7 @@ async function undoAllPayments(invoiceNo) {
 
     try {
         showLoading('Undoing All Payments', 'Reverting all payments and recalculating balance...');
-        const payments = await db.getPaymentsByInvoice(invoiceNo);
+        const payments = await db.getPurchasePaymentsByInvoice(invoiceNo);
 
         if (payments.length === 0) {
             Utils.showToast('Notification', 'No payments found for this invoice.', 'info');
@@ -1942,7 +1942,7 @@ async function undoAllPayments(invoiceNo) {
 
         // Delete all payment records
         for (const payment of payments) {
-            await db.deletePayment(payment.id);
+            await db.deletePurchasePayment(payment.id);
         }
 
         // Reset invoice payment information
@@ -1954,7 +1954,7 @@ async function undoAllPayments(invoiceNo) {
             account: 0
         };
 
-        await db.saveInvoice(invoiceData);
+        await db.savePurchaseBill(invoiceData);
 
         // Update all subsequent invoices
         await Utils.updateSubsequentInvoices(invoiceData.supplierName, invoiceNo);
@@ -2550,7 +2550,7 @@ async function undoAllReturns(invoiceNo) {
 async function generateStatement(invoiceNo) {
     try {
         const invoiceData = await db.getPurchaseBill(invoiceNo);
-        const payments = await db.getPaymentsByInvoice(invoiceNo);
+        const payments = await db.getPurchasePaymentsByInvoice(invoiceNo);
 
         if (invoiceData) {
             await generatePDFStatement(invoiceData, payments);
