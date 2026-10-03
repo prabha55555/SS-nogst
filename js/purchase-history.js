@@ -1302,10 +1302,10 @@ async function displayInvoices(invoices) {
                 <div class="invoice-actions-container">
                     <div class="primary-actions">
                         <button class="btn-edit" onclick="editInvoice('${invoice.invoiceNo}')">Edit</button>
-                        <button class="btn-delete" onclick="deletePurchaseBill('${invoice.invoiceNo}')">Delete</button>
+                        <button class="btn-delete" onclick="deletePurchaseBill('${invoice.invoiceNo}', this)">Delete</button>
                         ${invoice.invoiceNo === latestInvoicePersupplier[invoice.supplierName] ? 
-                            `<button class="btn-payment" onclick="addPayment('${invoice.invoiceNo}')">Add Payment</button>` : ''}
-                        <button class="btn-return" onclick="addReturn('${invoice.invoiceNo}')">Add Return</button>
+                            `<button class="btn-payment" onclick="addPayment('${invoice.invoiceNo}', this)">Add Payment</button>` : ''}
+                        <button class="btn-return" onclick="addReturn('${invoice.invoiceNo}', this)">Add Return</button>
                         <button class="btn-statement" onclick="generateStatement('${invoice.invoiceNo}')">Download Statement</button>
                     </div>
                 </div>
@@ -1614,9 +1614,23 @@ function copyToClipboard(text) {
 
 
 // Add payment to an invoice with multiple payment methods
-async function addPayment(invoiceNo) {
-    // Create a custom dialog for payment input with multiple payment methods
-    const paymentDialog = document.createElement('div');
+async function addPayment(invoiceNo, btn) {
+    if (document.querySelector('.payment-dialog-overlay')) return;
+    
+    let originalText = '';
+    if (btn) {
+        originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wait...';
+        btn.disabled = true;
+    }
+    
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+
+        // Create a custom dialog for payment input with multiple payment methods
+        const paymentDialog = document.createElement('div');
     paymentDialog.className = 'payment-dialog-overlay';
     paymentDialog.innerHTML = `
         <div class="payment-dialog">
@@ -2059,7 +2073,16 @@ async function deletePayment(paymentId) {
 
 // Add Return to an invoice - UPDATED to show current adjusted balance
 // SIMPLER SOLUTION: Store products in dialog dataset
-async function addReturn(invoiceNo) {
+async function addReturn(invoiceNo, btn) {
+    if (document.querySelector('.return-dialog-overlay')) return;
+    
+    let originalText = '';
+    if (btn) {
+        originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wait...';
+        btn.disabled = true;
+    }
+    
     try {
         const invoiceData = await db.getPurchaseBill(invoiceNo);
         if (!invoiceData) {
@@ -2071,6 +2094,11 @@ async function addReturn(invoiceNo) {
         const totalReturns = await Utils.calculateTotalPurchaseReturns(invoiceNo);
         const invoiceBalanceDue = invoiceData.payment?.balanceDue !== undefined ? (parseFloat(invoiceData.payment.balanceDue) || 0) : (parseFloat(invoiceData.balanceDue) || 0);
         const currentAdjustedBalance = invoiceBalanceDue - totalReturns;
+
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
 
         // Create return dialog
         const returnDialog = document.createElement('div');
@@ -3087,9 +3115,17 @@ async function generateInvoicePDF(invoiceNo) {
 }
 
 // Update deletePurchaseBill function with professional UI
-window.deletePurchaseBill = async function(invoiceNo) {
+window.deletePurchaseBill = async function(invoiceNo, btn) {
+    if (document.querySelector('.delete-dialog-overlay')) return;
     if (!invoiceNo) return;
-
+    
+    let originalText = '';
+    if (btn) {
+        originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wait...';
+        btn.disabled = true;
+    }
+    
     let cleanInvoiceNo = invoiceNo.toString();
     if (cleanInvoiceNo.startsWith('P-')) cleanInvoiceNo = cleanInvoiceNo.substring(2);
     cleanInvoiceNo = String(parseInt(cleanInvoiceNo, 10) || cleanInvoiceNo).padStart(3, '0');
@@ -3118,6 +3154,11 @@ window.deletePurchaseBill = async function(invoiceNo) {
         }
     } catch (err) {
         console.error("Error checking purchase history:", err);
+    } finally {
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
     }
 
     const displayInvoiceNo = String(invoiceNo).replace('P-', '');
@@ -3141,12 +3182,6 @@ window.deletePurchaseBill = async function(invoiceNo) {
                     This action will move the item to the recycle bin:
                 </p>
                 
-                <ul class="delete-consequences">
-                    <li><i class="fas fa-file-invoice"></i> The invoice record</li>
-                    <li><i class="fas fa-money-bill-wave"></i> All payment history</li>
-                    <li><i class="fas fa-undo"></i> All return records</li>
-                    <li><i class="fas fa-chart-line"></i> supplier balance calculations</li>
-                </ul>
                 
                 <div class="delete-final-warning">
                     <i class="fas fa-exclamation-circle"></i>
@@ -3384,7 +3419,21 @@ async function getDateWiseStatistics() {
 
 
 // Add payment to a purchase invoice with multiple payment methods
-async function addPayment(invoiceNo) {
+async function addPayment(invoiceNo, btn) {
+    if (document.querySelector('.payment-dialog-overlay')) return;
+    
+    let originalText = '';
+    if (btn) {
+        originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wait...';
+        btn.disabled = true;
+    }
+    
+    if (btn) {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+
     const paymentDialog = document.createElement('div');
     paymentDialog.className = 'payment-dialog-overlay';
     paymentDialog.innerHTML = `
