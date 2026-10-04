@@ -28,7 +28,7 @@ export function DataTable({
 
   if (rows.length === 0) {
     return (
-      <div className={cn('rounded-xl border border-slate-200 bg-white', className)}>
+      <div className={cn('rounded-2xl border border-line bg-white shadow-card', className)}>
         {empty ?? <EmptyState title="No records found" />}
       </div>
     );
@@ -38,7 +38,7 @@ export function DataTable({
     const titleCol = columns.find((c) => c.mobile === 'title');
     const cols = columns.filter((c) => c.mobile !== 'hide' && c !== titleCol);
     return (
-      <ul className={cn('space-y-2.5', className)}>
+      <ul className={cn('space-y-3', className)}>
         {rows.map((row, i) => (
           <li key={rowKey(row, i)}>
             <div
@@ -47,8 +47,8 @@ export function DataTable({
               onClick={onRowClick ? () => onRowClick(row) : undefined}
               onKeyDown={onRowClick ? (e) => e.key === 'Enter' && onRowClick(row) : undefined}
               className={cn(
-                'rounded-xl border border-slate-200 bg-white p-3.5 shadow-card',
-                onRowClick && 'active:bg-brand-50',
+                'rounded-2xl border border-line bg-white p-4 shadow-card',
+                onRowClick && 'transition active:scale-[0.99] active:bg-gold-50',
               )}
             >
               {renderCard ? (
@@ -56,9 +56,11 @@ export function DataTable({
               ) : (
                 <>
                   {titleCol ? (
-                    <div className="mb-1.5 font-semibold text-slate-900">{cellContent(titleCol, row, i)}</div>
+                    <div className="mb-2 font-display font-bold text-brand-800">
+                      {cellContent(titleCol, row, i)}
+                    </div>
                   ) : null}
-                  <dl className="space-y-1">
+                  <dl className="space-y-1.5">
                     {cols.map((c) => (
                       <div key={c.key} className="flex items-start justify-between gap-3 text-sm">
                         <dt className="shrink-0 text-slate-500">{c.header}</dt>
@@ -73,22 +75,19 @@ export function DataTable({
             </div>
           </li>
         ))}
-        {footer ? <li className="rounded-xl border border-slate-200 bg-slate-50 p-3.5">{footer}</li> : null}
+        {footer ? <li className="rounded-2xl border border-line bg-gold-50/60 p-4">{footer}</li> : null}
       </ul>
     );
   }
 
-  const pad = dense ? 'px-2.5 py-1.5' : 'px-3.5 py-2.5';
+  const pad = dense ? 'px-3 py-2' : 'px-4 py-3';
   return (
-    <div className={cn('overflow-x-auto rounded-xl border border-slate-200 bg-white', className)}>
+    <div className={cn('overflow-x-auto rounded-2xl border border-line bg-white shadow-card', className)}>
       <table className="w-full min-w-max text-sm">
-        <thead className="bg-slate-50 text-xs tracking-wide text-slate-500 uppercase">
-          <tr>
+        <thead>
+          <tr className="border-b border-line bg-linear-to-b from-slate-50 to-slate-100/70 text-[11px] tracking-[0.08em] text-slate-500 uppercase">
             {columns.map((c) => (
-              <th
-                key={c.key}
-                className={cn(pad, 'font-semibold whitespace-nowrap', ALIGN[c.align ?? 'left'])}
-              >
+              <th key={c.key} className={cn(pad, 'font-bold whitespace-nowrap', ALIGN[c.align ?? 'left'])}>
                 {c.header}
               </th>
             ))}
@@ -100,8 +99,8 @@ export function DataTable({
               key={rowKey(row, i)}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
               className={cn(
-                i % 2 === 1 && 'bg-slate-50/50',
-                onRowClick && 'cursor-pointer hover:bg-brand-50',
+                'transition-colors',
+                onRowClick ? 'cursor-pointer hover:bg-gold-50/70' : 'hover:bg-slate-50/70',
               )}
             >
               {columns.map((c) => (
@@ -113,7 +112,7 @@ export function DataTable({
           ))}
         </tbody>
         {footer ? (
-          <tfoot className="border-t border-slate-200 bg-slate-50">
+          <tfoot className="border-t border-gold-200 bg-gold-50/60">
             <tr>
               <td colSpan={columns.length} className={pad}>
                 {footer}

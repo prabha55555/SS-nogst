@@ -18,19 +18,17 @@ afterEach(() => jest.restoreAllMocks());
 describe('loadCustomerSummaries', () => {
   test('aggregates exactly the invoices and returns collections (no customers / payments reads)', async () => {
     const invoices = jest.spyOn(db, 'getAllInvoices').mockResolvedValue([invoice({})]);
-    const returns = jest
-      .spyOn(db, 'getAllReturns')
-      .mockResolvedValue([
-        {
-          id: 'r',
-          invoiceNo: '1',
-          returnDate: '2026-10-02',
-          description: 'x',
-          qty: 1,
-          rate: 100,
-          returnAmount: 100,
-        },
-      ]);
+    const returns = jest.spyOn(db, 'getAllReturns').mockResolvedValue([
+      {
+        id: 'r',
+        invoiceNo: '1',
+        returnDate: '2026-10-02',
+        description: 'x',
+        qty: 1,
+        rate: 100,
+        returnAmount: 100,
+      },
+    ]);
     const customers = jest.spyOn(db, 'getAllCustomers');
     const payments = jest.spyOn(db, 'getAllPayments');
     const result = await loadCustomerSummaries();

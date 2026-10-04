@@ -1,4 +1,5 @@
 import { Pencil, Trash2 } from 'lucide-react';
+import { InitialAvatar } from '@/features/customerForm/InitialAvatar';
 import { Button, DataTable } from '@/ui';
 import { SupplierAdminCard } from './SupplierAdminCard';
 
@@ -9,10 +10,25 @@ export function SupplierDirectory({ suppliers, empty, onEdit, onDelete }) {
       key: 'name',
       header: 'Supplier Name',
       mobile: 'title',
-      render: (s) => <span className="font-semibold text-slate-900">{s.name}</span>,
+      render: (s) => (
+        <div className="flex items-center gap-3">
+          <InitialAvatar name={s.name} size="sm" />
+          <span className="min-w-0 font-semibold text-brand-800">{s.name}</span>
+        </div>
+      ),
     },
-    { key: 'phone', header: 'Phone', className: 'tabular-nums', value: (s) => s.phone || 'N/A' },
-    { key: 'address', header: 'Address', className: 'max-w-xs', value: (s) => s.address || 'N/A' },
+    {
+      key: 'phone',
+      header: 'Phone',
+      className: 'whitespace-nowrap text-slate-600 tabular-nums',
+      value: (s) => s.phone || 'N/A',
+    },
+    {
+      key: 'address',
+      header: 'Address',
+      className: 'max-w-xs text-slate-600',
+      value: (s) => s.address || 'N/A',
+    },
     {
       key: 'actions',
       header: 'Actions',

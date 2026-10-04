@@ -15,10 +15,10 @@ export function CustomerFormFields({ draft, errors, change, onSubmit }) {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <TextField
         label="Phone Number *"
-        placeholder="10-digit phone number"
+        placeholder="98765 43210"
         type="tel"
         inputMode="tel"
         autoComplete="off"
@@ -31,7 +31,7 @@ export function CustomerFormFields({ draft, errors, change, onSubmit }) {
       <TextField
         ref={nameRef}
         label="Customer Name *"
-        placeholder="Enter customer name"
+        placeholder="e.g. ABC Traders"
         autoComplete="off"
         leftIcon={User}
         value={draft.name}
@@ -42,7 +42,7 @@ export function CustomerFormFields({ draft, errors, change, onSubmit }) {
       <TextField
         ref={addressRef}
         label="Address"
-        placeholder="Enter address"
+        placeholder="Street, area, city"
         autoComplete="off"
         leftIcon={MapPin}
         value={draft.address}

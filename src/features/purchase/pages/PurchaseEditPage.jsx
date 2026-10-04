@@ -1,5 +1,5 @@
 /**
- * Edit Purchase Bill screen — replaces legacy/edit-purchase.html + js/edit-purchase.js. Route /purchase/edit/:invoiceNo,
+ * Edit Purchase Bill screen — replaces original-app/edit-purchase.html + js/edit-purchase.js. Route /purchase/edit/:invoiceNo,
  * reached from Purchase History. Loads the bill, lets everything but the invoice number be edited (supplier phone,
  * name and address are plain inputs here), then updates it and goes back. Logic lives in usePurchaseEditForm.
  */
@@ -56,7 +56,8 @@ export default function PurchaseEditPage() {
 
   const main = (
     <>
-      <Card>
+      <Card className="relative animate-rise overflow-hidden">
+        <span className="absolute inset-x-0 top-0 h-[3px] bg-gold-gradient" aria-hidden />
         <SectionHeader title="Invoice" icon={Receipt} />
         <InvoiceHeaderFields
           last=""

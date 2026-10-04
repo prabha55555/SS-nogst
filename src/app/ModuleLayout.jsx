@@ -1,26 +1,29 @@
 import {
   ArrowLeft,
   Boxes,
+  CalendarDays,
+  ChevronRight,
   FilePlus2,
   History,
-  Home,
   LayoutDashboard,
   LogOut,
   PieChart,
-  ShoppingCart,
   Receipt,
-  TrendingUp,
+  ShoppingCart,
   Trash2,
+  TrendingUp,
   UserPlus,
   Users,
   Wallet,
   Zap,
 } from 'lucide-react';
-import { NavLink, Outlet, useNavigate } from 'react-router';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 
-import logo from '@/assets/logo.png';
 import { useAuth } from '@/app/AuthProvider';
+import { COMPANY } from '@/core/branding';
+import { formatDateShort, todayISO } from '@/core/format';
 import { cn, useFeedback } from '@/ui';
+import { BrandLockup, BrandMark } from './Brand';
 import { OfflineBanner } from './pwa';
 
 /** The three modules of the app. `items` drive the sidebar (desktop) and bottom tab bar (phones / tablets). */
@@ -76,75 +79,136 @@ function useLogout() {
   };
 }
 
-function Sidebar({ module }) {
-  const onLogout = useLogout();
+const initial = (name) => (name?.trim()?.[0] ?? 'U').toUpperCase();
+
+function UserCard({ onLogout }) {
   const { username } = useAuth();
   return (
-    <aside className="no-print hidden w-64 shrink-0 flex-col bg-brand-800 text-white lg:flex">
-      <div className="flex items-center gap-3 px-5 py-5">
-        <img src={logo} alt="" className="size-10 rounded-lg bg-white object-contain p-0.5" />
-        <div className="leading-tight">
-          <div className="text-sm font-bold">Santhamani</div>
-          <div className="text-xs text-brand-200">Textiles Billing</div>
-        </div>
+    <div className="flex items-center gap-3 rounded-2xl bg-white/5 p-2.5 ring-1 ring-white/10">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gold-sheen font-display text-base font-extrabold text-brand-900">
+        {initial(username)}
+      </span>
+      <div className="min-w-0 flex-1 leading-tight">
+        <div className="truncate text-sm font-semibold text-white">{username ?? 'User'}</div>
+        <div className="text-[11px] text-brand-300">Signed in</div>
       </div>
+      <button
+        type="button"
+        onClick={onLogout}
+        aria-label="Logout"
+        title="Logout"
+        className="rounded-xl p-2 text-brand-300 transition hover:bg-red-500/20 hover:text-red-200"
+      >
+        <LogOut className="size-[18px]" />
+      </button>
+    </div>
+  );
+}
 
-      <div className="px-3 pb-1 text-[11px] font-semibold tracking-wider text-brand-300 uppercase">
-        <span className="px-2">{module.title}</span>
+function SideLink({ to, icon: Icon, children, end }) {
+  return (
+    <NavLink
+      to={to}
+      end={end}
+      className={({ isActive }) =>
+        cn(
+          'group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition duration-150',
+          isActive ? 'bg-white/10 text-white' : 'text-brand-200 hover:bg-white/5 hover:text-white',
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <span
+            className={cn(
+              'absolute top-1/2 left-0 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-gold-gradient transition',
+              isActive ? 'opacity-100' : 'opacity-0',
+            )}
+          />
+          <Icon
+            className={cn(
+              'size-[18px] transition',
+              isActive ? 'text-gold-300' : 'text-brand-300 group-hover:text-gold-300',
+            )}
+            aria-hidden
+          />
+          {children}
+        </>
+      )}
+    </NavLink>
+  );
+}
+
+function Sidebar({ module }) {
+  const onLogout = useLogout();
+  return (
+    <aside className="no-print sticky top-0 hidden h-dvh w-72 shrink-0 flex-col border-r border-white/5 surface-ink lg:flex">
+      <div className="px-5 pt-6 pb-5">
+        <BrandLockup />
       </div>
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3" aria-label={`${module.title} navigation`}>
-        {module.items.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition',
-                isActive ? 'bg-white/15 text-white' : 'text-brand-100 hover:bg-white/10',
-              )
-            }
-          >
-            <Icon className="size-[18px]" aria-hidden />
-            {label}
-          </NavLink>
-        ))}
+      <div className="mx-5 h-px hairline-gold opacity-60" />
 
-        <div className="px-2 pt-5 pb-1 text-[11px] font-semibold tracking-wider text-brand-300 uppercase">
-          Modules
+      <nav className="flex-1 scrollbar-thin space-y-6 overflow-y-auto px-3 py-5" aria-label="Main navigation">
+        <div>
+          <div className="mb-2 flex items-center gap-2 px-3.5 text-[11px] font-bold tracking-[0.18em] text-gold-400/90 uppercase">
+            <module.icon className="size-3.5" aria-hidden /> {module.title}
+          </div>
+          <div className="space-y-0.5">
+            {module.items.map(({ to, label, icon }) => (
+              <SideLink key={to} to={to} icon={icon}>
+                {label}
+              </SideLink>
+            ))}
+          </div>
         </div>
-        <NavLink
-          to="/"
-          end
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-brand-100 hover:bg-white/10"
-        >
-          <LayoutDashboard className="size-[18px]" aria-hidden /> Dashboard
-        </NavLink>
-        {Object.entries(MODULES)
-          .filter(([, m]) => m !== module)
-          .map(([key, m]) => (
-            <NavLink
-              key={key}
-              to={m.home}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-brand-100 hover:bg-white/10"
-            >
-              <m.icon className="size-[18px]" aria-hidden /> {m.title}
-            </NavLink>
-          ))}
+
+        <div>
+          <div className="mb-2 px-3.5 text-[11px] font-bold tracking-[0.18em] text-brand-400 uppercase">
+            Workspace
+          </div>
+          <div className="space-y-0.5">
+            <SideLink to="/" end icon={LayoutDashboard}>
+              Dashboard
+            </SideLink>
+            {Object.entries(MODULES)
+              .filter(([, m]) => m !== module)
+              .map(([key, m]) => (
+                <SideLink key={key} to={m.home} icon={m.icon}>
+                  {m.title}
+                </SideLink>
+              ))}
+          </div>
+        </div>
       </nav>
 
-      <div className="border-t border-white/10 p-3">
-        {username ? (
-          <div className="truncate px-3 pb-2 text-xs text-brand-200">Signed in as {username}</div>
-        ) : null}
-        <button
-          type="button"
-          onClick={onLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-200 hover:bg-red-500/20"
-        >
-          <LogOut className="size-[18px]" aria-hidden /> Logout
-        </button>
+      <div className="space-y-3 p-3">
+        <UserCard onLogout={onLogout} />
+        <p className="px-2 pb-1 text-center text-[10px] tracking-wide text-brand-400">
+          Powered by {COMPANY.displayName}
+        </p>
       </div>
     </aside>
+  );
+}
+
+/** Desktop top bar: breadcrumb, today's date, online dot. */
+function TopBar({ module }) {
+  const { pathname } = useLocation();
+  const page = module.items.find((i) => pathname.startsWith(i.to));
+  const label = page?.label ?? (pathname.includes('/edit/') ? 'Edit Purchase Bill' : module.title);
+  return (
+    <div className="no-print sticky top-0 z-20 hidden h-14 items-center justify-between border-b border-line glass px-8 lg:flex">
+      <nav className="flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+        <module.icon className="size-4 text-gold-600" aria-hidden />
+        <span className="font-medium text-slate-500">{module.title}</span>
+        <ChevronRight className="size-3.5 text-slate-300" aria-hidden />
+        <span className="font-semibold text-brand-800">{label}</span>
+      </nav>
+      <div className="flex items-center gap-2 rounded-full border border-line bg-white px-3.5 py-1.5 text-xs font-medium text-slate-600 shadow-sm">
+        <CalendarDays className="size-3.5 text-gold-600" aria-hidden />
+        {formatDateShort(todayISO())}
+      </div>
+    </div>
   );
 }
 
@@ -152,30 +216,25 @@ function MobileHeader({ module }) {
   const navigate = useNavigate();
   const onLogout = useLogout();
   return (
-    <header className="no-print pt-safe sticky top-0 z-30 flex items-center gap-2 bg-brand-800 px-3 py-2.5 text-white lg:hidden">
+    <header className="no-print pt-safe sticky top-0 z-30 flex items-center gap-2.5 surface-ink px-3 py-2.5 text-white lg:hidden">
       <button
         type="button"
         onClick={() => navigate('/')}
-        aria-label="Dashboard"
-        className="rounded-lg p-2 hover:bg-white/10"
+        aria-label="Back to dashboard"
+        className="rounded-xl p-2 text-brand-200 hover:bg-white/10"
       >
         <ArrowLeft className="size-5" />
       </button>
-      <module.icon className="size-5 text-brand-200" aria-hidden />
-      <h1 className="flex-1 truncate text-base font-semibold">{module.title}</h1>
-      <button
-        type="button"
-        onClick={() => navigate('/')}
-        aria-label="Home"
-        className="rounded-lg p-2 hover:bg-white/10"
-      >
-        <Home className="size-5" />
-      </button>
+      <BrandMark size="sm" />
+      <div className="min-w-0 flex-1 leading-tight">
+        <h1 className="truncate font-display text-[15px] font-bold">{module.title}</h1>
+        <p className="text-[10px] tracking-[0.2em] text-gold-400 uppercase">Brightlight Billing</p>
+      </div>
       <button
         type="button"
         onClick={onLogout}
         aria-label="Logout"
-        className="rounded-lg p-2 hover:bg-white/10"
+        className="rounded-xl p-2 text-brand-200 hover:bg-white/10"
       >
         <LogOut className="size-5" />
       </button>
@@ -186,24 +245,29 @@ function MobileHeader({ module }) {
 function BottomTabs({ module }) {
   return (
     <nav
-      className="no-print pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white lg:hidden"
+      className="no-print pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-line glass shadow-[0_-10px_30px_-18px_rgb(20_26_48/0.35)] lg:hidden"
       aria-label={`${module.title} navigation`}
     >
-      <ul className="mx-auto flex max-w-2xl">
+      <ul className="mx-auto flex max-w-2xl px-1">
         {module.items.map(({ to, short, icon: Icon }) => (
           <li key={to} className="flex-1">
             <NavLink
               to={to}
               className={({ isActive }) =>
                 cn(
-                  'flex min-h-14 flex-col items-center justify-center gap-0.5 px-1 text-[11px] font-medium transition',
-                  isActive ? 'text-brand-700' : 'text-slate-500',
+                  'flex min-h-[3.6rem] flex-col items-center justify-center gap-0.5 px-1 text-[11px] font-semibold transition',
+                  isActive ? 'text-brand-800' : 'text-slate-500',
                 )
               }
             >
               {({ isActive }) => (
                 <>
-                  <span className={cn('rounded-full px-4 py-1', isActive && 'bg-brand-100')}>
+                  <span
+                    className={cn(
+                      'rounded-full px-4 py-1 transition',
+                      isActive && 'bg-gold-sheen text-brand-900 shadow-gold',
+                    )}
+                  >
                     <Icon className="size-5" aria-hidden />
                   </span>
                   {short}
@@ -226,7 +290,8 @@ export function ModuleLayout({ module: key }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <OfflineBanner />
         <MobileHeader module={module} />
-        <main className="flex-1 pb-24 lg:pb-8">
+        <TopBar module={module} />
+        <main className="flex-1 pb-28 lg:pb-10">
           <Outlet />
         </main>
         <BottomTabs module={module} />

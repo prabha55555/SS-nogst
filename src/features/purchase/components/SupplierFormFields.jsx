@@ -1,4 +1,4 @@
-import { Phone } from 'lucide-react';
+import { MapPin, Phone, Truck } from 'lucide-react';
 import { cn, TextField } from '@/ui';
 
 /**
@@ -8,14 +8,14 @@ import { cn, TextField } from '@/ui';
 export function SupplierFormFields({ value, onChange, layout = 'stack', idPrefix = 'supplier' }) {
   const set = (key) => (v) => onChange({ ...value, [key]: v });
   return (
-    <div className={cn('grid gap-3', layout === 'row' && 'sm:grid-cols-3')}>
+    <div className={cn('grid gap-4', layout === 'row' && 'sm:grid-cols-3')}>
       <TextField
         id={`${idPrefix}-phone`}
         label="Phone Number *"
         type="tel"
         inputMode="tel"
         autoComplete="off"
-        placeholder="10-digit phone number"
+        placeholder="98765 43210"
         leftIcon={Phone}
         value={value.phone}
         onChange={set('phone')}
@@ -24,7 +24,8 @@ export function SupplierFormFields({ value, onChange, layout = 'stack', idPrefix
         id={`${idPrefix}-name`}
         label="Supplier Name *"
         autoComplete="off"
-        placeholder="Enter supplier name"
+        placeholder="e.g. ABC Traders"
+        leftIcon={Truck}
         value={value.name}
         onChange={set('name')}
       />
@@ -32,7 +33,8 @@ export function SupplierFormFields({ value, onChange, layout = 'stack', idPrefix
         id={`${idPrefix}-address`}
         label="Address"
         autoComplete="off"
-        placeholder="Enter address"
+        placeholder="Street, area, city"
+        leftIcon={MapPin}
         value={value.address}
         onChange={set('address')}
       />

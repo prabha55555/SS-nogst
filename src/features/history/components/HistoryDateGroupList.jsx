@@ -15,28 +15,49 @@
  *   pageDays     number of days rendered per step (default 8)
  *   emptyTitle   text of the empty state (default "No invoices found.")
  */
-import { Calendar } from 'lucide-react';
+import { Calendar, FileSearch } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { formatCurrency } from '@/core/format';
 import { Button, EmptyState, ErrorState } from '@/ui';
 import { HistoryInvoiceGroupBody } from './HistoryInvoiceTable';
 import { InvoiceListSkeleton } from './Skeleton';
 
 function DateHeading({ group, onClick }) {
   const count = `${group.totalInvoices} Invoice${group.totalInvoices > 1 ? 's' : ''}`;
+  const dayTotal = group.invoices.reduce((sum, invoice) => sum + (Number(invoice.grandTotal) || 0), 0);
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={!group.key}
-      aria-label={`${group.date}, ${count}. Show only this day`}
-      className="flex min-h-12 w-full items-center justify-between gap-3 bg-slate-600 px-4 text-white transition focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none focus-visible:ring-inset enabled:hover:bg-slate-700"
-    >
-      <span className="flex items-center gap-2 text-base font-bold sm:text-lg">
-        <Calendar className="size-[18px]" aria-hidden />
-        {group.date}
-      </span>
-      <span className="text-sm font-semibold">{count}</span>
-    </button>
+    <div className="sticky top-14 z-10 -mx-1 bg-canvas/85 px-1 py-2 backdrop-blur-md">
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={!group.key}
+        aria-label={`${group.date}, ${count}. Show only this day`}
+        className="group relative flex min-h-12 w-full items-center justify-between gap-3 overflow-hidden rounded-2xl border border-line bg-white py-1.5 pr-3.5 pl-4 text-left shadow-card transition duration-200 focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:outline-none enabled:hover:-translate-y-px enabled:hover:border-gold-300 enabled:hover:shadow-lift"
+      >
+        <span className="absolute inset-y-0 left-0 w-1 bg-gold-gradient" aria-hidden />
+        <span className="flex min-w-0 items-center gap-2.5">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-gold-100 text-gold-700 ring-1 ring-gold-200 transition group-enabled:group-hover:bg-gold-sheen group-enabled:group-hover:text-brand-900">
+            <Calendar className="size-[18px]" aria-hidden />
+          </span>
+          <span className="truncate font-display text-[15px] font-extrabold text-brand-800 sm:text-base">
+            {group.date}
+          </span>
+        </span>
+        <span className="flex shrink-0 items-center gap-2.5">
+          <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 ring-inset">
+            {count}
+          </span>
+          <span className="hidden text-right sm:block">
+            <span className="block text-[10px] leading-none font-bold tracking-[0.08em] text-slate-400 uppercase">
+              Day total
+            </span>
+            <span className="font-display text-sm font-extrabold text-brand-800 tabular-nums">
+              ₹{formatCurrency(dayTotal)}
+            </span>
+          </span>
+        </span>
+      </button>
+    </div>
   );
 }
 
@@ -75,26 +96,32 @@ export function HistoryDateGroupList({
       <ErrorState
         message="Error loading invoices. Please try again."
         onRetry={onRetry}
-        className="rounded-xl bg-white shadow-card"
+        className="rounded-2xl border border-line bg-white shadow-card"
       />
     );
   }
   if (groups.length === 0) {
     return (
-      <EmptyState title={emptyTitle} className="rounded-xl border border-slate-200 bg-white shadow-card" />
+      <EmptyState
+        icon={FileSearch}
+        title={emptyTitle}
+        message="Try a different name, invoice number or date range, or clear the filters."
+        className="rounded-2xl border border-line bg-white shadow-card"
+      />
     );
   }
 
   return (
-    <div className="space-y-4">
-      {groups.slice(0, shownDays).map((group) => (
+    <div className="space-y-2">
+      {groups.slice(0, shownDays).map((group, index) => (
         <section
           key={group.key || 'no-date'}
           aria-label={group.date}
-          className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card"
+          className="animate-rise"
+          style={{ animationDelay: `${Math.min(index, 6) * 50}ms` }}
         >
           <DateHeading group={group} onClick={() => onFilterDate(group.key)} />
-          <div className="p-2.5 sm:p-3 lg:p-1.5">
+          <div className="pt-1 pb-3 lg:overflow-hidden lg:rounded-2xl lg:border lg:border-line lg:bg-white lg:p-1.5 lg:shadow-card">
             <HistoryInvoiceGroupBody invoices={group.invoices} labels={labels} actions={actions} />
           </div>
         </section>

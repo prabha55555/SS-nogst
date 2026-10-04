@@ -10,6 +10,7 @@
  *  - onPhoneChange(phone) · onSelect(party)
  *  - summary: { totalPreviousBills, balanceCarriedForward } | null
  */
+import { Wallet } from 'lucide-react';
 import { PartyNotFoundHint, PartyPicker } from '@/components/bill';
 import { formatCurrency } from '@/core/format';
 
@@ -46,17 +47,27 @@ export function CustomerSection({
         }
       />
       {summary ? (
-        <div className="rounded-lg bg-brand-50 p-3" aria-label="Customer Account Summary">
-          <h3 className="mb-1 text-sm font-bold text-brand-800">Customer Account Summary</h3>
-          <div className="flex justify-between gap-3 text-sm">
-            <span className="text-slate-600">Total Previous Bills:</span>
-            <span className="font-semibold tabular-nums">{rupees(summary.totalPreviousBills)}</span>
+        <div
+          className="grid gap-px overflow-hidden rounded-xl border border-gold-200 bg-gold-200/60 sm:grid-cols-2"
+          aria-label="Customer Account Summary"
+        >
+          <div className="col-span-full bg-gold-50 px-3.5 py-2">
+            <h3 className="flex items-center gap-2 text-[13px] font-bold text-gold-800">
+              <Wallet className="size-4" aria-hidden />
+              Customer Account Summary
+            </h3>
           </div>
-          <div className="flex justify-between gap-3 text-sm">
-            <span className="text-slate-600">Balance Carried Forward:</span>
-            <span className="font-semibold text-red-600 tabular-nums">
+          <div className="bg-white px-3.5 py-3">
+            <div className="text-xs font-medium text-slate-500">Total Previous Bills:</div>
+            <div className="mt-0.5 font-display text-lg font-extrabold text-brand-800 tabular-nums">
+              {rupees(summary.totalPreviousBills)}
+            </div>
+          </div>
+          <div className="bg-white px-3.5 py-3">
+            <div className="text-xs font-medium text-slate-500">Balance Carried Forward:</div>
+            <div className="mt-0.5 font-display text-lg font-extrabold text-red-600 tabular-nums">
               {rupees(summary.balanceCarriedForward)}
-            </span>
+            </div>
           </div>
         </div>
       ) : null}

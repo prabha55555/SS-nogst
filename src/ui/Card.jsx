@@ -1,9 +1,16 @@
 import { cn } from './cn';
 
-export function Card({ className, children, as: Tag = 'div', ...rest }) {
+/** White surface with a soft brand shadow. `tone="ink"` gives the dark premium variant. */
+export function Card({ className, children, as: Tag = 'div', tone = 'light', ...rest }) {
   return (
     <Tag
-      className={cn('rounded-xl border border-slate-200 bg-white p-4 shadow-card sm:p-5', className)}
+      className={cn(
+        'rounded-2xl p-4 sm:p-5',
+        tone === 'ink'
+          ? 'border border-white/10 surface-ink text-white shadow-lift'
+          : 'border border-line bg-white shadow-card',
+        className,
+      )}
       {...rest}
     >
       {children}
@@ -11,12 +18,16 @@ export function Card({ className, children, as: Tag = 'div', ...rest }) {
   );
 }
 
-/** Card heading row: icon + title on the left, optional actions (`right`) on the right. */
+/** Card heading row: gold-tinted icon + title on the left, optional actions (`right`) on the right. */
 export function SectionHeader({ title, icon: Icon, right, className }) {
   return (
-    <div className={cn('mb-3 flex flex-wrap items-center justify-between gap-2', className)}>
-      <h2 className="flex items-center gap-2 text-base font-semibold text-slate-800">
-        {Icon ? <Icon className="size-5 text-brand-600" aria-hidden /> : null}
+    <div className={cn('mb-4 flex flex-wrap items-center justify-between gap-2', className)}>
+      <h2 className="flex items-center gap-2.5 text-[15px] font-bold text-brand-800">
+        {Icon ? (
+          <span className="flex size-8 items-center justify-center rounded-lg bg-gold-100 text-gold-700 ring-1 ring-gold-200">
+            <Icon className="size-[18px]" aria-hidden />
+          </span>
+        ) : null}
         {title}
       </h2>
       {right}
@@ -25,23 +36,23 @@ export function SectionHeader({ title, icon: Icon, right, className }) {
 }
 
 export function Divider({ className }) {
-  return <hr className={cn('my-3 border-slate-200', className)} />;
+  return <hr className={cn('my-3 border-line', className)} />;
 }
 
 const TONES = {
-  success: 'bg-emerald-100 text-emerald-800',
-  danger: 'bg-red-100 text-red-800',
-  warning: 'bg-amber-100 text-amber-800',
-  info: 'bg-sky-100 text-sky-800',
-  neutral: 'bg-slate-100 text-slate-700',
-  brand: 'bg-brand-100 text-brand-800',
+  success: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+  danger: 'bg-red-50 text-red-700 ring-red-200',
+  warning: 'bg-amber-50 text-amber-800 ring-amber-200',
+  info: 'bg-sky-50 text-sky-700 ring-sky-200',
+  neutral: 'bg-slate-100 text-slate-700 ring-slate-200',
+  brand: 'bg-gold-100 text-gold-800 ring-gold-200',
 };
 
 export function Badge({ tone = 'neutral', className, children }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold',
+        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset',
         TONES[tone],
         className,
       )}
@@ -64,38 +75,45 @@ export function KeyValue({ label, value, bold, valueClassName, className }) {
 }
 
 const TINTS = {
-  brand: 'bg-brand-50 text-brand-600',
-  green: 'bg-emerald-50 text-emerald-600',
-  red: 'bg-red-50 text-red-600',
-  amber: 'bg-amber-50 text-amber-600',
-  sky: 'bg-sky-50 text-sky-600',
-  violet: 'bg-violet-50 text-violet-600',
+  brand: 'bg-gold-100 text-gold-700 ring-gold-200',
+  green: 'bg-emerald-50 text-emerald-600 ring-emerald-200',
+  red: 'bg-red-50 text-red-600 ring-red-200',
+  amber: 'bg-amber-50 text-amber-600 ring-amber-200',
+  sky: 'bg-sky-50 text-sky-600 ring-sky-200',
+  violet: 'bg-violet-50 text-violet-600 ring-violet-200',
 };
 
-/** KPI tile: icon, big value, small label. */
+/** KPI tile: tinted icon, big value, small label, gold hairline on top. */
 export function StatCard({ icon: Icon, value, label, tint = 'brand', valueClassName, className }) {
   return (
     <div
       className={cn(
-        'flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5 shadow-card',
+        'group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border border-line bg-white p-4 shadow-card',
+        'transition duration-200 hover:-translate-y-0.5 hover:shadow-lift',
         className,
       )}
     >
+      <span className="absolute inset-x-0 top-0 h-px hairline-gold opacity-0 transition group-hover:opacity-100" />
       {Icon ? (
-        <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-full', TINTS[tint])}>
+        <span
+          className={cn(
+            'flex size-11 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset',
+            TINTS[tint],
+          )}
+        >
           <Icon className="size-5" aria-hidden />
         </span>
       ) : null}
       <div className="min-w-0">
         <div
           className={cn(
-            'truncate text-lg leading-tight font-bold text-slate-900 tabular-nums',
+            'truncate font-display text-xl leading-tight font-extrabold text-brand-800 tabular-nums',
             valueClassName,
           )}
         >
           {value}
         </div>
-        <div className="truncate text-xs text-slate-500">{label}</div>
+        <div className="truncate text-xs font-medium text-slate-500">{label}</div>
       </div>
     </div>
   );

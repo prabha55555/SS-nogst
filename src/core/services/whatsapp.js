@@ -62,7 +62,7 @@ export function buildStatementMessage(args) {
     if (pb.account > 0) m += `│   🏦 Acct:   Rs. ${fmt(pb.account)}\n`;
   }
   m += `│ ${LINE}\n│ *DUE:       Rs. ${fmt(totalReturns > 0 ? adjustedBalanceDue : invoice.balanceDue)}*\n+${LINE}\n`;
-  m += `\n━━━━━━━━━━━━━━━━━━━━━━\n*CONTACT INFORMATION*\n🏪 *${COMPANY.name}*\n📍 ${COMPANY.whatsappLocation}\n📞 ${COMPANY.whatsappPhones}\n\n_Automated invoice statement._`;
+  m += `\n━━━━━━━━━━━━━━━━━━━━━━\n*CONTACT INFORMATION*\n🏪 *${COMPANY.name}*${COMPANY.whatsappLocation ? `\n📍 ${COMPANY.whatsappLocation}` : ''}${COMPANY.whatsappPhones ? `\n📞 ${COMPANY.whatsappPhones}` : ''}\n\n_Automated invoice statement._`;
   m += `\n\n${CREDIT_LINE}`;
   return m;
 }

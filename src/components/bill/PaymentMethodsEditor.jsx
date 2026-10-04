@@ -8,14 +8,14 @@
  *  - totalLabel?: string        default "Total Amount Paid"
  *  - readOnly?: boolean
  */
-import { Building2, Banknote, Smartphone } from 'lucide-react';
+import { Banknote, Building2, Smartphone } from 'lucide-react';
 import { formatCurrency } from '@/core/format';
 import { NumberField } from '@/ui';
 
 const METHODS = [
-  { key: 'cash', label: 'CASH', icon: Banknote, tint: 'text-emerald-600' },
-  { key: 'upi', label: 'UPI', icon: Smartphone, tint: 'text-sky-600' },
-  { key: 'account', label: 'ACCOUNT', icon: Building2, tint: 'text-violet-600' },
+  { key: 'cash', label: 'CASH', icon: Banknote, hint: 'Cash in hand' },
+  { key: 'upi', label: 'UPI', icon: Smartphone, hint: 'GPay · PhonePe · Paytm' },
+  { key: 'account', label: 'ACCOUNT', icon: Building2, hint: 'Bank transfer' },
 ];
 
 export function PaymentMethodsEditor({
@@ -28,14 +28,21 @@ export function PaymentMethodsEditor({
   return (
     <div>
       <div className="space-y-2">
-        {METHODS.map(({ key, label, icon: Icon, tint }) => (
-          <div key={key} className="flex items-center gap-3">
-            <span className="flex w-28 shrink-0 items-center gap-2 text-sm font-bold text-slate-800">
-              <Icon className={`size-5 ${tint}`} aria-hidden />
-              {label}
+        {METHODS.map(({ key, label, icon: Icon, hint }) => (
+          <div
+            key={key}
+            className="flex items-center gap-3 rounded-xl border border-line bg-slate-50/70 p-2 pl-2.5 transition focus-within:border-gold-400 focus-within:bg-gold-50/50 focus-within:ring-4 focus-within:ring-gold-100"
+          >
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gold-100 text-gold-700 ring-1 ring-gold-200">
+              <Icon className="size-[18px]" aria-hidden />
+            </span>
+            <span className="min-w-0 flex-1 leading-tight">
+              <span className="block text-[13px] font-bold tracking-wide text-slate-800">{label}</span>
+              <span className="block truncate text-[11px] text-slate-500">{hint}</span>
             </span>
             <NumberField
-              className="flex-1"
+              className="w-32 shrink-0 sm:w-36"
+              inputClassName="font-semibold"
               aria-label={`${label.charAt(0)}${label.slice(1).toLowerCase()} amount paid`}
               value={values[key]}
               readOnly={readOnly}
@@ -44,9 +51,11 @@ export function PaymentMethodsEditor({
           </div>
         ))}
       </div>
-      <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-slate-200 pt-2">
-        <span className="text-sm font-bold text-slate-800">{totalLabel}</span>
-        <span className="font-bold text-emerald-600 tabular-nums">₹{formatCurrency(totalPaid)}</span>
+      <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-dashed border-slate-300 pt-3">
+        <span className="text-sm font-bold text-slate-700">{totalLabel}</span>
+        <span className="font-display text-lg font-extrabold text-emerald-600 tabular-nums">
+          ₹{formatCurrency(totalPaid)}
+        </span>
       </div>
     </div>
   );

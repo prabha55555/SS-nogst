@@ -92,12 +92,14 @@ export function AddPaymentSheet({
         className="space-y-4"
       >
         {balanceDue !== undefined ? (
-          <div className="flex items-baseline justify-between text-sm">
-            <span className="text-slate-500">Current Balance Due</span>
-            <span className="font-bold text-red-600 tabular-nums">₹{formatCurrency(balanceDue)}</span>
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 surface-ink px-4 py-3.5 text-white shadow-lift">
+            <span className="text-sm font-medium text-brand-200">Current Balance Due</span>
+            <span className="font-display text-2xl font-extrabold text-gold-300 tabular-nums">
+              ₹{formatCurrency(balanceDue)}
+            </span>
           </div>
         ) : null}
-        <div className="grid grid-cols-3 gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+        <div className="grid grid-cols-3 gap-3 rounded-2xl border border-line bg-slate-50/70 p-3">
           <NumberField
             label={
               <span className="flex items-center gap-1 text-xs font-semibold">
@@ -128,9 +130,12 @@ export function AddPaymentSheet({
             value={values.account}
             onChange={set('account')}
           />
-          <div className="col-span-3 flex items-center justify-between rounded-lg border border-brand-100 bg-brand-50 px-3 py-2 text-sm font-bold">
+          <div className="col-span-3 flex items-center justify-between rounded-xl border border-gold-200 bg-gold-50/70 px-3.5 py-2.5 text-sm font-bold">
             <span className="text-slate-700">Total:</span>
-            <span className="text-base text-brand-700 tabular-nums" aria-live="polite">
+            <span
+              className="font-display text-lg font-extrabold text-brand-800 tabular-nums"
+              aria-live="polite"
+            >
               ₹{formatCurrency(totalOf(amounts))}
             </span>
           </div>
@@ -139,7 +144,7 @@ export function AddPaymentSheet({
         {error ? (
           <p
             role="alert"
-            className="rounded-lg bg-red-50 p-3 text-sm font-semibold whitespace-pre-line text-red-700"
+            className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold whitespace-pre-line text-red-700"
           >
             {error}
           </p>

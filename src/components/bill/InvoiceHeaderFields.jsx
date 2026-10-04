@@ -37,20 +37,30 @@ export function InvoiceHeaderFields({
 }) {
   const noSuggestion = !suggested || suggested === '-';
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {!invoiceNoReadOnly && !hideSuggestion ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-brand-50 p-3">
-          <div className="min-w-0 text-sm text-slate-600">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-gold-50/70 p-3 ring-1 ring-gold-200/80">
+          <div className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-1 text-sm text-slate-600">
             <div>
-              {lastLabel}: <strong className="text-brand-700">{last || '-'}</strong>
+              <div className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
+                {lastLabel}
+              </div>
+              <strong className="font-display text-base font-bold text-brand-800 tabular-nums">
+                {last || '-'}
+              </strong>
             </div>
             <div>
-              Suggested Next: <strong className="text-brand-700">{suggested || '-'}</strong>
+              <div className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
+                Suggested Next
+              </div>
+              <strong className="font-display text-base font-bold text-gold-700 tabular-nums">
+                {suggested || '-'}
+              </strong>
               {cycleRestarted ? <span className="ml-1 text-xs text-red-600">(Cycle Restarted)</span> : null}
             </div>
           </div>
           <Button
-            variant="info"
+            variant="outline"
             size="sm"
             icon={Sparkles}
             disabled={noSuggestion}
@@ -60,13 +70,14 @@ export function InvoiceHeaderFields({
           </Button>
         </div>
       ) : null}
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3.5 sm:grid-cols-2">
         <TextField
           label={invoiceNoLabel}
           placeholder="Invoice no."
           value={invoiceNo}
           readOnly={invoiceNoReadOnly}
           onChange={onInvoiceNoChange}
+          inputClassName="font-display font-bold tracking-wide"
           autoCapitalize="characters"
           autoComplete="off"
           spellCheck={false}

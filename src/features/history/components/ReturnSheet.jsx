@@ -12,7 +12,7 @@
 import { Plus, Save } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { formatCurrency, formatDateIN, todayISO } from '@/core/format';
-import { Button, DateField } from '@/ui';
+import { Button, DateField, cn } from '@/ui';
 import { newReturnItem, returnSummary, returnedQtyByDescription } from '../lib/returns';
 import { HistorySheet } from './HistorySheet';
 import { ReturnItemEditor } from './ReturnItemEditor';
@@ -22,10 +22,21 @@ const rs = (n) => `₹${formatCurrency(n)}`;
 function SummaryRow({ label, value, tone, bold }) {
   return (
     <div
-      className={`flex justify-between gap-3 py-0.5 text-sm ${bold ? 'mt-1 border-t border-slate-300 pt-2 font-bold' : ''}`}
+      className={cn(
+        'flex items-baseline justify-between gap-3 py-0.5 text-sm',
+        bold && 'mt-1.5 border-t border-gold-200 pt-2.5 font-bold',
+      )}
     >
-      <span className={bold ? 'text-slate-900' : 'text-slate-500'}>{label}</span>
-      <span className={`font-semibold tabular-nums ${tone ?? 'text-slate-900'}`}>{value}</span>
+      <span className={bold ? 'text-brand-800' : 'text-slate-500'}>{label}</span>
+      <span
+        className={cn(
+          'tabular-nums',
+          bold ? 'font-display text-lg font-extrabold' : 'font-semibold',
+          tone ?? 'text-brand-800',
+        )}
+      >
+        {value}
+      </span>
     </div>
   );
 }
@@ -99,17 +110,17 @@ export function ReturnSheet({
         </>
       }
     >
-      <div className="mb-4 rounded-xl bg-slate-50 p-3">
-        <p className="text-base font-bold text-slate-900">{`${labels.party}: ${partyName}`}</p>
+      <div className="mb-4 rounded-2xl border border-line bg-slate-50/70 p-3.5">
+        <p className="font-display text-base font-bold text-brand-800">{`${labels.party}: ${partyName}`}</p>
         <p className="text-sm text-slate-500">Invoice Date: {formatDateIN(invoiceDate)}</p>
         {previousReturns > 0 ? (
-          <p className="text-sm font-bold text-red-600">Previous Returns: {rs(previousReturns)}</p>
+          <p className="mt-0.5 text-sm font-bold text-amber-700">Previous Returns: {rs(previousReturns)}</p>
         ) : null}
       </div>
 
       <DateField label="Return Date" value={returnDate} onChange={setReturnDate} className="mb-4 max-w-xs" />
 
-      <h3 className="mb-2 text-base font-bold text-slate-900">Return Products</h3>
+      <h3 className="mb-2 font-display text-base font-bold text-brand-800">Return Products</h3>
       {items.map((item, index) => (
         <ReturnItemEditor
           key={item.key}
@@ -130,11 +141,11 @@ export function ReturnSheet({
         Add Return Item
       </Button>
 
-      <div className="my-4 rounded-xl bg-slate-50 p-3">
+      <div className="my-4 rounded-2xl border border-gold-200 bg-gold-50/60 p-3.5">
         <SummaryRow label="Original Balance Due:" value={rs(balanceDue)} />
         {previousReturns > 0 ? (
           <>
-            <SummaryRow label="Previous Returns:" value={`-${rs(previousReturns)}`} tone="text-red-600" />
+            <SummaryRow label="Previous Returns:" value={`-${rs(previousReturns)}`} tone="text-amber-700" />
             <SummaryRow label="Current Balance Before This Return:" value={rs(currentBalance)} />
           </>
         ) : null}
@@ -143,7 +154,10 @@ export function ReturnSheet({
       </div>
 
       {error ? (
-        <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">
+        <p
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700"
+        >
           {error}
         </p>
       ) : null}

@@ -10,6 +10,16 @@ const esc = (value) =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+/** Address / phone / e-mail / website line for the invoice header — empty details are left out. */
+function companyContactLine() {
+  const parts = [
+    COMPANY.address && esc(COMPANY.address),
+    COMPANY.cell && `<span style="white-space: nowrap;">CELL: ${esc(COMPANY.cell)}</span>`,
+    COMPANY.email && esc(COMPANY.email),
+    COMPANY.website && esc(COMPANY.website),
+  ].filter(Boolean);
+  return parts.length ? `<p>${parts.join(' | ')}</p>` : '';
+}
 const CSS = `
   * { box-sizing: border-box; }
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 24px; background: #fff; position: relative; color: #333; }
@@ -90,13 +100,13 @@ export function invoiceBody(input) {
   const legacyMethod =
     invoice.paymentMethod === 'cash' ? 'CASH' : invoice.paymentMethod === 'upi' ? 'UPI' : 'ACCOUNT';
   return `
-  <div class="watermark">SS ${esc(invoice.invoiceNo)}</div>
+  <div class="watermark">${esc(COMPANY.monogram)} ${esc(invoice.invoiceNo)}</div>
   <div class="invoice-container">
     <div class="invoice-header">
       <div class="company-info">
         <div class="company-details">
           <h2>${COMPANY.name}</h2>
-          <p>${esc(COMPANY.address)} | <span style="white-space: nowrap;">CELL: ${COMPANY.cell}</span></p>
+          ${companyContactLine()}
         </div>
       </div>
       <div class="logo-container">
@@ -162,7 +172,7 @@ export function invoiceBody(input) {
       <div class="amount-in-words">
         <p><strong>Amount in words:</strong></p>
         <p style="margin-bottom: 12px; font-style: italic;">${numberToWords(invoice.grandTotal)}</p>
-        <p style="margin: 0; font-weight: bold; font-size: 13px;">G-pay No : ${COMPANY.gpay}</p>
+        ${COMPANY.gpay ? `<p style="margin: 0; font-weight: bold; font-size: 13px;">G-pay No : ${esc(COMPANY.gpay)}</p>` : ''}
       </div>
       <div class="payment-calculation">
         <h3>PAYMENT SUMMARY</h3>
@@ -223,9 +233,9 @@ export function invoiceBody(input) {
 
     <div class="developer-credit-print">
       <p style="margin: 3px 0;">
-        Software created by <strong style="color: #2c3e50;">${COMPANY.creditName}</strong>
+        Powered by <strong style="color: #1b2030;">${esc(COMPANY.creditName)}</strong>
         <span style="color: #ccc; margin: 0 5px;">|</span>
-        For custom billing solutions, contact: <strong style="color: #e74c3c;">${COMPANY.creditPhone}</strong>
+        <span style="color: #b9830f;">${esc(COMPANY.tagline)}</span>
       </p>
     </div>
   </div>`;

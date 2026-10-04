@@ -1,8 +1,8 @@
-# Migration notes — HTML site → React (JSX) + Tailwind PWA
+# Business-rule notes — original HTML app → React (JSX) + Tailwind PWA
 
-The original site (static HTML + vanilla JS + Firestore, kept in `legacy/`) is now a **React 19 + Tailwind CSS PWA**.
-Both read and write the *same* Firestore project, so the old site and the new app can run side by side during the
-cut-over.
+This app is a React 19 + Tailwind CSS PWA ported from an earlier static HTML + vanilla JS + Firestore application. The
+business rules were ported 1:1; this file records the behaviours that were preserved on purpose (some look like bugs)
+and what changed.
 
 ## 1. Web-app behaviour that was preserved on purpose (looks like a bug — decide before fixing)
 
@@ -101,5 +101,5 @@ the old source files (U+FFFD / `?`) were rebuilt, and WhatsApp numbers get the `
 
 ## 5. Where the original code is
 
-The original HTML/JS site lives in `legacy/` (`legacy/*.html`, `legacy/js`, `legacy/css`). Every `PARITY NOTE` comment that
-mentions `js/…` or a `*.html` file refers to it.
+The original HTML/JS application is preserved in git history (the commit before the React conversion). Every
+`PARITY NOTE` comment that mentions `js/…` or a `*.html` file refers to it.

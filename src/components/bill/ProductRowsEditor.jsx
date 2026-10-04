@@ -16,6 +16,7 @@ import { rowAmount } from '@/core/billing';
 import { formatCurrency } from '@/core/format';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { Button, IconButton, NumberField } from '@/ui';
+import { cn } from '@/ui/cn';
 import { ProductDescriptionInput } from './ProductDescriptionInput';
 import { EMPTY_ROW, removeRowAt } from './productMatch';
 
@@ -34,9 +35,17 @@ export function ProductRowsEditor({ rows, onChange, shortcuts, readOnly, addLabe
       {isCompact ? (
         <ul className="space-y-3">
           {rows.map((row, i) => (
-            <li key={i} className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-bold text-brand-700">Item {i + 1}</span>
+            <li key={i} className="rounded-2xl border border-line bg-white p-3.5 shadow-card">
+              <div className="mb-2.5 flex items-center justify-between">
+                <span className="flex items-center gap-2 text-sm font-bold text-brand-800">
+                  <span
+                    aria-hidden
+                    className="flex size-6 items-center justify-center rounded-full bg-brand-800 text-xs font-bold text-gold-300 tabular-nums"
+                  >
+                    {i + 1}
+                  </span>
+                  Item {i + 1}
+                </span>
                 {!readOnly ? (
                   <IconButton
                     icon={Trash2}
@@ -53,7 +62,7 @@ export function ProductRowsEditor({ rows, onChange, shortcuts, readOnly, addLabe
                 shortcuts={shortcuts}
                 readOnly={readOnly}
               />
-              <div className="mt-2 grid grid-cols-[1fr_1fr_1.1fr] items-end gap-2">
+              <div className="mt-2.5 grid grid-cols-[1fr_1fr] gap-2.5">
                 <NumberField
                   label="Qty"
                   value={row.qty}
@@ -66,81 +75,103 @@ export function ProductRowsEditor({ rows, onChange, shortcuts, readOnly, addLabe
                   readOnly={readOnly}
                   onChange={(rate) => update(i, { rate })}
                 />
-                <div className="pb-2 text-right">
-                  <div className="text-xs text-slate-500">Amount</div>
-                  <div className="truncate text-base font-bold text-slate-900 tabular-nums">
-                    {rupees(rowAmount(row.qty, row.rate))}
-                  </div>
-                </div>
+              </div>
+              <div className="mt-3 flex items-baseline justify-between gap-3 rounded-xl bg-gold-50/70 px-3 py-2 ring-1 ring-gold-200/70">
+                <span className="text-xs font-semibold tracking-wider text-slate-500 uppercase">Amount</span>
+                <span className="truncate font-display text-lg font-extrabold text-brand-800 tabular-nums">
+                  {rupees(rowAmount(row.qty, row.rate))}
+                </span>
               </div>
             </li>
           ))}
         </ul>
       ) : (
-        <table className="w-full table-fixed border-separate border-spacing-0 text-sm">
-          <thead>
-            <tr className="text-left text-xs font-semibold tracking-wide text-slate-500 uppercase">
-              <th className="w-14 border-b border-slate-200 px-2 pb-2">S.No</th>
-              <th className="border-b border-slate-200 px-2 pb-2">Description</th>
-              <th className="w-24 border-b border-slate-200 px-2 pb-2 text-right lg:w-28">Qty</th>
-              <th className="w-28 border-b border-slate-200 px-2 pb-2 text-right lg:w-32">Rate</th>
-              <th className="w-32 border-b border-slate-200 px-2 pb-2 text-right lg:w-36">Amount</th>
-              {!readOnly ? (
-                <th className="w-12 border-b border-slate-200 pb-2">
-                  <span className="sr-only">Remove</span>
+        <div className="rounded-xl border border-line">
+          <table className="w-full table-fixed border-separate border-spacing-0 text-sm">
+            <thead>
+              <tr className="text-left text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
+                <th className="w-14 rounded-tl-xl border-b border-line bg-slate-50/80 px-3 py-2.5">S.No</th>
+                <th className="border-b border-line bg-slate-50/80 px-2 py-2.5">Description</th>
+                <th className="w-24 border-b border-line bg-slate-50/80 px-2 py-2.5 text-right lg:w-28">
+                  Qty
                 </th>
-              ) : null}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, i) => (
-              <tr key={i} className="align-top">
-                <td className="px-2 pt-4 text-slate-500 tabular-nums">{i + 1}</td>
-                <td className="px-1 py-1.5">
-                  <ProductDescriptionInput
-                    label={`Description of item ${i + 1}`}
-                    value={row.description}
-                    onChange={(description) => update(i, { description })}
-                    shortcuts={shortcuts}
-                    readOnly={readOnly}
-                  />
-                </td>
-                <td className="px-1 py-1.5">
-                  <NumberField
-                    aria-label={`Quantity of item ${i + 1}`}
-                    value={row.qty}
-                    readOnly={readOnly}
-                    onChange={(qty) => update(i, { qty })}
-                  />
-                </td>
-                <td className="px-1 py-1.5">
-                  <NumberField
-                    aria-label={`Rate of item ${i + 1}`}
-                    value={row.rate}
-                    readOnly={readOnly}
-                    onChange={(rate) => update(i, { rate })}
-                  />
-                </td>
-                <td className="px-2 pt-4 text-right font-semibold text-slate-900 tabular-nums">
-                  {rupees(rowAmount(row.qty, row.rate))}
-                </td>
+                <th className="w-28 border-b border-line bg-slate-50/80 px-2 py-2.5 text-right lg:w-32">
+                  Rate
+                </th>
+                <th
+                  className={cn(
+                    'w-32 border-b border-line bg-slate-50/80 px-3 py-2.5 text-right lg:w-36',
+                    readOnly && 'rounded-tr-xl',
+                  )}
+                >
+                  Amount
+                </th>
                 {!readOnly ? (
-                  <td className="px-1 py-1.5 text-center">
-                    <IconButton
-                      icon={Trash2}
-                      label={`Remove item ${i + 1}`}
-                      className="text-red-600 hover:bg-red-50"
-                      onClick={() => remove(i)}
-                    />
-                  </td>
+                  <th className="w-12 rounded-tr-xl border-b border-line bg-slate-50/80 py-2.5">
+                    <span className="sr-only">Remove</span>
+                  </th>
                 ) : null}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="[&>tr:last-child>td]:border-b-0 [&>tr:last-child>td:first-child]:rounded-bl-xl [&>tr:last-child>td:last-child]:rounded-br-xl">
+              {rows.map((row, i) => (
+                <tr
+                  key={i}
+                  className="group align-top transition-colors focus-within:bg-gold-50/40 hover:bg-gold-50/40"
+                >
+                  <td className="border-b border-line px-3 pt-4 text-slate-400 tabular-nums">{i + 1}</td>
+                  <td className="border-b border-line px-1.5 py-2">
+                    <ProductDescriptionInput
+                      label={`Description of item ${i + 1}`}
+                      value={row.description}
+                      onChange={(description) => update(i, { description })}
+                      shortcuts={shortcuts}
+                      readOnly={readOnly}
+                    />
+                  </td>
+                  <td className="border-b border-line px-1.5 py-2">
+                    <NumberField
+                      aria-label={`Quantity of item ${i + 1}`}
+                      value={row.qty}
+                      readOnly={readOnly}
+                      onChange={(qty) => update(i, { qty })}
+                    />
+                  </td>
+                  <td className="border-b border-line px-1.5 py-2">
+                    <NumberField
+                      aria-label={`Rate of item ${i + 1}`}
+                      value={row.rate}
+                      readOnly={readOnly}
+                      onChange={(rate) => update(i, { rate })}
+                    />
+                  </td>
+                  <td className="border-b border-line px-3 pt-3.5 text-right font-display font-bold text-brand-800 tabular-nums">
+                    {rupees(rowAmount(row.qty, row.rate))}
+                  </td>
+                  {!readOnly ? (
+                    <td className="border-b border-line px-1 py-2 text-center">
+                      <IconButton
+                        icon={Trash2}
+                        label={`Remove item ${i + 1}`}
+                        className="text-slate-400 hover:bg-red-50 hover:text-red-600"
+                        onClick={() => remove(i)}
+                      />
+                    </td>
+                  ) : null}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
       {!readOnly ? (
-        <Button variant="outline" icon={PlusCircle} onClick={add} fullWidth={isCompact} className="mt-3">
+        <Button
+          variant="outline"
+          icon={PlusCircle}
+          onClick={add}
+          fullWidth
+          className="mt-3 min-h-12 border-dashed border-gold-400 bg-gold-50/40 text-gold-800 hover:bg-gold-50"
+        >
           {addLabel}
         </Button>
       ) : null}

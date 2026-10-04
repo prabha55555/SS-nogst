@@ -6,7 +6,7 @@
  *        noun (default "Invoice": "Delete Invoice", "Move to Recycle Bin"; pass "Bill" for purchases) ·
  *        note? (string shown in the amber note box; default: later invoices are recalculated).
  */
-import { Trash2, X } from 'lucide-react';
+import { AlertTriangle, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button, TextField } from '@/ui';
 import { HistorySheet } from './HistorySheet';
@@ -56,16 +56,22 @@ export function DeleteInvoiceSheet({
         className="space-y-4"
       >
         <div className="flex justify-center">
-          <span className="flex size-16 items-center justify-center rounded-full bg-red-50 text-red-600">
+          <span className="flex size-16 items-center justify-center rounded-2xl bg-red-50 text-red-600 shadow-sm ring-4 ring-red-100/70 ring-inset">
             <Trash2 className="size-8" aria-hidden />
           </span>
         </div>
-        <p className="text-center text-sm text-slate-800">
-          You are about to delete {noun} <strong>#{invoiceNo}</strong>. It will be moved to the Recycle Bin,
-          and you can restore it from there.
-        </p>
+        <div className="rounded-2xl border border-red-200 bg-red-50/70 p-3.5 text-center">
+          <p className="text-sm text-slate-700">
+            You are about to delete {noun}{' '}
+            <strong className="font-display text-base font-extrabold text-red-700">#{invoiceNo}</strong>. It
+            will be moved to the Recycle Bin, and you can restore it from there.
+          </p>
+        </div>
         {note ? (
-          <p className="rounded-lg bg-amber-50 p-3 text-sm font-semibold text-amber-800">{note}</p>
+          <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-semibold text-amber-800">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
+            {note}
+          </p>
         ) : null}
         <TextField
           label={`Type the ${noun.toLowerCase()} number ${invoiceNo} to confirm:`}

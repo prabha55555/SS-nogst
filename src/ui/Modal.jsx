@@ -47,7 +47,7 @@ export function Modal({
   return createPortal(
     <div className={cn('no-print fixed inset-0 flex items-end justify-center sm:items-center sm:p-4', layer)}>
       <div
-        className="absolute inset-0 animate-fade-in bg-slate-900/50"
+        className="absolute inset-0 animate-fade-in bg-brand-950/55 backdrop-blur-[3px]"
         onClick={dismissable ? onClose : undefined}
         aria-hidden
       />
@@ -58,15 +58,18 @@ export function Modal({
         aria-labelledby={title ? titleId : undefined}
         tabIndex={-1}
         className={cn(
-          'relative flex max-h-[92dvh] w-full animate-sheet-in flex-col rounded-t-2xl bg-white shadow-pop outline-none',
-          'sm:max-h-[90dvh] sm:rounded-2xl',
+          'relative flex max-h-[92dvh] w-full animate-sheet-in flex-col overflow-hidden rounded-t-3xl bg-white shadow-pop outline-none',
+          'sm:max-h-[90dvh] sm:rounded-3xl',
           SIZES[size],
           className,
         )}
       >
+        <span className="absolute inset-x-0 top-0 h-[2px] hairline-gold" aria-hidden />
+        {/* phone grab handle */}
+        <span className="mx-auto mt-2 h-1 w-10 rounded-full bg-slate-200 sm:hidden" aria-hidden />
         {title ? (
-          <header className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 sm:px-5">
-            <h2 id={titleId} className="text-lg font-semibold text-slate-900">
+          <header className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5 sm:px-6 sm:py-4">
+            <h2 id={titleId} className="font-display text-lg font-bold text-brand-800">
               {title}
             </h2>
             {dismissable ? (
@@ -74,16 +77,16 @@ export function Modal({
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
-                className="-mr-1 rounded-lg p-1.5 text-slate-500 hover:bg-slate-100"
+                className="-mr-1.5 rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
               >
                 <X className="size-5" />
               </button>
             ) : null}
           </header>
         ) : null}
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
         {footer ? (
-          <footer className="pb-safe flex flex-wrap justify-end gap-2 border-t border-slate-200 px-4 py-3 sm:px-5">
+          <footer className="pb-safe flex flex-wrap justify-end gap-2 border-t border-line bg-slate-50/70 px-5 py-3.5 sm:px-6">
             {footer}
           </footer>
         ) : null}

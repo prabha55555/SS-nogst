@@ -29,7 +29,7 @@ function IconAction({ icon: Icon, label, tone, onClick }) {
         onClick();
       }}
       className={cn(
-        'flex size-8 items-center justify-center rounded-md hover:bg-slate-200/70 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-none',
+        'flex size-8 items-center justify-center rounded-lg transition hover:bg-gold-100/70 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:outline-none active:scale-90',
         tone,
       )}
     >
@@ -44,16 +44,46 @@ export function buildInvoiceColumns(labels, actions) {
     {
       key: 'no',
       header: 'Invoice',
-      render: (i) => <span className="font-semibold">#{displayInvoiceNo(labels, i.invoiceNo)}</span>,
+      render: (i) => (
+        <span className="inline-flex items-center gap-2 font-display font-bold text-brand-800">
+          <span
+            className={cn(
+              'size-2 shrink-0 rounded-full ring-2',
+              balanceOf(i) > 0
+                ? i.amountPaid > 0
+                  ? 'bg-amber-400 ring-amber-100'
+                  : 'bg-red-500 ring-red-100'
+                : 'bg-emerald-500 ring-emerald-100',
+            )}
+            title={balanceOf(i) > 0 ? (i.amountPaid > 0 ? 'Part paid' : 'Unpaid') : 'Paid'}
+            aria-hidden
+          />
+          #{displayInvoiceNo(labels, i.invoiceNo)}
+        </span>
+      ),
     },
-    { key: 'date', header: 'Date', render: (i) => formatDateIN(i.invoiceDate) },
-    { key: 'party', header: labels.party, render: (i) => i.partyName, className: 'w-full max-w-0 truncate' },
-    { key: 'total', header: 'Total', align: 'right', render: (i) => money(i.grandTotal) },
+    {
+      key: 'date',
+      header: 'Date',
+      render: (i) => <span className="text-slate-500">{formatDateIN(i.invoiceDate)}</span>,
+    },
+    {
+      key: 'party',
+      header: labels.party,
+      render: (i) => i.partyName,
+      className: 'w-full max-w-0 truncate font-medium text-slate-800',
+    },
+    {
+      key: 'total',
+      header: 'Total',
+      align: 'right',
+      render: (i) => <span className="font-semibold text-brand-800">{money(i.grandTotal)}</span>,
+    },
     {
       key: 'paid',
       header: 'Paid',
       align: 'right',
-      render: (i) => <span className="text-emerald-700">{money(i.amountPaid)}</span>,
+      render: (i) => <span className="text-emerald-600">{money(i.amountPaid)}</span>,
     },
     {
       key: 'returns',
@@ -61,9 +91,9 @@ export function buildInvoiceColumns(labels, actions) {
       align: 'right',
       render: (i) =>
         i.totalReturns > 0 ? (
-          <span className="text-amber-700">-{money(i.totalReturns)}</span>
+          <span className="text-amber-600">-{money(i.totalReturns)}</span>
         ) : (
-          <span className="text-slate-400">-</span>
+          <span className="text-slate-300">-</span>
         ),
     },
     {
@@ -71,7 +101,7 @@ export function buildInvoiceColumns(labels, actions) {
       header: 'Balance',
       align: 'right',
       render: (i) => (
-        <span className={cn('font-semibold', balanceOf(i) > 0 ? 'text-red-600' : 'text-emerald-700')}>
+        <span className={cn('font-bold', balanceOf(i) > 0 ? 'text-red-600' : 'text-emerald-600')}>
           {money(balanceOf(i))}
         </span>
       ),
@@ -83,7 +113,7 @@ export function buildInvoiceColumns(labels, actions) {
       render: (i) => {
         const no = i.invoiceNo;
         return (
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end gap-0.5">
             <IconAction
               icon={SquarePen}
               label={`Edit invoice ${no}`}
@@ -93,7 +123,7 @@ export function buildInvoiceColumns(labels, actions) {
             <IconAction
               icon={FileDown}
               label={`Download statement ${no}`}
-              tone="text-brand-600"
+              tone="text-brand-700"
               onClick={() => actions.downloadStatement(no)}
             />
             <IconAction
@@ -114,6 +144,7 @@ export function buildInvoiceColumns(labels, actions) {
               tone="text-amber-600"
               onClick={() => actions.viewReturns(no)}
             />
+            <span className="mx-1 h-4 w-px bg-line" aria-hidden />
             <IconAction
               icon={Trash2}
               label={`Delete invoice ${no}`}
@@ -132,14 +163,14 @@ export function HistoryInvoiceTable({ invoices, labels, actions }) {
   const { open } = actions;
   return (
     <table className="w-full text-sm">
-      <thead className="text-xs tracking-wide text-slate-500 uppercase">
-        <tr>
+      <thead>
+        <tr className="border-b border-line bg-linear-to-b from-slate-50 to-slate-100/70 text-[11px] tracking-[0.08em] text-slate-500 uppercase">
           {columns.map((c) => (
             <th
               key={c.key}
               scope="col"
               className={cn(
-                'px-2.5 py-2 font-semibold whitespace-nowrap',
+                'px-3 py-2.5 font-bold whitespace-nowrap',
                 c.align === 'right' ? 'text-right' : 'text-left',
               )}
             >
@@ -153,13 +184,16 @@ export function HistoryInvoiceTable({ invoices, labels, actions }) {
           <tr
             key={invoice.invoiceNo}
             onClick={open ? () => open(invoice.invoiceNo) : undefined}
-            className={cn('tabular-nums', open && 'cursor-pointer hover:bg-brand-50')}
+            className={cn(
+              'tabular-nums transition-colors',
+              open ? 'cursor-pointer hover:bg-gold-50/70' : 'hover:bg-slate-50/70',
+            )}
           >
             {columns.map((c) => (
               <td
                 key={c.key}
                 className={cn(
-                  'px-2.5 py-1.5 whitespace-nowrap',
+                  'px-3 py-2 whitespace-nowrap',
                   c.align === 'right' && 'text-right',
                   c.className,
                 )}
@@ -178,7 +212,7 @@ export const HistoryInvoiceGroupBody = memo(function HistoryInvoiceGroupBody({ i
   const { isExpanded } = useBreakpoint();
   if (isExpanded) return <HistoryInvoiceTable invoices={invoices} labels={labels} actions={actions} />;
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
       {invoices.map((invoice) => (
         <HistoryInvoiceCard key={invoice.invoiceNo} invoice={invoice} labels={labels} actions={actions} />
       ))}

@@ -1,12 +1,12 @@
 /**
- * Customer Details — replaces legacy/customer-details.html + js/customer-details.js.
+ * Customer Details — replaces original-app/customer-details.html + js/customer-details.js.
  * Search toolbar, stat tiles, customer list (table on desktop, cards on phones / tablets), export and WhatsApp
  * reminder dialogs. Customers are derived from the sales invoices (see aggregate.js).
  */
-import { Download, RefreshCw, Users } from 'lucide-react';
+import { Download, ListChecks, RefreshCw, Users } from 'lucide-react';
 
 import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { Button, EmptyState, ErrorState, LoadingState, Page } from '@/ui';
+import { Badge, Button, EmptyState, ErrorState, LoadingState, Page } from '@/ui';
 import { CustomerCard } from './CustomerCard';
 import { CustomerTable } from './CustomerTable';
 import { ExportSheet } from './ExportSheet';
@@ -22,10 +22,10 @@ export default function CustomerDetailsPage() {
 
   const actions = (
     <>
-      <Button variant="success" icon={Download} onClick={openExport}>
+      <Button variant="secondary" icon={Download} onClick={openExport}>
         Export
       </Button>
-      <Button variant="danger" icon={RefreshCw} loading={refreshing} onClick={() => void refresh()}>
+      <Button variant="outline" icon={RefreshCw} loading={refreshing} onClick={() => void refresh()}>
         Refresh
       </Button>
     </>
@@ -56,8 +56,9 @@ export default function CustomerDetailsPage() {
     list = <CustomerTable rows={visible} onRemind={setReminderFor} />;
   } else if (visible.length === 0) {
     list = (
-      <div className="rounded-xl border border-slate-200 bg-white">
+      <div className="rounded-2xl border border-line bg-white shadow-card">
         <EmptyState
+          icon={Users}
           title="No Customers Found"
           message="Start by creating invoices to see customer data here"
         />
@@ -65,9 +66,9 @@ export default function CustomerDetailsPage() {
     );
   } else {
     list = (
-      <ul className={isMedium ? 'grid grid-cols-2 gap-3' : 'space-y-3'}>
-        {visible.map((c) => (
-          <li key={c.name}>
+      <ul className={isMedium ? 'grid grid-cols-2 gap-3.5' : 'space-y-3'}>
+        {visible.map((c, i) => (
+          <li key={c.name} className="animate-rise" style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}>
             <CustomerCard customer={c} onRemind={setReminderFor} />
           </li>
         ))}
@@ -79,7 +80,17 @@ export default function CustomerDetailsPage() {
     <Page {...head} max="7xl" actions={actions}>
       <SearchToolbar onTermChange={setTerm} />
       <StatsGrid stats={stats} />
-      <h2 className="mb-3 text-base font-bold text-slate-800">Customer List</h2>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h2 className="flex items-center gap-2.5 text-[15px] font-bold text-brand-800">
+          <span className="flex size-8 items-center justify-center rounded-lg bg-gold-100 text-gold-700 ring-1 ring-gold-200">
+            <ListChecks className="size-[18px]" aria-hidden />
+          </span>
+          Customer List
+        </h2>
+        <Badge tone="brand" className="tabular-nums">
+          {visible.length}
+        </Badge>
+      </div>
       {list}
 
       <ReminderSheet customer={model.reminderFor} onClose={() => setReminderFor(null)} />

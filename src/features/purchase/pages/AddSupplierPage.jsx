@@ -1,5 +1,5 @@
 /**
- * Add Supplier — replaces legacy/manage-suppliers.html + js/manage-suppliers.js.
+ * Add Supplier — replaces original-app/manage-suppliers.html + js/manage-suppliers.js.
  * Add form (the `?phone=` query pre-fills the phone), searchable supplier directory, edit sheet and delete (confirm).
  * Wide desktops (xl): add form as a side card; everything narrower: form on top, directory below.
  */
@@ -54,14 +54,18 @@ export default function AddSupplierPage() {
       title="Add Supplier"
       icon={UserPlus}
       actions={
-        <Button variant="subtle" icon={RefreshCw} loading={dir.refreshing} onClick={dir.refresh}>
+        <Button variant="outline" icon={RefreshCw} loading={dir.refreshing} onClick={dir.refresh}>
           Refresh
         </Button>
       }
     >
       <div className="grid items-start gap-4 xl:grid-cols-[22rem_minmax(0,1fr)]">
-        <Card as="form" onSubmit={submitAdd} className="xl:sticky xl:top-4">
-          <SectionHeader title="Add New Supplier" icon={UserPlus} />
+        <Card as="form" onSubmit={submitAdd} className="relative overflow-hidden xl:sticky xl:top-20">
+          <span className="absolute inset-x-0 top-0 h-[2px] hairline-gold" aria-hidden />
+          <SectionHeader title="Add New Supplier" icon={UserPlus} className="mb-1" />
+          <p className="mb-4 text-[13px] text-slate-500">
+            Phone number and name are required; address is optional.
+          </p>
           <SupplierFormFields
             value={dir.newSupplier}
             onChange={dir.setNewSupplier}
@@ -73,13 +77,13 @@ export default function AddSupplierPage() {
             icon={UserPlus}
             fullWidth
             loading={dir.adding}
-            className="mt-4 sm:w-auto xl:w-full"
+            className="mt-5 sm:w-auto xl:w-full"
           >
             Add Supplier
           </Button>
         </Card>
 
-        <section className="min-w-0 space-y-3" aria-label="Supplier Directory">
+        <section className="min-w-0 space-y-3.5" aria-label="Supplier Directory">
           <SectionHeader
             title="Supplier Directory"
             icon={ListChecks}

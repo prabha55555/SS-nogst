@@ -9,7 +9,7 @@
  *   onUndoAll()         undo all payments (the caller confirms)
  *   onAddPayment?()     "Add Payment" footer button – only pass it when the invoice may take another payment
  */
-import { Plus, Undo2 } from 'lucide-react';
+import { Banknote, Plus, Undo2 } from 'lucide-react';
 import { useMemo } from 'react';
 import { formatCurrency, formatDateIN } from '@/core/format';
 import { Button, EmptyState } from '@/ui';
@@ -50,14 +50,26 @@ export function PaymentHistorySheet({
         </>
       }
     >
-      <div className="mb-4 rounded-xl bg-sky-50 p-3">
-        <p className="text-base font-bold text-slate-900">{partyName}</p>
-        <p className="text-sm text-slate-500">Total Payments: {payments.length}</p>
-        <p className="text-sm text-slate-500">Current Balance Due: ₹{formatCurrency(balanceDue)}</p>
+      <div className="mb-4 rounded-2xl border border-white/10 surface-ink p-4 text-white shadow-lift">
+        <p className="truncate font-display text-lg font-bold">{partyName}</p>
+        <div className="mt-1 flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
+          <p className="text-sm text-brand-300">Total Payments: {payments.length}</p>
+          <p className="text-sm text-brand-200">
+            Current Balance Due:{' '}
+            <span className="font-display font-extrabold text-gold-300 tabular-nums">
+              ₹{formatCurrency(balanceDue)}
+            </span>
+          </p>
+        </div>
       </div>
 
       {payments.length === 0 ? (
-        <EmptyState title="No payment records found for this invoice." />
+        <EmptyState
+          icon={Banknote}
+          title="No payment records found for this invoice."
+          message="Payments added to this invoice will be listed here."
+          className="py-10"
+        />
       ) : (
         <ul className="space-y-3">
           {sorted.map((payment, index) => {
@@ -65,35 +77,40 @@ export function PaymentHistorySheet({
             return (
               <li
                 key={`${id}-${index}`}
-                className="rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm"
+                className="rounded-2xl border border-l-[3px] border-line border-l-emerald-400 bg-white p-3.5 text-sm text-slate-700 shadow-sm"
               >
-                <div className="mb-2 flex justify-between gap-2 border-b border-dashed border-slate-300 pb-2">
-                  <span className="font-bold text-brand-700">Payment #{index + 1}</span>
-                  <span className="text-slate-500">{formatDateIN(payment.paymentDate)}</span>
+                <div className="mb-2 flex items-center justify-between gap-2 border-b border-dashed border-slate-200 pb-2">
+                  <span className="font-display font-bold text-brand-800">Payment #{index + 1}</span>
+                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
+                    {formatDateIN(payment.paymentDate)}
+                  </span>
                 </div>
                 <p>
-                  <span className="font-bold">Amount: </span>₹{formatCurrency(payment.amount)}
+                  <span className="font-semibold text-slate-500">Amount: </span>
+                  <span className="font-display font-extrabold text-emerald-600 tabular-nums">
+                    ₹{formatCurrency(payment.amount)}
+                  </span>
                 </p>
                 <p>
-                  <span className="font-bold">Method: </span>
+                  <span className="font-semibold text-slate-500">Method: </span>
                   {paymentMethodLabel(payment, 'CASH')}
                 </p>
                 <p>
-                  <span className="font-bold">Type: </span>
+                  <span className="font-semibold text-slate-500">Type: </span>
                   {payment.paymentType === 'initial' ? 'Initial Payment' : 'Additional Payment'}
                 </p>
                 {payment.note ? (
                   <p>
-                    <span className="font-bold">Notes: </span>
+                    <span className="font-semibold text-slate-500">Notes: </span>
                     {payment.note}
                   </p>
                 ) : null}
-                <p className="break-all">
-                  <span className="font-bold">Payment ID: </span>
+                <p className="text-xs break-all text-slate-400">
+                  <span className="font-semibold text-slate-500">Payment ID: </span>
                   {id}
                 </p>
                 <div className="mt-2 flex justify-end">
-                  <Button variant="warning" size="sm" icon={Undo2} onClick={() => onUndo(id)}>
+                  <Button variant="outline" size="sm" icon={Undo2} onClick={() => onUndo(id)}>
                     Undo This Payment
                   </Button>
                 </div>
@@ -104,7 +121,7 @@ export function PaymentHistorySheet({
       )}
 
       {payments.length > 0 ? (
-        <p className="mt-3 border-t-2 border-brand-600 pt-2 text-right text-lg font-bold text-brand-700 tabular-nums">
+        <p className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-right font-display text-lg font-extrabold text-emerald-700 tabular-nums">
           Total Amount Paid: ₹{formatCurrency(sumPaymentAmounts(payments))}
         </p>
       ) : null}

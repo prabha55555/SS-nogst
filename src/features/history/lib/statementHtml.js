@@ -70,8 +70,9 @@ function wrap(title, logoSrc, body) {
   <div class="doc">
     ${logoSrc ? `<div class="logo"><img src="${logoSrc}" alt="${esc(COMPANY.displayName)}" /></div>` : ''}
     <div class="company">${esc(COMPANY.name)}</div>
-    <div class="company-sub">${esc(COMPANY.address)}</div>
-    <div class="company-sub">Cell: ${esc(COMPANY.cell)}</div>
+    <div class="company-sub">${esc(COMPANY.tagline)}</div>
+    ${COMPANY.address ? `<div class="company-sub">${esc(COMPANY.address)}</div>` : ''}
+    ${COMPANY.cell ? `<div class="company-sub">Cell: ${esc(COMPANY.cell)}</div>` : ''}
     ${body}
   </div>
 </body>
@@ -135,9 +136,9 @@ const paymentsTable = (payments, grandTotal, totalReturns, today, labels) =>
 function footer(now, includeCredit) {
   return `<div class="footer">
       <div>This is a computer-generated statement. No signature is required.</div>
-      <div>For any queries, please contact: ${esc(COMPANY.whatsappPhones)}</div>
+      ${COMPANY.whatsappPhones ? `<div>For any queries, please contact: ${esc(COMPANY.whatsappPhones)}</div>` : ''}
       <div>Generated on: ${esc(formatDateTimeIN(now))}</div>
-      ${includeCredit ? '<div>Software created by Sabarish</div>' : ''}
+      ${includeCredit ? `<div>Powered by ${esc(COMPANY.creditName)}</div>` : ''}
     </div>`;
 }
 const rs = (amount) => `Rs. ${formatCurrency(amount)}`;

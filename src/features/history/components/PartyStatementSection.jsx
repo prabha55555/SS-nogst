@@ -11,7 +11,16 @@
  *   busy              null | 'pdf' | 'easy' | 'whatsapp'  (which export is running)
  *   onGenerate() · onClear() · onDownloadPdf() · onDownloadEasyPdf() · onShareWhatsApp()
  */
-import { ChevronDown, ChevronUp, Download, FileText, MessageCircle, RotateCcw, User } from 'lucide-react';
+import {
+  ChevronDown,
+  Download,
+  FileSearch,
+  FileText,
+  MessageCircle,
+  ReceiptText,
+  RotateCcw,
+  User,
+} from 'lucide-react';
 import { useState } from 'react';
 import { formatCurrency, formatDateIN } from '@/core/format';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
@@ -22,11 +31,27 @@ import { SkeletonBlock } from './Skeleton';
 
 const rs = (n) => `₹${formatCurrency(n)}`;
 
-function Tile({ label, value, tone }) {
+function Tile({ label, value, tone, highlight }) {
   return (
-    <div className="min-w-36 flex-1 basis-36 rounded-lg border border-slate-200 bg-slate-50 p-3 text-center">
-      <div className={cn('text-xl font-bold text-brand-700 tabular-nums', tone)}>{value}</div>
-      <div className="mt-1 text-xs text-slate-600">{label}</div>
+    <div
+      className={cn(
+        'min-w-36 flex-1 basis-36 rounded-xl p-3 text-center',
+        highlight
+          ? 'border border-white/10 surface-ink text-white shadow-lift'
+          : 'border border-line bg-slate-50/70',
+      )}
+    >
+      <div
+        className={cn(
+          'font-display text-xl font-extrabold tabular-nums',
+          tone ?? (highlight ? 'text-gold-300' : 'text-brand-800'),
+        )}
+      >
+        {value}
+      </div>
+      <div className={cn('mt-1 text-xs font-medium', highlight ? 'text-brand-200' : 'text-slate-500')}>
+        {label}
+      </div>
     </div>
   );
 }
@@ -36,8 +61,13 @@ function Results({ statement, labels, busy, onDownloadPdf, onDownloadEasyPdf, on
   const balance = totals.adjustedBalanceDue;
   return (
     <div>
-      <h3 className="mb-3 border-b border-slate-200 pb-2 text-lg font-bold text-slate-900">
-        {labels.party}: {statement.partyName}
+      <h3 className="mb-3 flex items-center gap-2 border-b border-line pb-2.5 font-display text-lg font-extrabold text-brand-800">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-gold-100 text-gold-700 ring-1 ring-gold-200">
+          <User className="size-[18px]" aria-hidden />
+        </span>
+        <span className="min-w-0 truncate">
+          {labels.party}: {statement.partyName}
+        </span>
       </h3>
       <div className="mb-4 flex flex-wrap gap-2">
         <Tile label="Total Invoices" value={String(totals.totalInvoices)} />
@@ -45,12 +75,13 @@ function Results({ statement, labels, busy, onDownloadPdf, onDownloadEasyPdf, on
         <Tile label="Total Paid" value={rs(totals.totalPaid)} />
         {totals.totalDiscount > 0 ? <Tile label="Total Discount" value={rs(totals.totalDiscount)} /> : null}
         {totals.totalReturns > 0 ? (
-          <Tile label="Total Returns" value={`-${rs(totals.totalReturns)}`} tone="text-red-600" />
+          <Tile label="Total Returns" value={`-${rs(totals.totalReturns)}`} tone="text-amber-600" />
         ) : null}
         <Tile
           label={statementBalanceLabel(totals)}
           value={rs(balance)}
-          tone={balance > 0 ? 'text-red-600' : balance < 0 ? 'text-emerald-600' : undefined}
+          tone={balance > 0 ? 'text-red-300' : balance < 0 ? 'text-emerald-300' : undefined}
+          highlight
         />
       </div>
 
@@ -60,13 +91,13 @@ function Results({ statement, labels, busy, onDownloadPdf, onDownloadEasyPdf, on
           return (
             <li
               key={invoice.invoiceNo}
-              className="flex flex-wrap items-center justify-between gap-2 rounded border-l-[3px] border-brand-600 bg-slate-50 px-3 py-2 text-sm"
+              className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-l-[3px] border-line border-l-gold-400 bg-white px-3 py-2.5 text-sm shadow-sm transition hover:bg-gold-50/40"
             >
               <div className="min-w-48 flex-1">
-                <p className="font-bold text-slate-900">
+                <p className="font-display font-bold text-brand-800">
                   Invoice #{displayInvoiceNo(labels, invoice.invoiceNo)} - {formatDateIN(invoice.invoiceDate)}
                 </p>
-                <p className="text-slate-700 tabular-nums">
+                <p className="text-[13px] text-slate-600 tabular-nums">
                   {`Current: ${rs(invoice.subtotal)}`}
                   {invoice.previousBalance > 0 ? ` - Prev Bal: ${rs(invoice.previousBalance)}` : ''}
                   {invoice.discountAmount ? ` - Discount: ${rs(invoice.discountAmount)}` : ''}
@@ -87,9 +118,9 @@ function Results({ statement, labels, busy, onDownloadPdf, onDownloadEasyPdf, on
         })}
       </ul>
 
-      <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-200 pt-4">
+      <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-4">
         <Button
-          variant="info"
+          variant="secondary"
           icon={Download}
           className="grow basis-36"
           onClick={onDownloadPdf}
@@ -136,7 +167,10 @@ export function PartyStatementSection(props) {
         e.preventDefault();
         onGenerate();
       }}
-      className={cn('space-y-3', isExpanded && 'w-96 shrink-0')}
+      className={cn(
+        'space-y-3',
+        isExpanded && 'w-96 shrink-0 self-start rounded-2xl border border-line bg-slate-50/70 p-4',
+      )}
     >
       <TextField
         type="search"
@@ -148,10 +182,10 @@ export function PartyStatementSection(props) {
         onChange={onQueryChange}
       />
       <div className="flex flex-wrap gap-2">
-        <Button type="submit" variant="success" icon={FileText} className="grow">
+        <Button type="submit" icon={FileText} className="grow">
           Generate Combined Statement
         </Button>
-        <Button variant="secondary" onClick={onClear}>
+        <Button variant="outline" onClick={onClear}>
           Clear
         </Button>
       </div>
@@ -166,9 +200,13 @@ export function PartyStatementSection(props) {
         <SkeletonBlock className="h-14 w-full" />
       </div>
     ) : state.status === 'empty' ? (
-      <EmptyState title={`No invoices found for ${party}: "${state.query}"`} />
+      <EmptyState
+        icon={FileSearch}
+        title={`No invoices found for ${party}: "${state.query}"`}
+        className="py-10"
+      />
     ) : state.status === 'error' ? (
-      <EmptyState title={`Error loading ${party} statement.`} />
+      <EmptyState title={`Error loading ${party} statement.`} className="py-10" />
     ) : state.status === 'ready' ? (
       <Results
         statement={state.statement}
@@ -179,34 +217,39 @@ export function PartyStatementSection(props) {
         onShareWhatsApp={props.onShareWhatsApp}
       />
     ) : isExpanded ? (
-      <p className="text-sm text-slate-500">
+      <p className="flex h-full min-h-32 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50/40 px-6 py-8 text-center text-sm text-slate-500">
         {`Type part of a ${party}'s name and press Generate Combined Statement to see all their invoices, totals and the PDF / WhatsApp options here.`}
       </p>
     ) : null;
 
   return (
-    <section className="rounded-xl border border-t-4 border-slate-200 border-t-slate-600 bg-white p-3.5 shadow-card sm:p-4">
+    <section className="relative overflow-hidden rounded-2xl border border-line bg-white p-3.5 shadow-card sm:p-4">
+      <span className="absolute inset-x-0 top-0 h-[2px] hairline-gold" aria-hidden />
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         disabled={isExpanded}
         aria-expanded={showBody}
-        className="flex min-h-9 w-full items-center justify-between text-left disabled:cursor-default"
+        className="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl text-left focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:outline-none disabled:cursor-default"
       >
-        <h2 className="text-base font-bold text-slate-700 sm:text-lg">{labels.party} Statement</h2>
+        <h2 className="flex items-center gap-2.5 text-[15px] font-bold text-brand-800">
+          <span className="flex size-8 items-center justify-center rounded-lg bg-gold-100 text-gold-700 ring-1 ring-gold-200">
+            <ReceiptText className="size-[18px]" aria-hidden />
+          </span>
+          {labels.party} Statement
+        </h2>
         {!isExpanded ? (
-          open ? (
-            <ChevronUp className="size-5 text-slate-600" aria-hidden />
-          ) : (
-            <ChevronDown className="size-5 text-slate-600" aria-hidden />
-          )
+          <ChevronDown
+            className={cn('size-5 text-slate-500 transition-transform duration-200', open && 'rotate-180')}
+            aria-hidden
+          />
         ) : null}
       </button>
       {showBody ? (
         isExpanded ? (
-          <div className="mt-3 flex items-start gap-6">
+          <div className="mt-4 flex items-stretch gap-6">
             {search}
-            <div className="min-w-0 flex-1 border-l border-dashed border-slate-300 pl-6">{results}</div>
+            <div className="min-w-0 flex-1">{results}</div>
           </div>
         ) : (
           <div className="mt-3">

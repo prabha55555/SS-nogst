@@ -32,6 +32,17 @@ function ActionButtons({ layout, saveLabel, saving, onSave, onShare }) {
         <Button fullWidth size="lg" variant="whatsapp" icon={MessageCircle} onClick={onShare}>
           Share Acknowledgement
         </Button>
+        <p className="pt-0.5 text-center text-xs text-slate-400">
+          Shortcut:{' '}
+          <kbd className="rounded-md bg-slate-100 px-1.5 py-0.5 font-sans font-semibold text-slate-600">
+            Ctrl
+          </kbd>{' '}
+          +{' '}
+          <kbd className="rounded-md bg-slate-100 px-1.5 py-0.5 font-sans font-semibold text-slate-600">
+            S
+          </kbd>{' '}
+          to save
+        </p>
       </div>
     );
   }
@@ -121,7 +132,7 @@ export function PurchaseBillLayout({
         }
       />
       {isExpanded ? null : (
-        <div className="no-print sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-xl border border-slate-200 bg-white/95 p-2 shadow-pop backdrop-blur">
+        <div className="no-print sticky bottom-[calc(3.7rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-2xl border border-white/70 glass p-2 shadow-pop ring-1 ring-brand-900/5">
           {buttons('bar')}
         </div>
       )}

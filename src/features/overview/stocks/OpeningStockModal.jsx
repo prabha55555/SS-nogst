@@ -52,7 +52,7 @@ export default function OpeningStockModal({ row, onClose, onSave }) {
           <Button
             type="submit"
             form={FORM_ID}
-            variant="success"
+            variant="primary"
             icon={Save}
             loading={saving}
             className="max-sm:flex-1"
@@ -69,8 +69,9 @@ export default function OpeningStockModal({ row, onClose, onSave }) {
           void submit();
         }}
       >
-        <p className="mb-3 text-sm text-slate-700">
-          Enter opening stock quantity for &quot;{row?.description ?? ''}&quot;
+        <p className="mb-4 rounded-xl bg-gold-50/60 px-3.5 py-2.5 text-sm text-slate-700 ring-1 ring-gold-100">
+          Enter opening stock quantity for &quot;
+          <span className="font-semibold text-brand-800">{row?.description ?? ''}</span>&quot;
         </p>
         <NumberField
           label="Quantity"

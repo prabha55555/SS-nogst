@@ -1,5 +1,5 @@
 /**
- * Purchase Bill screen — replaces legacy/purchase.html + js/purchase.js.
+ * Purchase Bill screen — replaces original-app/purchase.html + js/purchase.js.
  * Enter a supplier bill (supplier by phone, shortcut-only products, previous balance, payments), save it, or share
  * the acknowledgement. Layout (TwoPane / sticky action bar) is shared with Edit Purchase via PurchaseBillLayout.
  * Logic lives in usePurchaseBillForm.
@@ -30,10 +30,11 @@ export default function PurchaseBillPage() {
         <ErrorState
           message={`Could not load suppliers or bills. ${bill.error}`}
           onRetry={bill.refresh}
-          className="py-6"
+          className="rounded-2xl border border-red-200 bg-red-50/40 py-6"
         />
       ) : null}
-      <Card>
+      <Card className="relative animate-rise overflow-hidden">
+        <span className="absolute inset-x-0 top-0 h-[3px] bg-gold-gradient" aria-hidden />
         <SectionHeader
           title="Invoice"
           icon={Receipt}

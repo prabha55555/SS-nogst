@@ -21,16 +21,27 @@ export function BillActionBar({ layout = 'bar', saveLabel, onSave, onGenerate, o
           {saveLabel}
         </Button>
         <div className="grid grid-cols-2 gap-2.5">
-          <Button variant="info" icon={FileText} aria-label="Generate BILL" onClick={onGenerate}>
+          <Button variant="secondary" icon={FileText} aria-label="Generate BILL" onClick={onGenerate}>
             Generate BILL
           </Button>
           <Button variant="whatsapp" icon={MessageCircle} aria-label="Share BILL" onClick={onShare}>
             Share BILL
           </Button>
         </div>
-        <Button variant="warning" fullWidth icon={RotateCcw} aria-label="Reset BILL" onClick={onReset}>
+        <Button variant="outline" fullWidth icon={RotateCcw} aria-label="Reset BILL" onClick={onReset}>
           Reset BILL
         </Button>
+        <p className="pt-0.5 text-center text-xs text-slate-400">
+          Shortcut:{' '}
+          <kbd className="rounded-md bg-slate-100 px-1.5 py-0.5 font-sans font-semibold text-slate-600">
+            Ctrl
+          </kbd>{' '}
+          +{' '}
+          <kbd className="rounded-md bg-slate-100 px-1.5 py-0.5 font-sans font-semibold text-slate-600">
+            S
+          </kbd>{' '}
+          to save
+        </p>
       </div>
     );
   }
@@ -41,7 +52,7 @@ export function BillActionBar({ layout = 'bar', saveLabel, onSave, onGenerate, o
       </Button>
       <Button
         className={cn(barBtn, 'flex-1')}
-        variant="info"
+        variant="secondary"
         icon={FileText}
         aria-label="Generate BILL"
         onClick={onGenerate}
@@ -59,7 +70,7 @@ export function BillActionBar({ layout = 'bar', saveLabel, onSave, onGenerate, o
       </Button>
       <Button
         className={cn(barBtn, 'flex-1')}
-        variant="warning"
+        variant="outline"
         icon={RotateCcw}
         aria-label="Reset BILL"
         onClick={onReset}

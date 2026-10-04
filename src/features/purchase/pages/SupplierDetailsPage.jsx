@@ -1,5 +1,5 @@
 /**
- * Supplier Details — replaces legacy/supplier-details.html + js/supplier-details.js.
+ * Supplier Details — replaces original-app/supplier-details.html + js/supplier-details.js.
  * Per-supplier totals built from the purchase bills: stats grid, search, table (desktop) / cards (phones, tablets),
  * revealable phone numbers and CSV export. `?phone=` opens the page already searching for that supplier.
  */
@@ -9,6 +9,7 @@ import { db } from '@/core/db';
 import { useFocusLoad } from '@/hooks/useFocusLoad';
 import { useRouteParams } from '@/hooks/useRouteParams';
 import {
+  Badge,
   Button,
   EmptyState,
   ErrorState,
@@ -72,24 +73,29 @@ export default function SupplierDetailsPage() {
 
   return (
     <Page title="Supplier Details" icon={Truck} max="7xl">
-      <div className="space-y-4">
-        <SearchBar
-          value={query}
-          onChange={setQuery}
-          placeholder="Search by supplier name, phone, or address..."
-          aria-label="Search suppliers"
-        />
+      <div className="space-y-5">
+        <div className="rounded-2xl border border-line bg-white p-2.5 shadow-card">
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            placeholder="Search by supplier name, phone, or address..."
+            aria-label="Search suppliers"
+          />
+        </div>
         <SupplierStatsGrid stats={stats} />
         <SectionHeader
           title="Supplier List"
           icon={FileText}
           className="mb-0"
           right={
-            <div className="flex gap-2">
-              <Button variant="success" icon={Download} loading={exporting} onClick={onExport}>
+            <div className="flex items-center gap-2">
+              <Badge tone="brand" className="mr-1 tabular-nums">
+                {visible.length}
+              </Badge>
+              <Button variant="secondary" icon={Download} loading={exporting} onClick={onExport}>
                 Export
               </Button>
-              <Button variant="danger" icon={RefreshCw} loading={refreshing} onClick={refresh}>
+              <Button variant="outline" icon={RefreshCw} loading={refreshing} onClick={refresh}>
                 Refresh
               </Button>
             </div>

@@ -10,11 +10,11 @@
  *   onClear()        reset everything
  *   labels    { party } – "Search customer name or invoice no"
  */
-import { Search as SearchIcon, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown, Search as SearchIcon, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { digitsOnly } from '@/core/format';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { Button, DateField, SearchBar, TextField } from '@/ui';
+import { Button, DateField, SearchBar, TextField, cn } from '@/ui';
 
 export function HistoryFilterBar({ value, onChange, onSearch, onClear, labels }) {
   const { isCompact } = useBreakpoint();
@@ -36,9 +36,9 @@ export function HistoryFilterBar({ value, onChange, onSearch, onClear, labels })
         e.preventDefault();
         onSearch();
       }}
-      className="space-y-3 rounded-xl border border-slate-200 bg-white p-3.5 shadow-card sm:p-4"
+      className="space-y-3.5 rounded-2xl border border-line bg-white p-3.5 shadow-card sm:p-4"
     >
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)]">
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)] lg:items-end">
         <SearchBar
           value={value.search}
           onChange={(search) => set({ search })}
@@ -51,13 +51,25 @@ export function HistoryFilterBar({ value, onChange, onSearch, onClear, labels })
             type="button"
             aria-expanded={showRanges}
             onClick={() => setMoreOpen((v) => !v)}
-            className="flex min-h-9 items-center gap-1.5 text-sm font-semibold text-brand-700"
+            className="flex min-h-11 items-center gap-2 rounded-xl bg-slate-50 px-3 text-sm font-semibold text-brand-800 ring-1 ring-line transition ring-inset hover:bg-gold-50 focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:outline-none"
           >
-            <SlidersHorizontal className="size-4" aria-hidden />
-            {showRanges ? 'Fewer filters' : 'More filters (invoice range, dates)'}
+            <span className="flex size-6 items-center justify-center rounded-md bg-gold-100 text-gold-700">
+              <SlidersHorizontal className="size-3.5" aria-hidden />
+            </span>
+            <span className="flex-1 text-left">
+              {showRanges ? 'Fewer filters' : 'More filters (invoice range, dates)'}
+            </span>
+            {anyRange ? <span className="size-2 rounded-full bg-gold-500" aria-hidden /> : null}
+            <ChevronDown
+              className={cn(
+                'size-4 text-slate-400 transition-transform duration-200',
+                showRanges && 'rotate-180',
+              )}
+              aria-hidden
+            />
           </button>
         ) : (
-          <div className="flex items-center gap-2">
+          <RangeGroup label="Invoice number">
             <TextField
               className="flex-1"
               inputMode="numeric"
@@ -66,7 +78,7 @@ export function HistoryFilterBar({ value, onChange, onSearch, onClear, labels })
               value={value.fromInvoiceNo}
               onChange={(v) => set({ fromInvoiceNo: digitsOnly(v) })}
             />
-            <span className="text-sm text-slate-500">to</span>
+            <RangeTo />
             <TextField
               className="flex-1"
               inputMode="numeric"
@@ -75,29 +87,29 @@ export function HistoryFilterBar({ value, onChange, onSearch, onClear, labels })
               value={value.toInvoiceNo}
               onChange={(v) => set({ toInvoiceNo: digitsOnly(v) })}
             />
-          </div>
+          </RangeGroup>
         )}
       </div>
 
       {showRanges ? (
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)]">
-          <div className="flex items-center gap-2">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)] lg:items-end">
+          <RangeGroup label="Date range">
             <DateField
               className="flex-1"
               aria-label="From date"
               value={value.fromDate}
               onChange={(fromDate) => set({ fromDate })}
             />
-            <span className="text-sm text-slate-500">to</span>
+            <RangeTo />
             <DateField
               className="flex-1"
               aria-label="To date"
               value={value.toDate}
               onChange={(toDate) => set({ toDate })}
             />
-          </div>
+          </RangeGroup>
           {isCompact ? (
-            <div className="flex items-center gap-2">
+            <RangeGroup label="Invoice number">
               <TextField
                 className="flex-1"
                 inputMode="numeric"
@@ -106,7 +118,7 @@ export function HistoryFilterBar({ value, onChange, onSearch, onClear, labels })
                 value={value.fromInvoiceNo}
                 onChange={(v) => set({ fromInvoiceNo: digitsOnly(v) })}
               />
-              <span className="text-sm text-slate-500">to</span>
+              <RangeTo />
               <TextField
                 className="flex-1"
                 inputMode="numeric"
@@ -115,7 +127,7 @@ export function HistoryFilterBar({ value, onChange, onSearch, onClear, labels })
                 value={value.toInvoiceNo}
                 onChange={(v) => set({ toInvoiceNo: digitsOnly(v) })}
               />
-            </div>
+            </RangeGroup>
           ) : (
             <Buttons onClear={onClear} />
           )}
@@ -127,13 +139,25 @@ export function HistoryFilterBar({ value, onChange, onSearch, onClear, labels })
   );
 }
 
+/** A labelled from–to pair (small-caps caption above the two fields). */
+function RangeGroup({ label, children }) {
+  return (
+    <div>
+      <p className="mb-1.5 text-[11px] font-bold tracking-[0.08em] text-slate-400 uppercase">{label}</p>
+      <div className="flex items-center gap-2">{children}</div>
+    </div>
+  );
+}
+
+const RangeTo = () => <span className="text-xs font-semibold text-slate-400 uppercase">to</span>;
+
 function Buttons({ onClear }) {
   return (
-    <div className="flex gap-2 lg:justify-end">
+    <div className="flex gap-2 lg:items-end lg:justify-end">
       <Button type="submit" icon={SearchIcon} className="flex-1 lg:flex-none">
         Search
       </Button>
-      <Button variant="secondary" onClick={onClear} className="flex-1 lg:flex-none">
+      <Button variant="outline" onClick={onClear} className="flex-1 lg:flex-none">
         Clear Filters
       </Button>
     </div>

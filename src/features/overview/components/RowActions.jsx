@@ -13,7 +13,7 @@ export default function RowActions({ onEdit, onDelete, editLabel = 'Edit', delet
           e.stopPropagation();
           onEdit();
         }}
-        className="text-sky-600 hover:bg-sky-50"
+        className="text-slate-500 hover:bg-gold-50 hover:text-gold-700"
       />
       <IconButton
         icon={Trash2}
@@ -22,7 +22,7 @@ export default function RowActions({ onEdit, onDelete, editLabel = 'Edit', delet
           e.stopPropagation();
           onDelete();
         }}
-        className="text-red-600 hover:bg-red-50"
+        className="text-slate-500 hover:bg-red-50 hover:text-red-600"
       />
     </div>
   );

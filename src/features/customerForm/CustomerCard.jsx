@@ -2,12 +2,13 @@ import { MapPin, Pencil, Phone, Trash2 } from 'lucide-react';
 import { memo } from 'react';
 
 import { Button } from '@/ui';
+import { InitialAvatar } from './InitialAvatar';
 
 function InfoRow({ icon: Icon, text }) {
   return (
-    <div className="flex items-start gap-2 py-0.5 text-sm text-slate-800">
-      <Icon className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden />
-      <span className="min-w-0 break-words">{text}</span>
+    <div className="flex items-start gap-2 text-sm text-slate-600">
+      <Icon className="mt-0.5 size-4 shrink-0 text-gold-600" aria-hidden />
+      <span className="min-w-0 break-words tabular-nums">{text}</span>
     </div>
   );
 }
@@ -16,10 +17,17 @@ function InfoRow({ icon: Icon, text }) {
 export const CustomerCard = memo(function CustomerCard({ customer, onEdit, onDelete }) {
   return (
     <div>
-      <h3 className="mb-1 text-lg font-bold text-slate-900">{customer.name || '(no name)'}</h3>
-      <InfoRow icon={Phone} text={customer.phone || 'N/A'} />
-      <InfoRow icon={MapPin} text={customer.address || 'N/A'} />
-      <div className="mt-3 flex gap-3" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center gap-3">
+        <InitialAvatar name={customer.name} size="lg" />
+        <h3 className="min-w-0 flex-1 text-[17px] leading-snug font-bold break-words text-brand-800">
+          {customer.name || '(no name)'}
+        </h3>
+      </div>
+      <div className="mt-3 space-y-1.5 rounded-xl bg-slate-50/70 p-3">
+        <InfoRow icon={Phone} text={customer.phone || 'N/A'} />
+        <InfoRow icon={MapPin} text={customer.address || 'N/A'} />
+      </div>
+      <div className="mt-3 flex gap-2.5" onClick={(e) => e.stopPropagation()}>
         <Button
           variant="outline"
           icon={Pencil}

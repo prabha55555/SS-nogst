@@ -5,7 +5,7 @@
  * Props: open (bool) · invoiceNo · partyName · returns (HistoryReturn[]) · onClose() ·
  *        onUndo(returnId) · onUndoAll() (callers confirm) · onAddReturn?() ("Add Return" footer button).
  */
-import { Plus, Undo2 } from 'lucide-react';
+import { Plus, RotateCcw, Undo2 } from 'lucide-react';
 import { useMemo } from 'react';
 import { formatCurrency, formatDateIN } from '@/core/format';
 import { Button, EmptyState } from '@/ui';
@@ -47,44 +47,54 @@ export function ReturnStatusSheet({
         </>
       }
     >
-      <div className="mb-4 rounded-xl bg-red-50 p-3">
-        <p className="text-base font-bold text-slate-900">{partyName}</p>
-        <p className="text-sm text-slate-500">Total Returns: {returns.length}</p>
+      <div className="mb-4 rounded-2xl border border-white/10 surface-ink p-4 text-white shadow-lift">
+        <p className="truncate font-display text-lg font-bold">{partyName}</p>
+        <p className="text-sm text-brand-300">Total Returns: {returns.length}</p>
       </div>
 
       {returns.length === 0 ? (
-        <EmptyState title="No return records found for this invoice." />
+        <EmptyState
+          icon={RotateCcw}
+          title="No return records found for this invoice."
+          message="Returned items will be listed here."
+          className="py-10"
+        />
       ) : (
         <ul className="space-y-3">
           {sorted.map((item, index) => (
             <li
               key={`${item.id}-${index}`}
-              className="rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm"
+              className="rounded-2xl border border-l-[3px] border-line border-l-amber-400 bg-white p-3.5 text-sm text-slate-700 shadow-sm"
             >
-              <div className="mb-2 flex justify-between gap-2 border-b border-dashed border-slate-300 pb-2">
-                <span className="font-bold text-brand-700">Return #{index + 1}</span>
-                <span className="text-slate-500">{formatDateIN(item.returnDate)}</span>
+              <div className="mb-2 flex items-center justify-between gap-2 border-b border-dashed border-slate-200 pb-2">
+                <span className="font-display font-bold text-brand-800">Return #{index + 1}</span>
+                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
+                  {formatDateIN(item.returnDate)}
+                </span>
               </div>
               <p>
-                <span className="font-bold">Product: </span>
+                <span className="font-semibold text-slate-500">Product: </span>
                 {item.description}
               </p>
               <p>
-                <span className="font-bold">Quantity: </span>
+                <span className="font-semibold text-slate-500">Quantity: </span>
                 {item.qty}
               </p>
               <p>
-                <span className="font-bold">Rate: </span>₹{formatCurrency(item.rate)}
+                <span className="font-semibold text-slate-500">Rate: </span>₹{formatCurrency(item.rate)}
               </p>
               <p>
-                <span className="font-bold">Amount: </span>₹{formatCurrency(item.returnAmount)}
+                <span className="font-semibold text-slate-500">Amount: </span>
+                <span className="font-display font-extrabold text-amber-700 tabular-nums">
+                  ₹{formatCurrency(item.returnAmount)}
+                </span>
               </p>
               <p>
-                <span className="font-bold">Reason: </span>
+                <span className="font-semibold text-slate-500">Reason: </span>
                 {item.reason || 'N/A'}
               </p>
               <div className="mt-2 flex justify-end">
-                <Button variant="warning" size="sm" icon={Undo2} onClick={() => onUndo(item.id)}>
+                <Button variant="outline" size="sm" icon={Undo2} onClick={() => onUndo(item.id)}>
                   Undo This Return
                 </Button>
               </div>
@@ -94,7 +104,7 @@ export function ReturnStatusSheet({
       )}
 
       {returns.length > 0 ? (
-        <p className="mt-3 border-t-2 border-red-600 pt-2 text-right text-lg font-bold text-red-600 tabular-nums">
+        <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-right font-display text-lg font-extrabold text-amber-700 tabular-nums">
           Total Return Amount: ₹{formatCurrency(sumReturnAmounts(returns))}
         </p>
       ) : null}

@@ -1,11 +1,11 @@
 /**
- * Add Customer / Manage Customers — replaces legacy/manage-customers.html + js/manage-customers.js.
+ * Add Customer / Manage Customers — replaces original-app/manage-customers.html + js/manage-customers.js.
  * Desktop: directory table with the add / edit form card beside it. Phones & tablets: customer cards, a floating
  * "Add" button and the form in a bottom sheet. `?phone=` (sent by the Sales Bill) pre-fills the add form.
  */
-import { RefreshCw, UserPlus, Users } from 'lucide-react';
+import { RefreshCw, Search, UserPlus, Users } from 'lucide-react';
 
-import { Button, EmptyState, ErrorState, LoadingState, Page, SearchBar, TwoPane } from '@/ui';
+import { Badge, Button, EmptyState, ErrorState, LoadingState, Page, SearchBar, TwoPane } from '@/ui';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { CustomerFormCard } from './CustomerFormCard';
 import { CustomerFormSheet } from './CustomerFormSheet';
@@ -44,18 +44,21 @@ export default function AddCustomerPage() {
     );
   }
 
-  const count = (
-    <p className="mt-1.5 mb-3 ml-1 text-sm text-slate-500">
-      {query.trim() ? `${visible.length} of ${customers.length} customers` : `${customers.length} customers`}
-    </p>
-  );
-  const search = (
-    <SearchBar
-      value={query}
-      onChange={manager.setQuery}
-      placeholder="Search name, phone or address"
-      aria-label="Search customers"
-    />
+  const toolbar = (
+    <div className="mb-4 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+      <SearchBar
+        value={query}
+        onChange={manager.setQuery}
+        placeholder="Search name, phone or address"
+        aria-label="Search customers"
+        className="min-w-0 flex-1"
+      />
+      <Badge tone="brand" className="self-start px-3 py-1 text-[13px] tabular-nums sm:self-auto">
+        {query.trim()
+          ? `${visible.length} of ${customers.length} customers`
+          : `${customers.length} customers`}
+      </Badge>
+    </div>
   );
 
   if (isExpanded) {
@@ -64,8 +67,7 @@ export default function AddCustomerPage() {
         <TwoPane
           main={
             <>
-              {search}
-              {count}
+              {toolbar}
               <CustomerTable
                 customers={visible}
                 emptyText={customers.length === 0 ? 'No customers found.' : 'No matching customers.'}
@@ -89,21 +91,28 @@ export default function AddCustomerPage() {
 
   return (
     <Page {...pageProps} actions={refreshButton}>
-      {search}
-      {count}
+      {toolbar}
       {customers.length === 0 ? (
-        <EmptyState
-          icon={Users}
-          title="No customers found."
-          message="Add your first customer to start billing."
-          action={
-            <Button icon={UserPlus} onClick={() => manager.openAdd()}>
-              Add New Customer
-            </Button>
-          }
-        />
+        <div className="rounded-2xl border border-line bg-white shadow-card">
+          <EmptyState
+            icon={Users}
+            title="No customers found."
+            message="Add your first customer to start billing."
+            action={
+              <Button icon={UserPlus} onClick={() => manager.openAdd()} className="mt-2">
+                Add New Customer
+              </Button>
+            }
+          />
+        </div>
       ) : visible.length === 0 ? (
-        <EmptyState title="No matching customers" message="Try a different name, phone number or address." />
+        <div className="rounded-2xl border border-line bg-white shadow-card">
+          <EmptyState
+            icon={Search}
+            title="No matching customers"
+            message="Try a different name, phone number or address."
+          />
+        </div>
       ) : (
         <CustomerTable
           customers={visible}
@@ -117,7 +126,7 @@ export default function AddCustomerPage() {
         type="button"
         onClick={() => manager.openAdd()}
         aria-label="Add New Customer"
-        className="fixed right-4 bottom-24 z-30 flex size-14 items-center justify-center rounded-full bg-brand-600 text-white shadow-pop transition hover:bg-brand-700 active:scale-95 sm:right-6"
+        className="fixed right-4 bottom-24 z-30 flex size-14 items-center justify-center rounded-full bg-gold-sheen text-brand-900 shadow-gold ring-4 ring-white/80 transition hover:brightness-105 focus-visible:ring-gold-300 focus-visible:outline-none active:scale-95 sm:right-6"
       >
         <UserPlus className="size-6" aria-hidden />
       </button>

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { formatRupees } from '@/core/format';
 import { normalizeWhatsAppPhone, openWhatsApp } from '@/core/services/whatsapp';
+import { InitialAvatar } from '@/features/customerForm/InitialAvatar';
 import { Button, ChoiceChips, Modal, TextArea, useFeedback } from '@/ui';
 import {
   generateReminderMessage,
@@ -79,20 +80,25 @@ export function ReminderSheet({ customer, onClose }) {
         </Button>
       }
     >
-      <div className="mb-4 space-y-0.5 rounded-lg bg-slate-100 p-3 text-sm text-slate-500">
-        <p className="text-base font-bold text-slate-900">Customer: {shown.name}</p>
-        <p>Phone: {shown.phone || 'Not provided'}</p>
-        <p>
-          Balance Due:{' '}
-          <span className="font-bold text-slate-900">{formatRupees(reminderBalance(shown))}</span>
-        </p>
+      <div className="mb-5 flex items-center gap-3.5 rounded-2xl border border-line bg-slate-50/70 p-3.5">
+        <InitialAvatar name={shown.name} size="lg" />
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-display text-base font-bold text-brand-800">Customer: {shown.name}</p>
+          <p className="text-sm text-slate-500 tabular-nums">Phone: {shown.phone || 'Not provided'}</p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">Balance Due</p>
+          <p className="font-display text-lg font-extrabold text-red-600 tabular-nums">
+            {formatRupees(reminderBalance(shown))}
+          </p>
+        </div>
       </div>
 
-      <p className="mb-2 text-sm font-semibold text-slate-800">Select Reminder Template:</p>
+      <p className="mb-2 text-[13px] font-semibold tracking-wide text-slate-600">Select Reminder Template:</p>
       <ChoiceChips options={REMINDER_TEMPLATES} value={template} onChange={setTemplate} />
 
-      <p className="mt-5 mb-2 text-sm font-semibold text-slate-800">Message Preview:</p>
-      <div className="rounded-lg border border-[#c5e8b7] bg-[#e7ffdb] p-3 text-sm leading-5 whitespace-pre-wrap text-slate-900">
+      <p className="mt-5 mb-2 text-[13px] font-semibold tracking-wide text-slate-600">Message Preview:</p>
+      <div className="rounded-2xl rounded-tl-md border border-[#c5e8b7] bg-[#e7ffdb] p-3.5 text-sm leading-5 whitespace-pre-wrap text-slate-900 shadow-sm">
         {message || <span className="text-slate-500 italic">Type a custom message below.</span>}
       </div>
 
@@ -107,7 +113,7 @@ export function ReminderSheet({ customer, onClose }) {
         />
       ) : null}
 
-      <div className="mt-3 flex justify-between text-xs text-slate-500">
+      <div className="mt-3 flex justify-between text-xs font-medium text-slate-500 tabular-nums">
         <span>Characters: {stats.characters}</span>
         <span>Messages: {stats.messages}</span>
       </div>

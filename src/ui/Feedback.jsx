@@ -106,7 +106,7 @@ function ToastHost({ toasts, onDismiss }) {
             onClick={() => onDismiss(t.id)}
             role="alert"
             className={cn(
-              'pointer-events-auto flex w-full max-w-sm animate-toast-in items-start gap-3 rounded-xl border border-l-4 border-slate-200 bg-white p-3 text-left shadow-pop',
+              'pointer-events-auto flex w-full max-w-sm animate-toast-in items-start gap-3 rounded-2xl border border-l-4 border-white/70 glass bg-white/95 p-3.5 text-left shadow-lift ring-1 ring-brand-900/5',
               s.bar,
             )}
           >
@@ -131,13 +131,13 @@ function ConfirmDialog({ state, onAnswer }) {
       <div className="flex flex-col items-center text-center">
         <span
           className={cn(
-            'mb-3 flex size-14 items-center justify-center rounded-full',
-            danger ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600',
+            'mb-3 flex size-16 items-center justify-center rounded-2xl ring-1 ring-inset',
+            danger ? 'bg-red-50 text-red-600 ring-red-200' : 'bg-gold-50 text-gold-600 ring-gold-200',
           )}
         >
           {danger ? <XCircle className="size-8" /> : <AlertTriangle className="size-8" />}
         </span>
-        <h3 className="text-lg font-semibold text-slate-900">{opts?.title}</h3>
+        <h3 className="font-display text-lg font-bold text-brand-800">{opts?.title}</h3>
         {opts?.message ? (
           <p className="mt-1.5 text-sm whitespace-pre-line text-slate-600">{opts.message}</p>
         ) : null}
@@ -158,13 +158,13 @@ function LoadingOverlay({ state }) {
   if (!state) return null;
   return createPortal(
     <div
-      className="no-print fixed inset-0 z-[80] flex items-center justify-center bg-white/75 backdrop-blur-[1px]"
+      className="no-print fixed inset-0 z-[80] flex items-center justify-center bg-brand-950/35 backdrop-blur-[2px]"
       role="status"
       aria-live="polite"
     >
-      <div className="flex min-w-52 flex-col items-center rounded-2xl bg-white px-8 py-6 shadow-pop">
-        <span className="size-9 animate-spin rounded-full border-4 border-brand-600 border-t-transparent" />
-        <p className="mt-3 text-center text-sm font-semibold text-slate-800">{state.message}</p>
+      <div className="flex min-w-56 flex-col items-center rounded-3xl bg-white px-9 py-7 shadow-pop">
+        <span className="size-10 animate-spin rounded-full border-4 border-gold-200 border-t-gold-500" />
+        <p className="mt-4 text-center font-display text-sm font-bold text-brand-800">{state.message}</p>
         {state.subtext ? <p className="mt-1 text-center text-xs text-slate-500">{state.subtext}</p> : null}
       </div>
     </div>,

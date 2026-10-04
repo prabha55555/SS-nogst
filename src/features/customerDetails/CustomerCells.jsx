@@ -1,7 +1,8 @@
 /** Small pieces shared by the phone card and the desktop table row. */
-import { MapPin, MessageCircle, Phone, RefreshCcw, User } from 'lucide-react';
+import { MapPin, MessageCircle, Phone, RefreshCcw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { InitialAvatar } from '@/features/customerForm/InitialAvatar';
 import { Button, cn } from '@/ui';
 import {
   isAddressTruncated,
@@ -56,12 +57,12 @@ export function PhoneReveal({ phone, showIcon }) {
       title={canReveal ? 'Click to reveal full number' : undefined}
       aria-label={`Phone ${text}`}
       className={cn(
-        'flex min-h-7 items-center gap-2 text-left text-sm tabular-nums',
-        revealed ? 'font-bold text-slate-900' : 'font-medium text-slate-500',
-        canReveal && 'cursor-pointer hover:text-brand-600',
+        'flex min-h-7 items-center gap-2 rounded-md text-left text-sm tabular-nums focus-visible:ring-2 focus-visible:ring-gold-300 focus-visible:outline-none',
+        revealed ? 'font-bold text-brand-800' : 'font-medium text-slate-500',
+        canReveal && 'cursor-pointer hover:text-gold-700',
       )}
     >
-      {showIcon ? <Phone className="size-4 shrink-0 text-slate-400" aria-hidden /> : null}
+      {showIcon ? <Phone className="size-4 shrink-0 text-gold-600" aria-hidden /> : null}
       {text}
     </button>
   );
@@ -79,36 +80,37 @@ export function AddressText({ address, showIcon }) {
       title={address || 'N/A'}
       aria-label={`Address ${address || 'N/A'}`}
       className={cn(
-        'flex min-h-7 items-start gap-2 text-left text-sm font-medium text-slate-500',
+        'flex min-h-7 items-start gap-2 rounded-md text-left text-sm font-medium text-slate-500 focus-visible:ring-2 focus-visible:ring-gold-300 focus-visible:outline-none',
         truncated && 'cursor-pointer',
       )}
     >
-      {showIcon ? <MapPin className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden /> : null}
+      {showIcon ? <MapPin className="mt-0.5 size-4 shrink-0 text-gold-600" aria-hidden /> : null}
       <span className="min-w-0 break-words">{expanded ? address : previewAddress(address)}</span>
     </button>
   );
 }
 
-/** `card` = large name with a person icon; `table` = compact bold name. */
+/** `card` = large name with a gold initial tile; `table` = compact bold name with a small tile. */
 export function CustomerName({ name, hasReturns, size = 'card' }) {
+  const card = size === 'card';
   return (
-    <div className="flex items-center gap-2">
-      {size === 'card' ? <User className="size-[18px] shrink-0 text-brand-600" aria-hidden /> : null}
+    <div className="flex items-center gap-3">
+      <InitialAvatar name={name} size={card ? 'lg' : 'sm'} />
       <span
         className={cn(
-          'min-w-0 font-bold break-words text-slate-900',
-          size === 'card' ? 'text-lg' : 'text-sm',
+          'min-w-0 font-bold break-words text-brand-800',
+          card ? 'text-[17px] leading-snug' : 'text-sm',
         )}
       >
         {name}
       </span>
       {hasReturns ? (
         <span
-          className="inline-flex items-center rounded-full border border-amber-400 bg-amber-300 px-1.5 py-px"
+          className="inline-flex items-center rounded-full bg-amber-50 px-1.5 py-1 text-amber-700 ring-1 ring-amber-300 ring-inset"
           title="This customer has returns"
           aria-label="This customer has returns"
         >
-          <RefreshCcw className="size-2.5" aria-hidden />
+          <RefreshCcw className="size-3" aria-hidden />
         </span>
       ) : null}
     </div>
@@ -118,7 +120,7 @@ export function CustomerName({ name, hasReturns, size = 'card' }) {
 /** "Send Reminder" button, or the muted "No balance/phone" note when no reminder applies. */
 export function ReminderAction({ customer, onRemind, dense }) {
   if (!canSendReminder(customer)) {
-    return <span className="block text-center text-sm text-slate-400">No balance/phone</span>;
+    return <span className="block text-center text-xs font-medium text-slate-400">No balance/phone</span>;
   }
   return (
     <Button

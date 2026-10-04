@@ -7,6 +7,8 @@
  *                                                      – "Payment History (₹x)" / "Return History (₹x)" rows.
  * InvoiceActionButtons({ invoice, actions, compact })  – wrapped button grid (see HistoryInvoiceActions in ./types.js);
  *                                                        `compact` (phone/tablet card) folds the rare actions behind "More actions".
+ * InvoiceStatusBadge({ invoice })                      – Paid / Part paid / Unpaid pill (presentational).
+ * PaidProgress({ invoice })                            – slim gold -> emerald bar: paid share of the invoice total.
  *
  * `invoice` is a HistoryInvoice view model, so the same parts serve sales and purchase.
  */
@@ -26,20 +28,68 @@ import {
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { formatCurrency } from '@/core/format';
-import { Button, cn } from '@/ui';
+import { Badge, Button, cn } from '@/ui';
 import { additionalPaymentsLabel, splitPayments } from '../lib/payments';
 
 const rs = (amount) => `₹${formatCurrency(amount)}`;
 
+const dueOf = (invoice) => (invoice.totalReturns > 0 ? invoice.adjustedBalanceDue : invoice.balanceDue);
+
+/** Paid / Part paid / Unpaid – purely a visual reading of the invoice figures. */
+export function InvoiceStatusBadge({ invoice, className }) {
+  const due = Number(dueOf(invoice)) || 0;
+  if (due <= 0) {
+    return (
+      <Badge tone="success" className={className}>
+        Paid
+      </Badge>
+    );
+  }
+  return invoice.amountPaid > 0 ? (
+    <Badge tone="warning" className={className}>
+      Part paid
+    </Badge>
+  ) : (
+    <Badge tone="danger" className={className}>
+      Unpaid
+    </Badge>
+  );
+}
+
+/** Slim progress bar (gold -> emerald): paid share of the invoice total. */
+export function PaidProgress({ invoice, className }) {
+  const total = Number(invoice.grandTotal) || 0;
+  const paid = Number(invoice.amountPaid) || 0;
+  const pct = total > 0 ? Math.max(0, Math.min(100, Math.round((paid / total) * 100))) : 0;
+  return (
+    <div className={cn('flex items-center gap-2.5', className)}>
+      <div
+        className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100"
+        role="progressbar"
+        aria-label="Paid share of invoice total"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct}
+      >
+        <div
+          className="h-full rounded-full bg-linear-to-r from-gold-400 to-emerald-500 transition-[width] duration-500"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <span className="w-9 text-right text-[11px] font-semibold text-slate-500 tabular-nums">{pct}%</span>
+    </div>
+  );
+}
+
 function Line({ label, value, valueClassName, bold, className }) {
   return (
     <div className={cn('flex items-baseline justify-between gap-3 text-sm', className)}>
-      <span className={cn('text-slate-600', bold && 'font-semibold text-slate-800')}>{label}</span>
+      <span className={bold ? 'font-semibold text-brand-800' : 'text-slate-500'}>{label}</span>
       <span
         className={cn(
-          'font-semibold text-slate-800 tabular-nums',
-          bold && 'text-base font-bold',
-          valueClassName,
+          'tabular-nums',
+          bold ? 'font-display text-base font-extrabold' : 'font-semibold',
+          valueClassName ?? (bold ? 'text-brand-800' : 'text-slate-800'),
         )}
       >
         {value}
@@ -53,65 +103,74 @@ export function InvoiceSummaryBox({ invoice }) {
   const split = useMemo(() => splitPayments(payments), [payments]);
   const additional = additionalPaymentsLabel(split.additional);
   const hasReturns = invoice.totalReturns > 0;
+  const due = hasReturns ? invoice.adjustedBalanceDue : invoice.balanceDue;
+  const settled = (Number(due) || 0) <= 0;
 
   return (
-    <div className="my-3 space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
-      <Line
-        label="Current Bill Amount:"
-        value={rs(invoice.subtotal)}
-        className="border-b border-slate-200 pb-2"
-      />
-      <Line label="Previous Balance:" value={rs(invoice.previousBalance)} valueClassName="text-red-600" />
-      {invoice.discountAmount ? (
+    <div className="my-3 overflow-hidden rounded-xl border border-line bg-slate-50/70">
+      <div className="space-y-2 p-3">
         <Line
-          label="Discount Amount:"
-          value={`-${rs(invoice.discountAmount)}`}
-          valueClassName="text-emerald-600"
+          label="Current Bill Amount:"
+          value={rs(invoice.subtotal)}
+          className="border-b border-line pb-2"
         />
-      ) : null}
-      <Line
-        label="Total Amount:"
-        value={rs(invoice.grandTotal)}
-        bold
-        className="border-b border-dashed border-slate-300 pb-2"
-      />
+        <Line label="Previous Balance:" value={rs(invoice.previousBalance)} valueClassName="text-red-600" />
+        {invoice.discountAmount ? (
+          <Line
+            label="Discount Amount:"
+            value={`-${rs(invoice.discountAmount)}`}
+            valueClassName="text-emerald-600"
+          />
+        ) : null}
+        <Line
+          label="Total Amount:"
+          value={rs(invoice.grandTotal)}
+          bold
+          className="border-t border-dashed border-slate-300 pt-2"
+        />
 
-      <div className="space-y-1.5 rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs text-emerald-800 sm:text-sm">
-        <div className="flex justify-between gap-3">
-          <span>Initial Amount Paid:</span>
-          <span className="font-semibold tabular-nums">
-            {split.initial.length > 0 ? rs(split.initialTotal) : '-'}
-          </span>
+        <div className="space-y-1.5 rounded-xl bg-emerald-50/80 p-2.5 text-xs text-emerald-800 ring-1 ring-emerald-200 ring-inset sm:text-sm">
+          <div className="flex justify-between gap-3">
+            <span>Initial Amount Paid:</span>
+            <span className="font-semibold tabular-nums">
+              {split.initial.length > 0 ? rs(split.initialTotal) : '-'}
+            </span>
+          </div>
+          <div className="flex justify-between gap-3">
+            <span>Additional Amount Paid:</span>
+            <span className="text-right font-semibold tabular-nums">{additional || '-'}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 border-t border-emerald-200 pt-1.5 font-semibold text-emerald-900">
+            <span>Total Amount Paid:</span>
+            <span className="flex items-center gap-1.5 font-bold tabular-nums">
+              {rs(invoice.amountPaid)}
+              {invoice.legacyPaymentMethod && payments.length === 0 ? (
+                <span className="rounded-md bg-emerald-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  {invoice.legacyPaymentMethod.toUpperCase()}
+                </span>
+              ) : null}
+            </span>
+          </div>
         </div>
-        <div className="flex justify-between gap-3">
-          <span>Additional Amount Paid:</span>
-          <span className="text-right font-semibold tabular-nums">{additional || '-'}</span>
-        </div>
-        <div className="flex items-center justify-between gap-3 border-t border-emerald-300 pt-1.5 font-semibold text-emerald-900">
-          <span>Total Amount Paid:</span>
-          <span className="flex items-center gap-1.5 font-bold tabular-nums">
-            {rs(invoice.amountPaid)}
-            {invoice.legacyPaymentMethod && payments.length === 0 ? (
-              <span className="rounded bg-emerald-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                {invoice.legacyPaymentMethod.toUpperCase()}
-              </span>
-            ) : null}
-          </span>
-        </div>
+
+        {hasReturns ? (
+          <Line
+            label="Return Amount:"
+            value={`-${rs(invoice.totalReturns)}`}
+            valueClassName="text-emerald-600"
+          />
+        ) : null}
       </div>
-
-      {hasReturns ? (
-        <Line
-          label="Return Amount:"
-          value={`-${rs(invoice.totalReturns)}`}
-          valueClassName="text-emerald-600"
-        />
-      ) : null}
-      <div className="flex items-baseline justify-between gap-3 border-t-2 border-slate-200 pt-2 font-bold text-red-600">
-        <span>{hasReturns ? 'Current Adjusted Balance Due:' : 'Balance Due:'}</span>
-        <span className="text-lg tabular-nums">
-          {rs(hasReturns ? invoice.adjustedBalanceDue : invoice.balanceDue)}
-        </span>
+      <div
+        className={cn(
+          'flex items-baseline justify-between gap-3 border-t px-3 py-2.5 font-bold',
+          settled
+            ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+            : 'border-red-200 bg-red-50 text-red-600',
+        )}
+      >
+        <span className="text-sm">{hasReturns ? 'Current Adjusted Balance Due:' : 'Balance Due:'}</span>
+        <span className="font-display text-lg font-extrabold tabular-nums">{rs(due)}</span>
       </div>
     </div>
   );
@@ -119,40 +178,51 @@ export function InvoiceSummaryBox({ invoice }) {
 
 export function InvoiceProducts({ invoice }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 text-sm">
-      <div className="flex gap-2 bg-slate-50 px-2.5 py-1.5 font-semibold text-slate-500">
+    <div className="overflow-hidden rounded-xl border border-line bg-white text-sm">
+      <div className="flex gap-2 bg-linear-to-b from-slate-50 to-slate-100/70 px-3 py-2 text-[11px] font-bold tracking-[0.08em] text-slate-500 uppercase">
         <span className="flex-1">Product</span>
         <span className="w-16 text-right">Qty</span>
         <span className="w-20 text-right">Rate</span>
       </div>
       {invoice.products.length > 0 ? (
         invoice.products.map((p, i) => (
-          <div key={`${i}-${p.description}`} className="flex gap-2 border-t border-slate-100 px-2.5 py-1.5">
+          <div
+            key={`${i}-${p.description}`}
+            className="flex gap-2 border-t border-slate-100 px-3 py-2 text-slate-800"
+          >
             <span className="min-w-0 flex-1 break-words">{p.description}</span>
             <span className="w-16 text-right tabular-nums">{p.qty}</span>
             <span className="w-20 text-right tabular-nums">{rs(p.rate)}</span>
           </div>
         ))
       ) : (
-        <p className="p-2 text-center text-slate-500">No products found</p>
+        <p className="p-3 text-center text-slate-500">No products found</p>
       )}
     </div>
   );
 }
 
-function HistoryLink({ label, tone, onClick }) {
+function HistoryLink({ label, tone, tile, icon: Icon, onClick }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
       className={cn(
-        'flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-2 text-left text-sm font-semibold hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:outline-none',
+        'group flex min-h-11 w-full items-center gap-2.5 rounded-xl px-2 text-left text-sm font-semibold transition hover:bg-gold-50/70 focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:outline-none',
         tone,
       )}
     >
-      <span>{label}</span>
-      <ChevronRight className="size-4 shrink-0" aria-hidden />
+      <span
+        className={cn('flex size-7 shrink-0 items-center justify-center rounded-lg ring-1 ring-inset', tile)}
+      >
+        <Icon className="size-4" aria-hidden />
+      </span>
+      <span className="flex-1">{label}</span>
+      <ChevronRight
+        className="size-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-gold-600"
+        aria-hidden
+      />
     </button>
   );
 }
@@ -160,18 +230,22 @@ function HistoryLink({ label, tone, onClick }) {
 export function InvoiceHistoryLinks({ invoice, onViewPayments, onViewReturns }) {
   if (!(invoice.amountPaid > 0 || invoice.totalReturns > 0)) return null;
   return (
-    <div className="mt-1 space-y-0.5">
+    <div className="mt-2 space-y-0.5 border-t border-line pt-2">
       {invoice.amountPaid > 0 ? (
         <HistoryLink
           label={`Payment History (${rs(invoice.amountPaid)})`}
           tone="text-emerald-700"
+          tile="bg-emerald-50 text-emerald-600 ring-emerald-200"
+          icon={Banknote}
           onClick={onViewPayments}
         />
       ) : null}
       {invoice.totalReturns > 0 ? (
         <HistoryLink
           label={`Return History (${rs(invoice.totalReturns)})`}
-          tone="text-red-600"
+          tone="text-amber-700"
+          tile="bg-amber-50 text-amber-600 ring-amber-200"
+          icon={RotateCcw}
           onClick={onViewReturns}
         />
       ) : null}
@@ -182,7 +256,7 @@ export function InvoiceHistoryLinks({ invoice, onViewPayments, onViewReturns }) 
 export function InvoiceActionButtons({ invoice, actions, compact = false }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const no = invoice.invoiceNo;
-  const cell = 'grow basis-[46%]';
+  const cell = compact ? 'grow basis-[46%]' : 'grow basis-[46%] sm:basis-[30%]';
   const extras = (
     <>
       {actions.whatsAppMessage ? (
@@ -215,19 +289,20 @@ export function InvoiceActionButtons({ invoice, actions, compact = false }) {
   const hasExtras = !!(actions.whatsAppMessage || actions.printInvoice || actions.shareInvoicePdf);
 
   return (
-    <div className="mt-3 flex flex-wrap gap-2">
-      <Button variant="info" icon={SquarePen} className={cell} onClick={() => actions.edit(no)}>
-        Edit
-      </Button>
+    <div className="mt-3 flex flex-wrap gap-2 border-t border-line pt-3">
       {invoice.canAddPayment ? (
         <Button variant="success" icon={Banknote} className={cell} onClick={() => actions.addPayment(no)}>
           Add Payment
         </Button>
       ) : null}
-      <Button variant="warning" icon={RotateCcw} className={cell} onClick={() => actions.addReturn(no)}>
+      <Button variant="outline" icon={SquarePen} className={cell} onClick={() => actions.edit(no)}>
+        Edit
+      </Button>
+      <Button variant="outline" icon={RotateCcw} className={cell} onClick={() => actions.addReturn(no)}>
         Add Return
       </Button>
       <Button
+        variant="secondary"
         icon={Download}
         className={cell}
         aria-label="Download Statement"
@@ -244,7 +319,7 @@ export function InvoiceActionButtons({ invoice, actions, compact = false }) {
       >
         {compact ? 'Share' : 'Share Statement'}
       </Button>
-      <Button variant="danger" icon={Trash2} className={cell} onClick={() => actions.remove(no)}>
+      <Button variant="outlineDanger" icon={Trash2} className={cell} onClick={() => actions.remove(no)}>
         Delete
       </Button>
       {compact && hasExtras ? (
@@ -253,7 +328,7 @@ export function InvoiceActionButtons({ invoice, actions, compact = false }) {
             type="button"
             aria-expanded={moreOpen}
             onClick={() => setMoreOpen((v) => !v)}
-            className="flex min-h-10 w-full items-center justify-center gap-1 text-sm font-semibold text-brand-700"
+            className="flex min-h-10 w-full items-center justify-center gap-1 rounded-xl text-sm font-semibold text-gold-700 transition hover:bg-gold-50 focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:outline-none"
           >
             {moreOpen ? 'Fewer actions' : 'More actions'}
             {moreOpen ? (

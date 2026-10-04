@@ -1,3 +1,4 @@
+import { CREDIT_LINE } from '@/core/branding';
 import { db } from '@/core/db';
 import {
   buildCombinedStatement,
@@ -234,9 +235,9 @@ describe('statement HTML', () => {
     expect(html).toContain('-Rs. 200.00');
     expect(html).toContain('Product Returns');
     expect(html).toContain('This is a computer-generated statement. No signature is required.');
-    expect(html).toContain('For any queries, please contact: 90872 93268, 9092779599');
+    expect(html).toContain('For any queries, please contact: +91 78450 81278');
     expect(html).toContain('Generated on: 4/10/2026, 4:05:09 pm');
-    expect(html).toContain('Software created by Sabarish');
+    expect(html).toContain('Powered by Brightlight Solutions');
     expect(html).not.toContain('<img');
   });
   test('combined: the logo is used for header and watermark when given; return/payment sections only when present', () => {
@@ -274,7 +275,7 @@ describe('statement HTML', () => {
     expect(html).toContain('Total Received:</span><span>Rs. 600.00');
     expect(html).toContain('Total Returns:</span><span>-Rs. 100.00');
     expect(html).toContain('Balance Due:</span><span>Rs. 900.00');
-    expect(html).not.toContain('Software created by Sabarish');
+    expect(html).not.toContain('Powered by Brightlight Solutions');
     expect(html.indexOf('>001<')).toBeLessThan(html.indexOf('>002<'));
     const noReturns = buildEasyStatementHtml({
       partyName: 'x',
@@ -340,7 +341,7 @@ describe('statement HTML', () => {
 describe('WhatsApp text of the combined statement', () => {
   const message = buildCombinedStatementMessage(statement(), SALES_LABELS);
   test('header, customer block and invoices (newest first) with their figures', () => {
-    expect(message).toContain('*SANTHAMANI TEXTILES - ACCOUNT STATEMENT*');
+    expect(message).toContain('*BRIGHTLIGHT SOLUTIONS - ACCOUNT STATEMENT*');
     expect(message).toContain('*CUSTOMER DETAILS*');
     expect(message).toContain('👤 Customer: sln');
     expect(message).toContain('📍 Address: Tirupur');
@@ -371,8 +372,8 @@ describe('WhatsApp text of the combined statement', () => {
     expect(message).toContain('📦 Total Return Amount: ₹100.00');
     expect(message).toContain('• #002 - 3/10/2026 - Due: ₹850.00');
     expect(message).toContain('• #001 - 1/9/2026 - Due: ₹600.00');
-    expect(message).toContain('📍 Palladam');
-    expect(message).toContain('📞 *Phone: 90872 93268, 9092779599*');
+    expect(message).toContain('📍 Tiruppur, Tamil Nadu');
+    expect(message).toContain('📞 *Phone: +91 78450 81278*');
     expect(
       message.trimEnd().endsWith('_This is an automated statement. Please contact us for any queries._'),
     ).toBe(true);
@@ -402,9 +403,7 @@ describe('WhatsApp text of the combined statement', () => {
   test('link text gets the developer credit appended (the clipboard copy does not)', () => {
     const url = combinedStatementWhatsAppUrl('919876543210', 'Hello');
     expect(url.startsWith('https://wa.me/919876543210?text=')).toBe(true);
-    expect(decodeURIComponent(url.split('?text=')[1])).toBe(
-      'Hello\n\nSoftware created by Sabarish R.\nFor custom billing solutions, contact: 7845081278',
-    );
+    expect(decodeURIComponent(url.split('?text=')[1])).toBe(`Hello\n\n${CREDIT_LINE}`);
   });
 });
 describe('loadCustomerStatement (db mocked)', () => {

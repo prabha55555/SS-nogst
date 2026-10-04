@@ -1,5 +1,5 @@
 /**
- * Sales Bill screen — replaces legacy/sales.html + js/script.js (+ print / WhatsApp share from js/pdf.js).
+ * Sales Bill screen — replaces original-app/sales.html + js/script.js (+ print / WhatsApp share from js/pdf.js).
  * Create a bill, or edit one when opened as /sales/bill?edit=<invoiceNo>.
  * Desktop: form on the left, calculation + payments + actions on the right (TwoPane).
  * Phones: stacked cards (product rows become cards) with a sticky action bar above the tab bar.
@@ -75,11 +75,21 @@ export default function SalesBillPage() {
         editingNo={session.editingNo}
         onNewBill={() => bill.reset(!session.saved)}
       />
-      <Card>
+      <Card className="relative animate-rise overflow-hidden">
+        <span className="absolute inset-x-0 top-0 h-[3px] bg-gold-gradient" aria-hidden />
         <SectionHeader
           title="Invoice"
           icon={Receipt}
-          right={editing ? undefined : <SaveBadge saved={session.saved} />}
+          right={
+            <div className="flex items-center gap-2">
+              {form.invoiceNo.trim() ? (
+                <span className="rounded-lg bg-brand-800 px-2.5 py-1 font-display text-xs font-bold tracking-wide text-gold-300 tabular-nums">
+                  #{form.invoiceNo.trim()}
+                </span>
+              ) : null}
+              {editing ? null : <SaveBadge saved={session.saved} />}
+            </div>
+          }
         />
         <InvoiceHeaderFields
           last={bill.suggestion?.lastInvoiceNo ?? '-'}
@@ -145,7 +155,7 @@ export default function SalesBillPage() {
     >
       <TwoPane main={main} side={side} />
       {isExpanded ? null : (
-        <div className="no-print sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-xl border border-slate-200 bg-white/95 p-2 shadow-pop backdrop-blur">
+        <div className="no-print sticky bottom-[calc(3.7rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-2xl border border-white/70 glass p-2 shadow-pop ring-1 ring-brand-900/5">
           {actions('bar')}
         </div>
       )}

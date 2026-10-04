@@ -1,23 +1,57 @@
 import { Loader2 } from 'lucide-react';
 import { cn } from './cn';
 
+const RING = 'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+
 const VARIANTS = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700 focus-visible:ring-brand-300',
-  success: 'bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:ring-emerald-300',
-  danger: 'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-300',
-  warning: 'bg-amber-400 text-slate-900 hover:bg-amber-500 focus-visible:ring-amber-200',
-  info: 'bg-sky-600 text-white hover:bg-sky-700 focus-visible:ring-sky-300',
-  secondary: 'bg-slate-600 text-white hover:bg-slate-700 focus-visible:ring-slate-300',
-  purple: 'bg-violet-600 text-white hover:bg-violet-700 focus-visible:ring-violet-300',
-  whatsapp: 'bg-whatsapp text-white hover:bg-whatsapp-dark focus-visible:ring-green-300',
-  outline: 'border border-brand-600 bg-white text-brand-700 hover:bg-brand-50 focus-visible:ring-brand-200',
-  outlineDanger: 'border border-red-500 bg-white text-red-600 hover:bg-red-50 focus-visible:ring-red-200',
-  ghost: 'text-brand-700 hover:bg-brand-50 focus-visible:ring-brand-200',
+  // Brand gold — the main call-to-action
+  primary: cn(
+    'bg-gold-sheen text-brand-900 shadow-[inset_0_1px_0_rgb(255_255_255/0.55),0_1px_2px_rgb(120_80_0/0.35)]',
+    'hover:brightness-105 hover:shadow-gold focus-visible:ring-gold-400',
+  ),
+  // Deep ink
+  secondary: cn(
+    'bg-linear-to-b from-brand-600 to-brand-800 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_1px_2px_rgb(12_16_34/0.4)]',
+    'hover:from-brand-500 hover:to-brand-700 focus-visible:ring-brand-400',
+  ),
+  success: cn(
+    'bg-linear-to-b from-emerald-500 to-emerald-600 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.2)]',
+    'hover:from-emerald-600 hover:to-emerald-700 focus-visible:ring-emerald-400',
+  ),
+  danger: cn(
+    'bg-linear-to-b from-red-500 to-red-600 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.2)]',
+    'hover:from-red-600 hover:to-red-700 focus-visible:ring-red-400',
+  ),
+  warning: cn(
+    'bg-linear-to-b from-amber-300 to-amber-400 text-slate-900 shadow-[inset_0_1px_0_rgb(255_255_255/0.4)]',
+    'hover:from-amber-400 hover:to-amber-500 focus-visible:ring-amber-300',
+  ),
+  info: cn(
+    'bg-linear-to-b from-sky-500 to-sky-600 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.2)]',
+    'hover:from-sky-600 hover:to-sky-700 focus-visible:ring-sky-400',
+  ),
+  purple: cn(
+    'bg-linear-to-b from-violet-500 to-violet-600 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.2)]',
+    'hover:from-violet-600 hover:to-violet-700 focus-visible:ring-violet-400',
+  ),
+  whatsapp: cn(
+    'bg-linear-to-b from-[#2fe07a] to-whatsapp-dark text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25)]',
+    'hover:brightness-95 focus-visible:ring-green-400',
+  ),
+  outline: cn(
+    'border border-slate-300 bg-white text-slate-800 shadow-sm',
+    'hover:border-gold-400 hover:bg-gold-50 focus-visible:ring-gold-300',
+  ),
+  outlineDanger: cn(
+    'border border-red-300 bg-white text-red-600 shadow-sm',
+    'hover:border-red-400 hover:bg-red-50 focus-visible:ring-red-300',
+  ),
+  ghost: 'text-slate-700 hover:bg-slate-100 hover:text-brand-800 focus-visible:ring-gold-300',
   subtle: 'bg-slate-100 text-slate-700 hover:bg-slate-200 focus-visible:ring-slate-300',
 };
 
 const SIZES = {
-  sm: 'min-h-9 px-3 text-sm',
+  sm: 'min-h-9 px-3 text-[13px]',
   md: 'min-h-11 px-4 text-sm sm:min-h-10',
   lg: 'min-h-12 px-6 text-base',
 };
@@ -25,7 +59,7 @@ const SIZES = {
 /**
  * <Button variant="primary" icon={Save} onClick={...}>Save</Button>
  * `icon` is a lucide-react component; `loading` shows a spinner and disables the button.
- * Variants: primary success danger warning info secondary purple whatsapp outline outlineDanger ghost subtle.
+ * Variants: primary (gold CTA) secondary (ink) success danger warning info purple whatsapp outline outlineDanger ghost subtle.
  */
 export function Button({
   variant = 'primary',
@@ -46,9 +80,10 @@ export function Button({
       disabled={inactive}
       aria-busy={loading || undefined}
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-lg font-semibold whitespace-nowrap transition',
-        'focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98]',
-        'disabled:cursor-not-allowed disabled:opacity-55',
+        'inline-flex items-center justify-center gap-2 rounded-xl font-semibold whitespace-nowrap',
+        'transition duration-150 ease-out focus-visible:outline-none active:translate-y-px active:scale-[0.985]',
+        'disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:brightness-100',
+        RING,
         VARIANTS[variant],
         SIZES[size],
         fullWidth && 'w-full',
@@ -59,7 +94,7 @@ export function Button({
       {loading ? (
         <Loader2 className="size-4 animate-spin" aria-hidden />
       ) : Icon ? (
-        <Icon className="size-4" aria-hidden />
+        <Icon className="size-4 shrink-0" aria-hidden />
       ) : null}
       {children}
     </button>

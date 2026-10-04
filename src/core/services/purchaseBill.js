@@ -8,6 +8,7 @@ import {
   calcSubtotal,
   suggestPurchaseInvoiceNumber,
 } from '@/core/billing';
+import { COMPANY, CREDIT_LINE } from '@/core/branding';
 import { db } from '@/core/db';
 import { toNum, todayISO } from '@/core/format';
 export function emptyPurchaseForm() {
@@ -149,7 +150,6 @@ export function buildAcknowledgementMessage(form) {
     message += `${i + 1}. ${p.description} - Qty: ${p.qty} - Amount: ₹${p.amount.toFixed(2)}\n`;
   });
   message += `\nTotal Amount: ₹${grandTotal.toFixed(2)}\n\n`;
-  message +=
-    'Santhamani Textiles has received the products mentioned above. Thank you.\n\nSoftware created by Sabarish R.\nFor custom billing solutions, contact: 7845081278';
+  message += `${COMPANY.displayName} has received the products mentioned above. Thank you.\n\n${CREDIT_LINE}`;
   return message;
 }

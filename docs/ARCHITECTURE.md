@@ -1,14 +1,14 @@
-# Santhamani Textiles — Architecture
+# Brightlight Billing — Architecture
 
 React 19 (JSX) + Tailwind CSS 4 + Vite 8, installable as a **PWA** (Android / iOS / desktop). One codebase, one
-Firestore project (`billing-56b7b`) used by this application.
+Firestore project. Visual language: [`DESIGN.md`](./DESIGN.md).
 
 ```
 src/
   main.jsx                 entry: Router → Auth → Feedback → routes
   app/                     shell: routes.jsx · ModuleLayout (sidebar / bottom tabs) · Login · Dashboard · PWA helpers
   core/                    business logic — plain JS, no React, no DOM
-    firebase.js db.js      Firestore data layer (same method names / collections / ids as legacy/js/db.js)
+    firebase.js db.js      Firestore data layer (same method names / collections / ids as the original app's db.js)
     billing.js format.js   totals, balances, invoice numbering · Indian-grouped currency, dates, number-to-words
     auth.js branding.js    login rules · company details printed on invoices
     services/              salesBill · purchaseBill · invoiceHtml · invoiceShare · whatsapp
@@ -47,7 +47,7 @@ like the original site's `enablePersistence({ synchronizeTabs: true })`.
 
 ## Data layer (`@/core/db`)
 
-`import { db } from '@/core/db'` — singleton with the same method names as `legacy/js/db.js`
+`import { db } from '@/core/db'` — singleton with the same method names as the original app's `db.js`
 (`getAllInvoices`, `saveInvoice`, `getPaymentsByInvoice`, `moveInvoiceToRecycleBin`, `getAllPurchaseBills`, …).
 
 * `getAll*` lists are cached in memory; every write invalidates what it touches. After a write done outside `db`

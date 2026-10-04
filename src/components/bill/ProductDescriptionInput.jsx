@@ -87,18 +87,18 @@ export function ProductDescriptionInput({
         onBlur={() => setFocused(false)}
         onKeyDown={onKeyDown}
         className={cn(
-          'block min-h-11 w-full min-w-0 rounded-lg border bg-white px-3 py-2 text-slate-900 transition sm:min-h-10',
-          'placeholder:text-slate-400 read-only:bg-slate-100 focus:ring-2 focus:outline-none',
+          'block min-h-11 w-full min-w-0 rounded-xl border bg-white px-3.5 py-2 text-slate-900 shadow-[inset_0_1px_2px_rgb(20_26_48/0.04)] transition duration-150 sm:min-h-10',
+          'placeholder:text-slate-400 read-only:bg-slate-50 read-only:text-slate-600 hover:border-slate-400 focus:ring-4 focus:outline-none',
           unknown
-            ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-            : 'border-slate-300 focus:border-brand-500 focus:ring-brand-200',
+            ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
+            : 'border-slate-300 focus:border-gold-500 focus:ring-gold-100',
         )}
       />
       {open ? (
         <ul
           id={listId}
           role="listbox"
-          className="absolute top-full right-0 left-0 z-30 mt-1 max-h-64 overflow-auto rounded-lg border border-slate-200 bg-white py-1 shadow-card"
+          className="absolute top-full right-0 left-0 z-30 mt-1.5 max-h-64 animate-fade-in overflow-auto rounded-xl border border-line bg-white/95 p-1 shadow-pop ring-1 ring-brand-900/5 backdrop-blur-md"
         >
           {suggestions.map((s, i) => (
             <li
@@ -112,16 +112,22 @@ export function ProductDescriptionInput({
                 pick(s);
               }}
               onMouseEnter={() => setHighlight(i)}
-              className={cn('cursor-pointer px-3 py-2 text-sm text-slate-800', i === active && 'bg-brand-50')}
+              className={cn(
+                'flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-slate-800 transition-colors',
+                i === active && 'bg-gold-50 ring-1 ring-gold-200',
+              )}
             >
-              <strong className="text-brand-700">{s.shortcutKey}</strong> → {s.fullDescription}
+              <strong className="shrink-0 rounded-md bg-gold-100 px-1.5 py-0.5 text-xs font-bold text-gold-800 ring-1 ring-gold-200">
+                {s.shortcutKey}
+              </strong>
+              <span className="min-w-0 truncate">{s.fullDescription}</span>
             </li>
           ))}
         </ul>
       ) : null}
-      {noMatch ? <p className="mt-1 text-xs text-slate-500">No matching products found</p> : null}
+      {noMatch ? <p className="mt-1.5 text-xs text-slate-500">No matching products found</p> : null}
       {unknown ? (
-        <p className="mt-1 text-xs text-red-600" role="alert">
+        <p className="mt-1.5 text-xs font-medium text-red-600" role="alert">
           Select a product from the suggestions
         </p>
       ) : null}

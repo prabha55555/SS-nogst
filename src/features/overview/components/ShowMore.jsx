@@ -8,7 +8,7 @@ import { PAGE_SIZE } from './paging';
 export default function ShowMore({ remaining, onClick }) {
   if (remaining <= 0) return null;
   return (
-    <Button variant="outline" icon={ChevronDown} fullWidth className="mt-3" onClick={onClick}>
+    <Button variant="outline" icon={ChevronDown} fullWidth className="mt-4" onClick={onClick}>
       Show more ({Math.min(remaining, PAGE_SIZE)} of {remaining} remaining)
     </Button>
   );

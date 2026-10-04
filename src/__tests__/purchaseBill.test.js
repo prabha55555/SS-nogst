@@ -97,5 +97,5 @@ test('acknowledgement message', () => {
   expect(msg).toContain('Supplier: ABC Mills');
   expect(msg).toContain('1. Yarn 30s - Qty: 5 - Amount: ₹1000.00');
   expect(msg).toContain('Total Amount: ₹1050.00');
-  expect(msg).toContain('Santhamani Textiles has received the products mentioned above.');
+  expect(msg).toContain('Brightlight Solutions has received the products mentioned above.');
 });

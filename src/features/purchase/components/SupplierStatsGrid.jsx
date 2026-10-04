@@ -10,12 +10,20 @@ export function SupplierStatsGrid({ stats }) {
     { icon: BadgeIndianRupee, value: formatRupees(stats.totalAmount), label: 'Total Amount', tint: 'brand' },
     { icon: CheckCircle2, value: formatRupees(stats.totalPaid), label: 'Total Paid', tint: 'green' },
     { icon: Tag, value: formatRupees(stats.totalDiscount), label: 'Total Discount', tint: 'violet' },
-    { icon: Clock, value: formatRupees(stats.totalBalance), label: 'Total Balance', tint: 'red' },
+    {
+      icon: Clock,
+      value: formatRupees(stats.totalBalance),
+      label: 'Total Balance',
+      tint: 'red',
+      valueClassName: stats.totalBalance > 0 ? 'text-red-600' : undefined,
+    },
   ];
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
-      {items.map((item) => (
-        <StatCard key={item.label} {...item} />
+    <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 xl:grid-cols-6">
+      {items.map((item, i) => (
+        <div key={item.label} className="animate-rise" style={{ animationDelay: `${i * 45}ms` }}>
+          <StatCard {...item} className="h-full" />
+        </div>
       ))}
     </div>
   );

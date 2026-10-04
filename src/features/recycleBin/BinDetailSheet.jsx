@@ -2,28 +2,33 @@ import { EyeOff, Trash2 } from 'lucide-react';
 import { useRef } from 'react';
 
 import { formatCurrency, formatDateIN } from '@/core/format';
-import { Button, Divider, EmptyState, KeyValue, Modal } from '@/ui';
+import { Button, Card, EmptyState, Modal } from '@/ui';
 import { buildBinDetail } from './binLogic';
 
 const rupees = (n) => `₹${formatCurrency(n)}`;
 
 function Box({ children, className = '' }) {
   return (
-    <div className={`rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 ${className}`}>{children}</div>
+    <div className={`rounded-2xl border border-line bg-slate-50/70 px-3.5 py-1 ${className}`}>{children}</div>
   );
 }
 
 function SectionTitle({ children }) {
-  return <h3 className="mt-4 mb-2 text-base font-bold text-slate-900">{children}</h3>;
+  return (
+    <h3 className="mt-5 mb-2 flex items-center gap-2 text-sm font-bold tracking-wide text-brand-800 uppercase">
+      <span className="h-4 w-1 rounded-full bg-gold-gradient" aria-hidden />
+      {children}
+    </h3>
+  );
 }
 
 function Line({ first, title, sub, amount }) {
   return (
-    <div className={`py-2 ${first ? '' : 'border-t border-slate-200'}`}>
+    <div className={`py-2.5 ${first ? '' : 'border-t border-line'}`}>
       <div className="font-semibold text-slate-900">{title}</div>
       <div className="mt-0.5 flex justify-between gap-3 text-sm">
         <span className="text-slate-500">{sub}</span>
-        <span className="font-bold text-slate-900 tabular-nums">{amount}</span>
+        <span className="font-bold text-brand-800 tabular-nums">{amount}</span>
       </div>
     </div>
   );
@@ -31,10 +36,19 @@ function Line({ first, title, sub, amount }) {
 
 function Info({ label, value }) {
   return (
-    <p className="text-slate-900">
-      <span className="font-bold">{label}: </span>
-      {value}
-    </p>
+    <div className="flex items-baseline justify-between gap-4 py-1 text-sm">
+      <span className="shrink-0 font-medium text-slate-500">{label}</span>
+      <span className="min-w-0 text-right font-semibold break-words text-slate-900">{value}</span>
+    </div>
+  );
+}
+
+function TotalRow({ label, value, valueClassName = 'text-white', bold }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 py-1 text-sm">
+      <span className={bold ? 'font-semibold text-brand-100' : 'text-brand-300'}>{label}</span>
+      <span className={`font-semibold tabular-nums ${valueClassName}`}>{value}</span>
+    </div>
   );
 }
 
@@ -42,19 +56,19 @@ function DetailBody({ detail }) {
   const { summary } = detail;
   return (
     <div>
-      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2 border-b border-slate-200 pb-2">
-        <h3 className="text-lg font-bold text-brand-700">{detail.heading}</h3>
-        <span className="text-sm text-slate-500">Date: {detail.dateText}</span>
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="font-display text-xl font-extrabold text-brand-800">{detail.heading}</h3>
+        <span className="text-sm font-medium text-slate-500">Date: {detail.dateText}</span>
       </div>
 
-      <div className="mb-3 space-y-1">
+      <Box className="py-2">
         <Info label={detail.partyLabel} value={detail.partyName} />
         <Info label="Phone" value={detail.phone} />
         <Info label="Address" value={detail.address} />
-        <p className="flex items-center gap-1.5 text-sm text-red-600">
+        <p className="mt-1 flex items-center gap-1.5 border-t border-line pt-2 text-sm font-medium text-red-600">
           <Trash2 className="size-3.5" aria-hidden /> Deleted: {detail.deletedText}
         </p>
-      </div>
+      </Box>
 
       <SectionTitle>Items</SectionTitle>
       <Box>
@@ -66,26 +80,31 @@ function DetailBody({ detail }) {
               key={i}
               first={i === 0}
               title={l.description}
-              sub={`${l.qty} × ${rupees(l.rate)}`}
+              sub={`${l.qty} � ${rupees(l.rate)}`}
               amount={rupees(l.amount)}
             />
           ))
         )}
       </Box>
 
-      <Box className="mt-3">
-        <KeyValue label="Subtotal:" value={rupees(summary.subtotal)} />
-        <KeyValue label="Old Balance:" value={rupees(summary.oldBalance)} />
-        <Divider />
-        <KeyValue label="Grand Total:" value={rupees(summary.grandTotal)} bold />
-        <KeyValue label="Paid:" value={rupees(summary.paid)} valueClassName="text-emerald-600" />
-        <KeyValue
+      <Card tone="ink" className="mt-3.5 p-4">
+        <TotalRow label="Subtotal:" value={rupees(summary.subtotal)} />
+        <TotalRow label="Old Balance:" value={rupees(summary.oldBalance)} />
+        <hr className="my-2 border-white/10" />
+        <div className="flex items-baseline justify-between gap-3 py-1">
+          <span className="text-sm font-semibold text-brand-100">Grand Total:</span>
+          <span className="font-display text-2xl font-extrabold text-gold-300 tabular-nums">
+            {rupees(summary.grandTotal)}
+          </span>
+        </div>
+        <TotalRow label="Paid:" value={rupees(summary.paid)} valueClassName="text-emerald-300" />
+        <TotalRow
           label="Balance Due:"
           value={rupees(summary.balanceDue)}
-          valueClassName="text-red-600"
+          valueClassName="text-red-300"
           bold
         />
-      </Box>
+      </Card>
 
       {detail.payments.length > 0 ? (
         <>
@@ -95,7 +114,7 @@ function DetailBody({ detail }) {
               <Line
                 key={p.id}
                 first={i === 0}
-                title={`${formatDateIN(p.date)} · ${p.method}`}
+                title={`${formatDateIN(p.date)} � ${p.method}`}
                 sub={p.type}
                 amount={rupees(p.amount)}
               />
@@ -113,7 +132,7 @@ function DetailBody({ detail }) {
                 key={r.id}
                 first={i === 0}
                 title={r.description}
-                sub={`${formatDateIN(r.date)} · Qty ${r.qty}`}
+                sub={`${formatDateIN(r.date)} � Qty ${r.qty}`}
                 amount={rupees(r.amount)}
               />
             ))}
@@ -137,7 +156,7 @@ export function BinDetailSheet({ item, config, onClose }) {
       onClose={onClose}
       title="View Details"
       footer={
-        <Button variant="secondary" onClick={onClose} className="flex-1 sm:flex-none">
+        <Button variant="outline" onClick={onClose} className="flex-1 sm:flex-none">
           Close
         </Button>
       }

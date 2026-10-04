@@ -108,8 +108,8 @@ export function buildCombinedStatementMessage(statement, labels) {
     '*CONTACT INFORMATION*',
     LIGHT,
     `🏢 *${COMPANY.name}*`,
-    `📍 ${COMPANY.whatsappLocation}`,
-    `📞 *Phone: ${COMPANY.whatsappPhones}*`,
+    ...(COMPANY.whatsappLocation ? [`📍 ${COMPANY.whatsappLocation}`] : []),
+    ...(COMPANY.whatsappPhones ? [`📞 *Phone: ${COMPANY.whatsappPhones}*`] : []),
     '',
     '_This is an automated statement. Please contact us for any queries._',
   );

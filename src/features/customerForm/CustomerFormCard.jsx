@@ -13,11 +13,18 @@ export function CustomerFormCard({ mode, initial, onCancel, onSubmit }) {
   const adding = mode === 'add';
 
   return (
-    <Card>
+    <Card className="relative overflow-hidden">
+      <span className="absolute inset-x-0 top-0 h-[2px] hairline-gold" aria-hidden />
       <SectionHeader
         title={adding ? 'Add New Customer' : 'Edit Customer'}
         icon={adding ? UserPlus : UserPen}
+        className="mb-1"
       />
+      <p className="mb-4 text-[13px] text-slate-500">
+        {adding
+          ? 'Phone number and name are required; address is optional.'
+          : 'Update the details, then save your changes.'}
+      </p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -31,7 +38,7 @@ export function CustomerFormCard({ mode, initial, onCancel, onSubmit }) {
           change={form.change}
           onSubmit={form.submit}
         />
-        <div className="mt-4 flex gap-3">
+        <div className="mt-5 flex gap-3">
           {adding ? null : (
             <Button variant="outline" onClick={onCancel} disabled={form.busy} className="flex-1">
               Cancel

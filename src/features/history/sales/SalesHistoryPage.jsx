@@ -1,5 +1,5 @@
 /**
- * Sales History (`/sales/history`, optional `?search=<text>`) – replaces legacy/invoice-history.html +
+ * Sales History (`/sales/history`, optional `?search=<text>`) – replaces original-app/invoice-history.html +
  * js/invoice-history.js.
  *
  * Recent invoices strip, customer statement (combined / easy PDF, WhatsApp), search + invoice-number + date filters,
@@ -56,7 +56,7 @@ export default function SalesHistoryPage() {
         </Button>
       }
     >
-      <div className="space-y-4">
+      <div className="space-y-5">
         {h.error ? null : (
           <RecentInvoicesStrip
             invoices={h.recent}
@@ -85,7 +85,11 @@ export default function SalesHistoryPage() {
           labels={SALES_LABELS}
         />
         {!h.loading && !h.error ? (
-          <p className="text-sm font-semibold text-slate-500" aria-live="polite">
+          <p
+            className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-semibold text-slate-600 shadow-sm ring-1 ring-line"
+            aria-live="polite"
+          >
+            <span className="size-1.5 rounded-full bg-gold-500" aria-hidden />
             {`${overallStats.totalInvoices} invoice${overallStats.totalInvoices === 1 ? '' : 's'} on ${totalDays} day${totalDays === 1 ? '' : 's'}`}
             {overallStats.totalInvoices !== h.totalInvoices ? ` (of ${h.totalInvoices})` : ''}
           </p>

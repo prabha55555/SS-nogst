@@ -1,22 +1,37 @@
+import { PackageMinus, PackagePlus } from 'lucide-react';
 import { useRef } from 'react';
 
 import { formatRupees } from '@/core/format';
 import { Button, DataTable, Modal, cn } from '@/ui';
 
+import { AvailableValue, OpeningValue } from './StockRowParts';
 import { historyDate, historyInvoiceNo, historyTotal } from './stocksLogic';
 
 const PURCHASE = {
   title: 'Purchase History',
   party: 'Supplier',
   empty: 'No purchases found.',
-  tone: 'text-emerald-700 border-emerald-600',
+  Icon: PackagePlus,
+  tile: 'bg-emerald-50 text-emerald-600 ring-emerald-200',
+  heading: 'text-emerald-800',
 };
 const SALES = {
   title: 'Sales History',
   party: 'Customer',
   empty: 'No sales found.',
-  tone: 'text-sky-700 border-sky-600',
+  Icon: PackageMinus,
+  tile: 'bg-sky-50 text-sky-600 ring-sky-200',
+  heading: 'text-sky-800',
 };
+
+function SummaryItem({ label, children }) {
+  return (
+    <div className="min-w-0 text-center">
+      <dt className="text-[10px] font-bold tracking-[0.08em] text-slate-500 uppercase">{label}</dt>
+      <dd className="mt-1">{children}</dd>
+    </div>
+  );
+}
 
 function HistorySection({ kind, entries }) {
   const columns = [
@@ -41,18 +56,28 @@ function HistorySection({ kind, entries }) {
   ];
   return (
     <section className="mb-6 last:mb-0">
-      <h3 className={cn('mb-3 border-b-2 pb-1 text-lg font-bold', kind.tone)}>{kind.title}</h3>
+      <h3 className={cn('mb-3 flex items-center gap-2.5 text-base font-bold', kind.heading)}>
+        <span
+          className={cn('flex size-8 items-center justify-center rounded-lg ring-1 ring-inset', kind.tile)}
+        >
+          <kind.Icon className="size-[18px]" aria-hidden />
+        </span>
+        {kind.title}
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600 tabular-nums">
+          {entries.length}
+        </span>
+      </h3>
       <DataTable
         columns={columns}
         rows={entries}
         rowKey={(_, i) => i}
         dense
-        empty={<p className="py-4 text-center text-sm text-slate-500">{kind.empty}</p>}
+        empty={<p className="py-6 text-center text-sm text-slate-500">{kind.empty}</p>}
         renderCard={(e) => (
-          <div className="space-y-0.5 text-sm">
+          <div className="space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-slate-500">{historyDate(e.date)}</span>
-              <span className="font-bold text-slate-800">#{historyInvoiceNo(e.invoiceNo)}</span>
+              <span className="font-display font-bold text-brand-800">#{historyInvoiceNo(e.invoiceNo)}</span>
             </div>
             <div className="text-slate-800">
               {kind.party}: {e.party}
@@ -61,14 +86,16 @@ function HistorySection({ kind, entries }) {
               <span className="text-slate-500 tabular-nums">
                 {e.qty} × {formatRupees(e.rate)}
               </span>
-              <span className="font-bold text-slate-900 tabular-nums">{formatRupees(e.amount)}</span>
+              <span className="font-display font-bold text-brand-800 tabular-nums">
+                {formatRupees(e.amount)}
+              </span>
             </div>
           </div>
         )}
         footer={
-          <div className="flex justify-between font-bold text-slate-800">
+          <div className="flex justify-between font-display font-bold text-brand-800">
             <span>Total</span>
-            <span className="tabular-nums">{formatRupees(historyTotal(entries))}</span>
+            <span className="text-base tabular-nums">{formatRupees(historyTotal(entries))}</span>
           </div>
         }
       />
@@ -96,6 +123,20 @@ export default function StockDetailModal({ row, onClose }) {
     >
       {shown ? (
         <>
+          <dl className="mb-6 grid grid-cols-2 gap-2 rounded-2xl bg-gold-50/60 p-3 ring-1 ring-gold-100 sm:grid-cols-4">
+            <SummaryItem label="Opening">
+              <OpeningValue row={shown} />
+            </SummaryItem>
+            <SummaryItem label="Purchased">
+              <span className="font-semibold text-slate-800 tabular-nums">{shown.purchased}</span>
+            </SummaryItem>
+            <SummaryItem label="Sold">
+              <span className="font-semibold text-slate-800 tabular-nums">{shown.sold}</span>
+            </SummaryItem>
+            <SummaryItem label="Available">
+              <AvailableValue row={shown} showLabel />
+            </SummaryItem>
+          </dl>
           <HistorySection kind={PURCHASE} entries={shown.purchaseHistory} />
           <HistorySection kind={SALES} entries={shown.salesHistory} />
         </>

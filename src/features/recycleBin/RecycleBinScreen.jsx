@@ -20,7 +20,7 @@ import {
   useFeedback,
 } from '@/ui';
 import { BinDetailSheet } from './BinDetailSheet';
-import { BinItemCard, BinRowActions, deletedAtText } from './BinItemCard';
+import { BinItemCard, BinRowActions, BinTypeBadge, deletedAtText } from './BinItemCard';
 import {
   BIN_CONFIG,
   binItemName,
@@ -36,10 +36,15 @@ const PAGE_SIZE = 50;
 
 function StatTile({ icon: Icon, value, label }) {
   return (
-    <div className="flex min-w-0 flex-col items-center gap-0.5 rounded-xl border border-slate-200 bg-white px-2 py-3 shadow-card">
-      <Icon className="size-[18px] text-brand-600" aria-hidden />
-      <div className="max-w-full truncate text-lg font-bold text-slate-900 tabular-nums">{value}</div>
-      <div className="max-w-full truncate text-xs text-slate-500">{label}</div>
+    <div className="group relative flex min-w-0 flex-col items-center gap-1 overflow-hidden rounded-2xl border border-line bg-white px-2 py-3.5 shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-lift">
+      <span className="absolute inset-x-0 top-0 h-px hairline-gold opacity-0 transition group-hover:opacity-100" />
+      <span className="flex size-9 items-center justify-center rounded-xl bg-gold-100 text-gold-700 ring-1 ring-gold-200">
+        <Icon className="size-[18px]" aria-hidden />
+      </span>
+      <div className="mt-0.5 max-w-full truncate font-display text-lg font-extrabold text-brand-800 tabular-nums">
+        {value}
+      </div>
+      <div className="max-w-full truncate text-xs font-medium text-slate-500">{label}</div>
     </div>
   );
 }
@@ -162,7 +167,16 @@ export default function RecycleBinScreen({ kind, title }) {
   });
 
   const columns = [
-    { key: 'no', header: 'Invoice No', render: (i) => <span className="font-bold">{displayBillNo(i)}</span> },
+    {
+      key: 'no',
+      header: 'Invoice No',
+      render: (i) => (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-display font-bold text-brand-800">{displayBillNo(i)}</span>
+          <BinTypeBadge item={i} />
+        </div>
+      ),
+    },
     { key: 'party', header: config.partyLabel, value: (i) => partyName(i) || '-' },
     { key: 'date', header: 'Date', value: (i) => (i.invoiceDate ? formatDateIN(i.invoiceDate) : '-') },
     {
@@ -172,7 +186,12 @@ export default function RecycleBinScreen({ kind, title }) {
       className: 'whitespace-nowrap tabular-nums',
       value: (i) => `₹${formatCurrency(i.grandTotal)}`,
     },
-    { key: 'deleted', header: 'Deleted At', value: (i) => deletedAtText(i, now) },
+    {
+      key: 'deleted',
+      header: 'Deleted At',
+      className: 'text-slate-600',
+      value: (i) => deletedAtText(i, now),
+    },
     { key: 'actions', header: 'Actions', render: (i) => <BinRowActions item={i} {...actionsFor(i)} /> },
   ];
 
@@ -188,23 +207,23 @@ export default function RecycleBinScreen({ kind, title }) {
     body = (
       <div className="space-y-3">
         {[0, 1, 2].map((i) => (
-          <Skeleton key={i} className="h-36 w-full rounded-xl" />
+          <Skeleton key={i} className="h-40 w-full rounded-2xl" />
         ))}
       </div>
     );
   } else if (error) {
     body = <ErrorState message={error} onRetry={() => void reload()} />;
   } else if (visible.length === 0) {
-    body = <div className="rounded-xl border border-slate-200 bg-white">{empty}</div>;
+    body = <div className="rounded-2xl border border-line bg-white shadow-card">{empty}</div>;
   } else {
     body = (
       <>
         {isExpanded ? (
           <DataTable rows={shown} columns={columns} rowKey={(i) => i.id} onRowClick={setViewItem} />
         ) : (
-          <ul className={isMedium ? 'grid grid-cols-2 gap-3' : 'space-y-3'}>
-            {shown.map((i) => (
-              <li key={i.id}>
+          <ul className={isMedium ? 'grid grid-cols-2 gap-3.5' : 'space-y-3'}>
+            {shown.map((i, n) => (
+              <li key={i.id} className="animate-rise" style={{ animationDelay: `${Math.min(n, 8) * 40}ms` }}>
                 <BinItemCard item={i} now={now} {...actionsFor(i)} />
               </li>
             ))}
@@ -229,7 +248,7 @@ export default function RecycleBinScreen({ kind, title }) {
       actions={
         <>
           <Button
-            variant="danger"
+            variant="outlineDanger"
             icon={Trash2}
             onClick={onEmptyBin}
             disabled={items.length === 0}
@@ -237,13 +256,13 @@ export default function RecycleBinScreen({ kind, title }) {
           >
             {config.emptyButton}
           </Button>
-          <Button variant="secondary" icon={RefreshCw} loading={refreshing} onClick={() => void refresh()}>
+          <Button variant="outline" icon={RefreshCw} loading={refreshing} onClick={() => void refresh()}>
             Refresh
           </Button>
         </>
       }
     >
-      <div className="mb-4 grid grid-cols-3 gap-2 sm:gap-3">
+      <div className="mb-5 grid grid-cols-3 gap-2.5 sm:gap-3.5">
         <StatTile icon={FileText} value={String(stats.totalItems)} label="Total Items" />
         <StatTile
           icon={Clock}
@@ -253,7 +272,7 @@ export default function RecycleBinScreen({ kind, title }) {
         <StatTile icon={Database} value={String(stats.invoiceItems)} label={config.countLabel} />
       </div>
 
-      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+      <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-line bg-white p-3 shadow-card lg:flex-row lg:items-center">
         <SearchBar
           value={search}
           onChange={changeSearch}

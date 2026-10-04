@@ -1,5 +1,5 @@
 /**
- * Available Stocks — replaces legacy/stocks.html + js/stocks.js.
+ * Available Stocks — replaces original-app/stocks.html + js/stocks.js.
  * Financial summary tiles, searchable per-product stock (table → cards on phones), "Stock Details" history dialog and
  * the opening ("old") stock add / edit / delete flow.
  */
@@ -8,7 +8,7 @@ import { useMemo, useState } from 'react';
 
 import { db } from '@/core/db';
 import { useFocusLoad } from '@/hooks/useFocusLoad';
-import { DataTable, EmptyState, ErrorState, Page, SearchBar, useFeedback } from '@/ui';
+import { Card, DataTable, EmptyState, ErrorState, Page, SearchBar, useFeedback } from '@/ui';
 
 import RefreshButton from '../components/RefreshButton';
 import ShowMore from '../components/ShowMore';
@@ -81,7 +81,7 @@ export default function StocksPage() {
     {
       key: 'product',
       header: 'Product Description',
-      className: 'min-w-44 font-medium',
+      className: 'min-w-44 font-semibold text-brand-800',
       value: (r) => r.description,
     },
     { key: 'opening', header: 'Opening Stock', align: 'right', render: (r) => <OpeningValue row={r} /> },
@@ -89,21 +89,21 @@ export default function StocksPage() {
       key: 'purchased',
       header: 'Total Purchased Qty',
       align: 'right',
-      className: 'tabular-nums',
+      className: 'tabular-nums text-slate-700',
       value: (r) => r.purchased,
     },
     {
       key: 'sold',
       header: 'Total Sold Qty',
       align: 'right',
-      className: 'tabular-nums',
+      className: 'tabular-nums text-slate-700',
       value: (r) => r.sold,
     },
     {
       key: 'available',
       header: 'Available Stock',
       align: 'right',
-      render: (r) => <AvailableValue row={r} />,
+      render: (r) => <AvailableValue row={r} showLabel />,
     },
     { key: 'actions', header: 'Details', render: (r) => <StockActions {...actionsFor(r)} compact /> },
   ];
@@ -114,20 +114,25 @@ export default function StocksPage() {
   else {
     const empty =
       !data || data.rows.length === 0 ? (
-        <EmptyState icon={Boxes} title="No stock data available." />
+        <EmptyState
+          icon={Boxes}
+          title="No stock data available."
+          message="Products appear here once you record purchases or sales."
+        />
       ) : (
         <EmptyState icon={SearchX} title="No matching products" message="Try a different search." />
       );
     body = (
       <>
         {data ? <FinancialSummary summary={data.summary} /> : null}
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          placeholder="Search by Product Description"
-          aria-label="Search by product description"
-          className="mb-3"
-        />
+        <Card className="mb-4 bg-white/80 p-3 sm:p-3.5">
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by Product Description"
+            aria-label="Search by product description"
+          />
+        </Card>
         <DataTable
           columns={columns}
           rows={paged.rows}

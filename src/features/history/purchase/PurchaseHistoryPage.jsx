@@ -1,5 +1,5 @@
 /**
- * Purchase History  (route /purchase/history)  – replaces legacy/purchase-history.html + js/purchase-history.js.
+ * Purchase History  (route /purchase/history)  – replaces original-app/purchase-history.html + js/purchase-history.js.
  * Recent bills strip, supplier statement, filters and the date-grouped bill list (table on desktop, cards on phones),
  * with view / edit / delete (→ Recycle Bin), payments, returns and statement PDFs / WhatsApp. ?search=<text> pre-fills
  * the search box. The shared UI lives in ../components, the rules in the purchase*.js services.
@@ -58,7 +58,7 @@ export default function PurchaseHistoryPage() {
         </Button>
       }
     >
-      <div className="space-y-4">
+      <div className="space-y-5">
         {h.error ? null : (
           <RecentInvoicesStrip
             invoices={h.recent}
@@ -88,7 +88,11 @@ export default function PurchaseHistoryPage() {
           labels={PURCHASE_LABELS}
         />
         {!h.loading && !h.error ? (
-          <p className="text-sm font-semibold text-slate-500" aria-live="polite">
+          <p
+            className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-semibold text-slate-600 shadow-sm ring-1 ring-line"
+            aria-live="polite"
+          >
+            <span className="size-1.5 rounded-full bg-gold-500" aria-hidden />
             {`${plural(overallStats.totalInvoices, 'invoice')} on ${plural(totalDays, 'day')}`}
             {overallStats.totalInvoices !== h.totalInvoices ? ` (of ${h.totalInvoices})` : ''}
           </p>

@@ -19,17 +19,22 @@ export function ReturnItemEditor({ index, item, products, returnedQty, onChange,
   const selected = typeof item.choice === 'number' ? products[item.choice] : undefined;
   const alreadyReturned = selected ? (returnedQty.get(selected.description) ?? 0) : 0;
   return (
-    <fieldset className="mb-3 space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+    <fieldset className="mb-3 space-y-3 rounded-2xl border border-line bg-slate-50/70 p-3.5">
       <legend className="sr-only">Return item {index + 1}</legend>
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-bold text-slate-800">Return Item {index + 1}</h4>
+        <h4 className="flex items-center gap-2 font-display text-sm font-bold text-brand-800">
+          <span className="flex size-6 items-center justify-center rounded-md bg-gold-100 text-xs font-extrabold text-gold-700 ring-1 ring-gold-200">
+            {index + 1}
+          </span>
+          Return Item {index + 1}
+        </h4>
         <button
           type="button"
           onClick={onRemove}
           aria-label={`Remove return item ${index + 1}`}
-          className="rounded-full p-1.5 text-red-600 hover:bg-red-50"
+          className="flex size-9 items-center justify-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-red-600 focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:outline-none"
         >
-          <X className="size-5" aria-hidden />
+          <X className="size-[18px]" aria-hidden />
         </button>
       </div>
 

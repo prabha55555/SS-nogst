@@ -1,5 +1,5 @@
 /**
- * Product Shortcuts — replaces legacy/shortcut.html + js/shortcut.js (+ css/shortcut.css).
+ * Product Shortcuts — replaces original-app/shortcut.html + js/shortcut.js (+ css/shortcut.css).
  * The product catalogue (key -> full description) the bill screens autocomplete from: KPI tiles, search, list
  * (table → cards on phones) with edit / delete, add + edit sheet (header button, floating "+" on phones).
  */
@@ -8,9 +8,20 @@ import { useMemo, useState } from 'react';
 
 import { db } from '@/core/db';
 import { useFocusLoad } from '@/hooks/useFocusLoad';
-import { Button, DataTable, EmptyState, ErrorState, Page, SearchBar, StatCard, useFeedback } from '@/ui';
+import {
+  Button,
+  Card,
+  DataTable,
+  EmptyState,
+  ErrorState,
+  Page,
+  SearchBar,
+  StatCard,
+  useFeedback,
+} from '@/ui';
 
 import FloatingAddButton from '../components/FloatingAddButton';
+import KeyCap from '../components/KeyCap';
 import KpiRow from '../components/KpiRow';
 import RefreshButton from '../components/RefreshButton';
 import RowActions from '../components/RowActions';
@@ -129,10 +140,15 @@ export default function ShortcutsPage() {
     {
       key: 'key',
       header: 'Shortcut Key',
-      className: 'text-brand-700 w-48 font-bold',
-      value: (s) => s.shortcutKey,
+      className: 'w-48',
+      render: (s) => <KeyCap>{s.shortcutKey}</KeyCap>,
     },
-    { key: 'description', header: 'Full Description', value: (s) => s.fullDescription },
+    {
+      key: 'description',
+      header: 'Full Description',
+      className: 'font-medium text-slate-800',
+      value: (s) => s.fullDescription,
+    },
     { key: 'actions', header: 'Actions', align: 'center', className: 'w-32', render: actions },
   ];
 
@@ -160,8 +176,8 @@ export default function ShortcutsPage() {
           renderCard={(s) => (
             <div className="flex items-center gap-2">
               <div className="min-w-0 flex-1">
-                <div className="text-lg font-bold break-words text-brand-700">{s.shortcutKey}</div>
-                <div className="break-words text-slate-800">{s.fullDescription}</div>
+                <KeyCap>{s.shortcutKey}</KeyCap>
+                <div className="mt-1.5 font-medium break-words text-slate-800">{s.fullDescription}</div>
               </div>
               {actions(s)}
             </div>
@@ -201,13 +217,14 @@ export default function ShortcutsPage() {
           tint="violet"
         />
       </KpiRow>
-      <SearchBar
-        value={search}
-        onChange={setSearch}
-        placeholder="Search shortcuts..."
-        aria-label="Search shortcuts"
-        className="mb-4"
-      />
+      <Card className="mb-5 bg-white/80 p-3 sm:p-3.5">
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          placeholder="Search shortcuts..."
+          aria-label="Search shortcuts"
+        />
+      </Card>
       {body}
       <FloatingAddButton label="Add shortcut" onClick={openAdd} />
       <ShortcutFormModal

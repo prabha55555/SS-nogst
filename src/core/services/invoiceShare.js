@@ -3,7 +3,7 @@
  *  - printInvoice():     browser print dialog (also "Save as PDF") — ORIGINAL + COPY pages
  *  - shareInvoicePdf():  print dialog, then opens the customer's WhatsApp chat so the PDF can be attached
  */
-import logoUrl from '@/assets/logo.png';
+import logoUrl from '@/assets/brand/logo.png';
 import { calculateTotalReturns } from '@/core/billing';
 import { db } from '@/core/db';
 import { printHtml } from '@/platform';

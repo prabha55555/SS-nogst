@@ -37,7 +37,7 @@ export default function ExpenseFormModal({ form, onChange, saving, onClose, onSa
       {form ? (
         <form
           id={FORM_ID}
-          className="space-y-3"
+          className="space-y-4"
           onSubmit={(e) => {
             e.preventDefault();
             onSave();

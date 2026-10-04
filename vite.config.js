@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-const THEME_COLOR = '#1e3a5f';
+const THEME_COLOR = '#0c1022';
 
 export default defineConfig({
   resolve: {
@@ -20,9 +20,9 @@ export default defineConfig({
       includeAssets: ['favicon.png', 'apple-touch-icon.png', 'logo192.png', 'logo512.png'],
       manifest: {
         id: '/',
-        name: 'Santhamani Textiles',
-        short_name: 'Santhamani',
-        description: 'Santhamani Textiles billing: sales, purchase, stock and expenses',
+        name: 'Brightlight Billing',
+        short_name: 'Brightlight',
+        description: 'Brightlight Billing — premium sales, purchase, stock and expense management by Brightlight Solutions',
         lang: 'en-IN',
         start_url: '/',
         scope: '/',

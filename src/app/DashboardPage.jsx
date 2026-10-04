@@ -1,22 +1,74 @@
-import { ChevronRight, LogOut, PieChart, Receipt, Share, ShoppingCart } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Boxes,
+  CalendarDays,
+  Clock,
+  FilePlus2,
+  Globe,
+  History,
+  LogOut,
+  Mail,
+  MapPin,
+  PieChart,
+  Phone,
+  Receipt,
+  Share,
+  ShoppingCart,
+  Sparkles,
+  TrendingUp,
+  Users,
+  Wallet,
+  Zap,
+} from 'lucide-react';
 import { Link } from 'react-router';
 
-import background from '@/assets/background.jpg';
-import logo from '@/assets/logo.png';
-import { Button, useFeedback } from '@/ui';
+import { COMPANY, PRODUCT, SERVICES } from '@/core/branding';
+import { formatDateShort, todayISO } from '@/core/format';
+import { Button, cn, useFeedback } from '@/ui';
 import { useAuth } from './AuthProvider';
+import { BrandLockup } from './Brand';
+import { GoldWaves, Sparkle } from './Decor';
 import { InstallButton, OfflineBanner, useInstallPrompt } from './pwa';
 
-const CARDS = [
-  { to: '/purchase/bill', title: 'Purchase Bill', text: 'Manage purchase entries', icon: ShoppingCart },
+const MODULE_CARDS = [
   {
     to: '/sales/bill',
-    title: 'Sales Bill',
-    text: 'Create and manage customer sales invoices',
+    title: 'Sales',
+    text: 'Create invoices, collect payments and keep every customer ledger in order.',
     icon: Receipt,
+    points: ['Sales bills & printing', 'History & statements', 'Customer details'],
   },
-  { to: '/overview/revenue', title: 'Overview', text: 'View stocks, revenue and expenses', icon: PieChart },
+  {
+    to: '/purchase/bill',
+    title: 'Purchase',
+    text: 'Record purchases, track supplier balances and acknowledge goods received.',
+    icon: ShoppingCart,
+    points: ['Purchase bills', 'Supplier ledger', 'Payments & returns'],
+  },
+  {
+    to: '/overview/revenue',
+    title: 'Overview',
+    text: 'Understand revenue, stock and expenses at a glance.',
+    icon: PieChart,
+    points: ['Revenue & profit', 'Live stock levels', 'Expense tracking'],
+  },
 ];
+
+const QUICK_LINKS = [
+  { to: '/sales/bill', label: 'New Sales Bill', icon: FilePlus2 },
+  { to: '/purchase/bill', label: 'New Purchase Bill', icon: ShoppingCart },
+  { to: '/sales/history', label: 'Sales History', icon: History },
+  { to: '/sales/customers', label: 'Customers', icon: Users },
+  { to: '/overview/stocks', label: 'Stocks', icon: Boxes },
+  { to: '/overview/expenses', label: 'Expenses', icon: Wallet },
+  { to: '/overview/revenue', label: 'Revenue', icon: TrendingUp },
+  { to: '/overview/shortcuts', label: 'Shortcuts', icon: Zap },
+];
+
+function greeting() {
+  const h = new Date().getHours();
+  return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+}
 
 export default function DashboardPage() {
   const { logout, username } = useAuth();
@@ -34,53 +86,149 @@ export default function DashboardPage() {
   };
 
   return (
-    <div
-      className="flex min-h-dvh flex-col bg-cover bg-center"
-      style={{
-        backgroundImage: `linear-gradient(rgb(15 23 42 / 0.5), rgb(15 23 42 / 0.65)), url(${background})`,
-      }}
-    >
+    <div className="min-h-dvh bg-canvas">
       <OfflineBanner />
-      <main className="pt-safe pb-safe flex flex-1 items-center justify-center p-4">
-        <div className="w-full max-w-4xl rounded-3xl bg-white/90 p-6 text-center shadow-pop backdrop-blur-md sm:p-10">
-          <img src={logo} alt="" className="mx-auto size-20 object-contain" />
-          <h1 className="mt-1 text-3xl font-bold text-brand-800 sm:text-4xl">Santhamani Textiles</h1>
-          <p className="mt-1 text-slate-500">
-            Billing &amp; Invoice Management{username ? <> · Welcome, {username}</> : null}
-          </p>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {CARDS.map(({ to, title, text, icon: Icon }) => (
-              <Link
-                key={to}
-                to={to}
-                className="group flex items-center gap-4 rounded-2xl border-2 border-slate-200 bg-slate-50 p-5 text-left transition hover:-translate-y-1 hover:border-brand-500 hover:shadow-lg md:flex-col md:py-8 md:text-center"
+      {/* ---------------------------------------------------------------- hero */}
+      <header className="pt-safe relative overflow-hidden rounded-b-[2.25rem] surface-ink pb-28 text-white sm:pb-32">
+        <GoldWaves />
+        <Sparkle className="absolute top-28 right-[14%] hidden size-6 animate-float text-gold-300 opacity-80 sm:block" />
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-3 py-5">
+            <BrandLockup />
+            <div className="flex items-center gap-2">
+              <InstallButton className="hidden sm:inline-flex" />
+              <Button
+                variant="outline"
+                size="sm"
+                icon={LogOut}
+                onClick={onLogout}
+                className="border-white/20! bg-white/5! text-white! hover:bg-white/10!"
               >
-                <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-100 text-brand-600 md:size-16">
-                  <Icon className="size-7 md:size-8" aria-hidden />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
+            </div>
+          </div>
+
+          <div className="animate-rise pt-6 pb-2 sm:pt-10">
+            <p className="inline-flex items-center gap-2 text-sm font-semibold text-gold-300">
+              <Sparkles className="size-4" /> {greeting()}
+              {username ? `, ${username}` : ''}
+            </p>
+            <h1 className="mt-2 max-w-2xl font-display text-3xl leading-[1.12] font-extrabold sm:text-5xl">
+              Welcome to <span className="text-gold-gradient">{PRODUCT.name}</span>
+            </h1>
+            <p className="mt-3 max-w-xl text-base text-brand-200 sm:text-lg">{COMPANY.tagline}.</p>
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-sm text-brand-100 ring-1 ring-white/10 backdrop-blur">
+              <CalendarDays className="size-4 text-gold-400" /> {formatDateShort(todayISO())}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* ------------------------------------------------------------ content */}
+      <main className="pb-safe relative mx-auto -mt-20 max-w-6xl px-4 pb-12 sm:-mt-24 sm:px-6 lg:px-8">
+        <section aria-label="Modules" className="grid gap-4 md:grid-cols-3 md:gap-5">
+          {MODULE_CARDS.map(({ to, title, text, icon: Icon, points }, i) => (
+            <Link
+              key={to}
+              to={to}
+              style={{ animationDelay: `${120 + i * 90}ms` }}
+              className="group relative flex animate-rise flex-col overflow-hidden rounded-3xl border border-line bg-white p-6 shadow-card transition duration-300 hover:-translate-y-1.5 hover:border-gold-300 hover:shadow-lift focus-visible:ring-4 focus-visible:ring-gold-200 focus-visible:outline-none"
+            >
+              <span className="absolute inset-x-0 top-0 h-[2px] hairline-gold opacity-0 transition group-hover:opacity-100" />
+              <div className="flex items-start justify-between">
+                <span className="flex size-14 items-center justify-center rounded-2xl bg-gold-sheen text-brand-900 shadow-gold">
+                  <Icon className="size-7" aria-hidden />
                 </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-lg font-bold text-slate-800">{title}</span>
-                  <span className="mt-0.5 block text-sm text-slate-500">{text}</span>
+                <span className="flex size-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition group-hover:bg-brand-800 group-hover:text-gold-300">
+                  <ArrowUpRight className="size-[18px]" aria-hidden />
                 </span>
-                <ChevronRight className="size-5 text-slate-400 md:hidden" aria-hidden />
+              </div>
+              <h2 className="mt-5 font-display text-xl font-extrabold text-brand-800">{title}</h2>
+              <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{text}</p>
+              <ul className="mt-5 hidden space-y-1.5 border-t border-line pt-4 md:block">
+                {points.map((p) => (
+                  <li key={p} className="flex items-center gap-2 text-[13px] font-medium text-slate-600">
+                    <span className="size-1.5 rounded-full bg-gold-400" /> {p}
+                  </li>
+                ))}
+              </ul>
+            </Link>
+          ))}
+        </section>
+
+        <section aria-label="Quick access" className="mt-9">
+          <h2 className="mb-3 font-display text-sm font-bold tracking-[0.16em] text-slate-500 uppercase">
+            Quick access
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {QUICK_LINKS.map(({ to, label, icon: Icon }) => (
+              <Link
+                key={label}
+                to={to}
+                className={cn(
+                  'group flex items-center gap-3 rounded-2xl border border-line bg-white p-3.5 shadow-sm transition',
+                  'hover:border-gold-300 hover:bg-gold-50/60 hover:shadow-card focus-visible:ring-4 focus-visible:ring-gold-200 focus-visible:outline-none',
+                )}
+              >
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gold-100 text-gold-700 ring-1 ring-gold-200 transition group-hover:bg-gold-sheen group-hover:text-brand-900">
+                  <Icon className="size-[18px]" aria-hidden />
+                </span>
+                <span className="text-sm font-semibold text-slate-700">{label}</span>
               </Link>
             ))}
           </div>
+        </section>
 
-          {showIosHint ? (
-            <p className="mt-6 flex items-center justify-center gap-1.5 text-sm text-slate-500">
-              To install: tap <Share className="size-4" aria-label="Share" /> then “Add to Home Screen”.
-            </p>
-          ) : null}
-
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <InstallButton />
-            <Button variant="danger" icon={LogOut} onClick={onLogout}>
-              Logout
-            </Button>
-          </div>
+        {showIosHint ? (
+          <p className="mt-6 flex items-center justify-center gap-1.5 text-sm text-slate-500">
+            Install this app: tap <Share className="size-4" aria-label="Share" /> then “Add to Home Screen”.
+          </p>
+        ) : null}
+        <div className="mt-6 flex justify-center sm:hidden">
+          <InstallButton />
         </div>
+
+        {/* ------------------------------------------------------ company card */}
+        <footer className="relative mt-10 overflow-hidden rounded-3xl surface-ink p-6 text-white sm:p-8">
+          <GoldWaves className="opacity-60" />
+          <div className="relative grid gap-8 md:grid-cols-[1.1fr_1fr]">
+            <div>
+              <h2 className="font-display text-xl font-extrabold">{COMPANY.displayName}</h2>
+              <p className="mt-1 text-sm text-gold-300">{COMPANY.tagline}</p>
+              <ul className="mt-5 flex flex-wrap gap-2">
+                {SERVICES.map((s) => (
+                  <li
+                    key={s}
+                    className="rounded-full bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-brand-100 ring-1 ring-white/10"
+                  >
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <ul className="space-y-3 text-sm text-brand-100">
+              {[
+                [Phone, COMPANY.cell],
+                [Mail, COMPANY.email],
+                [Globe, COMPANY.website],
+                [MapPin, COMPANY.address],
+                [Clock, `Business hours: ${COMPANY.hours}`],
+              ].map(([Icon, text]) => (
+                <li key={text} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-gold-sheen text-brand-900">
+                    <Icon className="size-4" aria-hidden />
+                  </span>
+                  <span className="leading-snug">{text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <p className="relative mt-7 border-t border-white/10 pt-4 text-center text-xs text-brand-300">
+            &copy; {new Date().getFullYear()} {COMPANY.displayName}. All rights reserved.
+          </p>
+        </footer>
       </main>
     </div>
   );

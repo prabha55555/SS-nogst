@@ -2,16 +2,17 @@ import { forwardRef, useId } from 'react';
 import { cn } from './cn';
 
 const BASE =
-  'block w-full min-w-0 rounded-lg border bg-white px-3 py-2 text-slate-900 placeholder:text-slate-400 ' +
-  'transition focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:bg-slate-100 read-only:bg-slate-100 ' +
-  'min-h-11 sm:min-h-10';
+  'block w-full min-w-0 rounded-xl border bg-white px-3.5 py-2 text-slate-900 shadow-[inset_0_1px_2px_rgb(20_26_48/0.04)] ' +
+  'placeholder:text-slate-400 transition duration-150 focus:outline-none focus:ring-4 ' +
+  'hover:border-slate-400 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500 ' +
+  'read-only:bg-slate-50 read-only:text-slate-600 min-h-11 sm:min-h-10';
 
 const fieldClass = (error) =>
   cn(
     BASE,
     error
-      ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-      : 'border-slate-300 focus:border-brand-500 focus:ring-brand-200',
+      ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
+      : 'border-slate-300 focus:border-gold-500 focus:ring-gold-100',
   );
 
 /** Label + control + hint/error wrapper shared by all fields. */
@@ -21,18 +22,21 @@ export function Field({ label, error, hint, htmlFor, className, children, labelC
       {label ? (
         <label
           htmlFor={htmlFor}
-          className={cn('mb-1 block text-sm font-medium text-slate-700', labelClassName)}
+          className={cn(
+            'mb-1.5 block text-[13px] font-semibold tracking-wide text-slate-600',
+            labelClassName,
+          )}
         >
           {label}
         </label>
       ) : null}
       {children}
       {error ? (
-        <p className="mt-1 text-xs text-red-600" role="alert">
+        <p className="mt-1.5 text-xs font-medium text-red-600" role="alert">
           {error}
         </p>
       ) : hint ? (
-        <p className="mt-1 text-xs text-slate-500">{hint}</p>
+        <p className="mt-1.5 text-xs text-slate-500">{hint}</p>
       ) : null}
     </div>
   );
@@ -66,7 +70,7 @@ export const TextField = forwardRef(function TextField(
       <div className="relative">
         {LeftIcon ? (
           <LeftIcon
-            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
+            className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400"
             aria-hidden
           />
         ) : null}
@@ -75,9 +79,9 @@ export const TextField = forwardRef(function TextField(
           id={inputId}
           className={cn(
             fieldClass(error),
-            LeftIcon && 'pl-9',
+            LeftIcon && 'pl-10',
             right && 'pr-10',
-            alignRight && 'text-right',
+            alignRight && 'text-right tabular-nums',
             inputClassName,
           )}
           onChange={(e) => onChange?.(e.target.value)}
@@ -151,7 +155,7 @@ export const SelectField = forwardRef(function SelectField(
       <select
         ref={ref}
         id={selectId}
-        className={fieldClass(error)}
+        className={cn(fieldClass(error), 'pr-8')}
         onChange={(e) => onChange?.(e.target.value)}
         {...rest}
       >
@@ -169,11 +173,11 @@ export const SelectField = forwardRef(function SelectField(
 export function Checkbox({ label, onChange, className, ...rest }) {
   return (
     <label
-      className={cn('inline-flex min-h-9 items-center gap-2 text-sm text-slate-700 select-none', className)}
+      className={cn('inline-flex min-h-9 items-center gap-2.5 text-sm text-slate-700 select-none', className)}
     >
       <input
         type="checkbox"
-        className="size-4 rounded border-slate-300 accent-brand-600"
+        className="size-[18px] rounded-md border-slate-300 accent-gold-500"
         onChange={(e) => onChange?.(e.target.checked)}
         {...rest}
       />

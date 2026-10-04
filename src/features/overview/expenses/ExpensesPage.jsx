@@ -1,5 +1,5 @@
 /**
- * Other Expenses — replaces legacy/expenses.html + js/expenses.js (+ css/expenses.css).
+ * Other Expenses — replaces original-app/expenses.html + js/expenses.js (+ css/expenses.css).
  * KPI row (day / month / overall totals of the filtered list), date + reason filters, expense log (table → cards on
  * phones) with edit / delete, and an add / edit sheet (header button, floating "+" on phones).
  */
@@ -9,10 +9,11 @@ import { useMemo, useState } from 'react';
 import { db } from '@/core/db';
 import { formatCurrency, formatDateShort, toNum, todayISO } from '@/core/format';
 import { useFocusLoad } from '@/hooks/useFocusLoad';
-import { Button, DataTable, EmptyState, ErrorState, Page, StatCard, useFeedback } from '@/ui';
+import { Button, DataTable, EmptyState, ErrorState, Page, StatCard, cn, useFeedback } from '@/ui';
 
 import FilterBar from '../components/FilterBar';
 import FloatingAddButton from '../components/FloatingAddButton';
+import InkStat from '../components/InkStat';
 import KpiRow from '../components/KpiRow';
 import RefreshButton from '../components/RefreshButton';
 import RowActions from '../components/RowActions';
@@ -32,6 +33,21 @@ import {
 const rs = (n) => `Rs. ${formatCurrency(n)}`;
 /** "Today's Total:" -> "Today's Total" (KPI labels have no trailing colon) */
 const kpiLabel = (text) => text.replace(/:$/, '');
+
+/** The reason as a category-style chip ('-' when there is none). */
+function ReasonChip({ expense, className }) {
+  if (!expense.reason) return <span className="text-slate-400">-</span>;
+  return (
+    <span
+      className={cn(
+        'inline-block rounded-lg bg-gold-50 px-2.5 py-1 text-[13px] leading-snug font-medium break-words text-brand-800 ring-1 ring-gold-200 ring-inset',
+        className,
+      )}
+    >
+      {expense.reason}
+    </span>
+  );
+}
 
 export default function ExpensesPage() {
   const { toast, confirm } = useFeedback();
@@ -109,12 +125,12 @@ export default function ExpensesPage() {
 
   const columns = [
     { key: 'date', header: 'Date', className: 'whitespace-nowrap', value: (e) => formatDateShort(e.date) },
-    { key: 'reason', header: 'Reason', className: 'min-w-48', value: (e) => e.reason || '-' },
+    { key: 'reason', header: 'Reason', className: 'min-w-48', render: (e) => <ReasonChip expense={e} /> },
     {
       key: 'amount',
       header: 'Amount (Rs.)',
       align: 'right',
-      className: 'font-semibold tabular-nums whitespace-nowrap',
+      className: 'font-display font-bold text-brand-800 tabular-nums whitespace-nowrap',
       value: (e) => rs(toNum(e.amount)),
     },
     { key: 'actions', header: 'Actions', align: 'center', render: actions },
@@ -132,15 +148,27 @@ export default function ExpensesPage() {
           rowKey={(e) => e.id}
           renderCard={(e) => (
             <div className="flex items-center gap-2">
-              <div className="min-w-0 flex-1">
-                <div className="text-sm text-slate-500">{formatDateShort(e.date)}</div>
-                <div className="break-words text-slate-800">{e.reason || '-'}</div>
-                <div className="text-lg font-bold text-slate-900 tabular-nums">{rs(toNum(e.amount))}</div>
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <div className="text-xs font-semibold tracking-wide text-slate-500">
+                  {formatDateShort(e.date)}
+                </div>
+                <div>
+                  <ReasonChip expense={e} />
+                </div>
+                <div className="font-display text-lg font-extrabold text-brand-800 tabular-nums">
+                  {rs(toNum(e.amount))}
+                </div>
               </div>
               {actions(e)}
             </div>
           )}
-          empty={<EmptyState icon={Wallet} title="No expenses found." />}
+          empty={
+            <EmptyState
+              icon={Wallet}
+              title="No expenses found."
+              message="Recorded expenses show up here. Adjust the filters or add a new one."
+            />
+          }
         />
         <ShowMore remaining={paged.remaining} onClick={paged.showMore} />
       </>
@@ -170,9 +198,9 @@ export default function ExpensesPage() {
           icon={CalendarRange}
           label={kpiLabel(totals.monthLabel)}
           value={rs(totals.monthTotal)}
-          tint="green"
+          tint="amber"
         />
-        <StatCard icon={Sigma} label="Overall Total" value={rs(totals.total)} tint="red" />
+        <InkStat icon={Sigma} label="Overall Total" value={rs(totals.total)} />
       </KpiRow>
       <FilterBar
         date={dateTerm}

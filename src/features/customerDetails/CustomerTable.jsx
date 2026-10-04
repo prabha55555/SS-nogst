@@ -1,3 +1,4 @@
+import { Users } from 'lucide-react';
 import { useMemo } from 'react';
 
 import { DataTable, EmptyState } from '@/ui';
@@ -52,6 +53,7 @@ export function CustomerTable({ rows, onRemind }) {
       rowKey={(c) => c.name}
       empty={
         <EmptyState
+          icon={Users}
           title="No Customers Found"
           message="Start by creating invoices to see customer data here"
         />

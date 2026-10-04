@@ -1,3 +1,4 @@
+import { CREDIT_LINE } from '@/core/branding';
 import { buildCustomerSummaries } from '@/features/customerDetails/aggregate';
 import {
   balanceTone,
@@ -60,7 +61,7 @@ describe('reminder text', () => {
   test('standard template', () => {
     expect(generateReminderMessage(customer(), 'standard')).toBe(
       [
-        'SANTHAMANI TEXTILES - Payment Reminder',
+        'BRIGHTLIGHT SOLUTIONS - Payment Reminder',
         '',
         'Dear Ravi,',
         '',
@@ -75,7 +76,7 @@ describe('reminder text', () => {
   test('urgent template', () => {
     expect(generateReminderMessage(customer(), 'urgent')).toBe(
       [
-        'SANTHAMANI TEXTILES - URGENT: Payment Required',
+        'BRIGHTLIGHT SOLUTIONS - URGENT: Payment Required',
         '',
         'Dear Ravi,',
         '',
@@ -90,7 +91,7 @@ describe('reminder text', () => {
   test('friendly template', () => {
     expect(generateReminderMessage(customer(), 'friendly')).toBe(
       [
-        'SANTHAMANI TEXTILES - Friendly Payment Follow-up',
+        'BRIGHTLIGHT SOLUTIONS - Friendly Payment Follow-up',
         '',
         'Hi Ravi,',
         '',
@@ -99,7 +100,7 @@ describe('reminder text', () => {
         'Please let us know if you have any questions or need more time.',
         '',
         'Best regards,',
-        'SANTHAMANI TEXTILES Team',
+        'BRIGHTLIGHT SOLUTIONS Team',
       ].join('\n'),
     );
   });
@@ -123,9 +124,7 @@ describe('reminder text', () => {
     expect(generateReminderMessage(c, 'standard')).toContain('₹900.00');
   });
   test('the developer credit is appended to the sent text after a blank line', () => {
-    expect(withSignature('Hello')).toBe(
-      'Hello\n\nSoftware created by Sabarish R.\nFor custom billing solutions, contact: 7845081278',
-    );
+    expect(withSignature('Hello')).toBe(`Hello\n\n${CREDIT_LINE}`);
   });
   test('counters: characters and 160-character message segments', () => {
     expect(messageStats('')).toEqual({ characters: 0, messages: 0 });

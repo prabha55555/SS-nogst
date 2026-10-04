@@ -24,7 +24,7 @@ export function SearchToolbar({ onTermChange }) {
   return (
     <form
       role="search"
-      className="mb-4 flex flex-wrap items-center gap-2"
+      className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-white p-2.5 shadow-card"
       onSubmit={(e) => {
         e.preventDefault();
         onTermChange(query);
@@ -40,7 +40,7 @@ export function SearchToolbar({ onTermChange }) {
       <Button type="submit" icon={Search} className="flex-1 sm:flex-none">
         Search
       </Button>
-      <Button variant="secondary" icon={X} onClick={clear} className="flex-1 sm:flex-none">
+      <Button variant="outline" icon={X} onClick={clear} className="flex-1 sm:flex-none">
         Clear
       </Button>
     </form>

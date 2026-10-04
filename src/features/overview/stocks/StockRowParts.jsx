@@ -6,20 +6,41 @@ import { openingActions, stockTone } from './stocksLogic';
 
 export const TONE_CLASS = { positive: 'text-emerald-700', negative: 'text-red-600', zero: 'text-slate-500' };
 
-/** Available quantity coloured green / red / grey. */
-export function AvailableValue({ row, className }) {
+/** Stock-level pill styles: in stock = emerald, out = neutral, oversold (negative) = red. */
+const LEVEL = {
+  positive: {
+    pill: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+    dot: 'bg-emerald-500',
+    label: 'In stock',
+  },
+  zero: { pill: 'bg-slate-100 text-slate-600 ring-slate-200', dot: 'bg-slate-400', label: 'Out of stock' },
+  negative: { pill: 'bg-red-50 text-red-700 ring-red-200', dot: 'bg-red-500', label: 'Oversold' },
+};
+
+/** Available quantity as a stock-level badge (dot + number); `showLabel` adds "In stock" / "Out of stock" / "Oversold". */
+export function AvailableValue({ row, className, showLabel = false }) {
+  const level = LEVEL[stockTone(row.available)];
   return (
-    <span className={cn('font-bold tabular-nums', TONE_CLASS[stockTone(row.available)], className)}>
+    <span
+      title={level.label}
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-sm font-bold tabular-nums ring-1 ring-inset',
+        level.pill,
+        className,
+      )}
+    >
+      <span className={cn('size-1.5 shrink-0 rounded-full', level.dot)} aria-hidden />
       {row.available}
+      {showLabel ? <span className="text-[11px] font-semibold opacity-80">{level.label}</span> : null}
     </span>
   );
 }
 
-/** Opening stock value: a blue badge when there is one, a grey 0 otherwise. */
+/** Opening stock value: a gold-tinted badge when there is one, a muted 0 otherwise. */
 export function OpeningValue({ row }) {
   if (openingActions(row) === 'edit') {
     return (
-      <span className="inline-block rounded-full bg-sky-100 px-2.5 py-0.5 text-sm font-bold text-sky-800 tabular-nums">
+      <span className="inline-block rounded-full bg-gold-100 px-2.5 py-0.5 text-sm font-bold text-gold-800 tabular-nums ring-1 ring-gold-200 ring-inset">
         {row.opening}
       </span>
     );
@@ -35,13 +56,13 @@ export function StockActions({ row, onViewHistory, onEditOpening, onDeleteOpenin
   const hasOpening = openingActions(row) === 'edit';
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Button variant="info" size="sm" icon={Eye} onClick={onViewHistory} className="max-sm:min-h-11">
+      <Button variant="secondary" size="sm" icon={Eye} onClick={onViewHistory} className="max-sm:min-h-11">
         View History
       </Button>
       {hasOpening ? (
         <>
           <Button
-            variant="warning"
+            variant="outline"
             size="sm"
             icon={Pencil}
             onClick={onEditOpening}
@@ -50,10 +71,15 @@ export function StockActions({ row, onViewHistory, onEditOpening, onDeleteOpenin
             Edit Old Stock
           </Button>
           {compact ? (
-            <IconButton icon={Trash2} label="Delete Old Stock" variant="danger" onClick={onDeleteOpening} />
+            <IconButton
+              icon={Trash2}
+              label="Delete Old Stock"
+              variant="outlineDanger"
+              onClick={onDeleteOpening}
+            />
           ) : (
             <Button
-              variant="danger"
+              variant="outlineDanger"
               size="sm"
               icon={Trash2}
               onClick={onDeleteOpening}
@@ -64,7 +90,7 @@ export function StockActions({ row, onViewHistory, onEditOpening, onDeleteOpenin
           )}
         </>
       ) : (
-        <Button variant="success" size="sm" icon={Plus} onClick={onEditOpening} className="max-sm:min-h-11">
+        <Button variant="outline" size="sm" icon={Plus} onClick={onEditOpening} className="max-sm:min-h-11">
           Add Old Stock
         </Button>
       )}
@@ -74,9 +100,9 @@ export function StockActions({ row, onViewHistory, onEditOpening, onDeleteOpenin
 
 function Metric({ label, children }) {
   return (
-    <div className="min-w-0">
-      <div className="text-[11px] text-slate-500">{label}</div>
-      <div className="text-base">{children}</div>
+    <div className="min-w-0 rounded-xl bg-slate-50/70 px-2 py-2 text-center">
+      <div className="text-[10px] font-bold tracking-[0.08em] text-slate-500 uppercase">{label}</div>
+      <div className="mt-1 text-base">{children}</div>
     </div>
   );
 }
@@ -85,19 +111,19 @@ function Metric({ label, children }) {
 export function StockCard({ row, ...actions }) {
   return (
     <div className="space-y-3">
-      <div className="text-base font-bold break-words text-slate-900">{row.description}</div>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="font-display text-base font-bold break-words text-brand-800">{row.description}</div>
+      <div className="grid grid-cols-4 gap-1.5">
         <Metric label="Opening">
           <OpeningValue row={row} />
         </Metric>
         <Metric label="Purchased">
-          <span className="font-semibold tabular-nums">{row.purchased}</span>
+          <span className="font-semibold text-slate-800 tabular-nums">{row.purchased}</span>
         </Metric>
         <Metric label="Sold">
-          <span className="font-semibold tabular-nums">{row.sold}</span>
+          <span className="font-semibold text-slate-800 tabular-nums">{row.sold}</span>
         </Metric>
         <Metric label="Available">
-          <AvailableValue row={row} />
+          <AvailableValue row={row} className="px-2" />
         </Metric>
       </div>
       <StockActions row={row} {...actions} />
