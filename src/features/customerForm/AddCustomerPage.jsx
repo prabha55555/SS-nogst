@@ -5,7 +5,7 @@
  */
 import { RefreshCw, Search, UserPlus, Users } from 'lucide-react';
 
-import { Badge, Button, EmptyState, ErrorState, LoadingState, Page, SearchBar, TwoPane } from '@/ui';
+import { Badge, Button, EmptyState, ErrorState, IconButton, LoadingState, Page, SearchBar, TwoPane } from '@/ui';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { CustomerFormCard } from './CustomerFormCard';
 import { CustomerFormSheet } from './CustomerFormSheet';
@@ -17,16 +17,15 @@ export default function AddCustomerPage() {
   const { isExpanded } = useBreakpoint();
   const { customers, visible, query } = manager;
 
-  const refreshButton = (
-    <Button
-      variant="outline"
-      icon={RefreshCw}
-      onClick={() => void manager.refresh()}
-      loading={manager.refreshing}
-    >
-      <span className="hidden sm:inline">Refresh</span>
-    </Button>
-  );
+  const actionButton = !isExpanded ? (
+    <IconButton
+      variant="primary"
+      icon={UserPlus}
+      label="Add Customer"
+      onClick={() => manager.openAdd()}
+      className="rounded-full"
+    />
+  ) : null;
   const pageProps = { title: 'Manage Customers', subtitle: 'Add, edit, or delete customers', icon: Users };
 
   if (manager.loading) {
@@ -63,7 +62,7 @@ export default function AddCustomerPage() {
 
   if (isExpanded) {
     return (
-      <Page {...pageProps} actions={refreshButton}>
+      <Page {...pageProps} actions={actionButton}>
         <TwoPane
           main={
             <>
@@ -90,7 +89,7 @@ export default function AddCustomerPage() {
   }
 
   return (
-    <Page {...pageProps} actions={refreshButton}>
+    <Page {...pageProps} actions={actionButton}>
       {toolbar}
       {customers.length === 0 ? (
         <div className="rounded-2xl border border-line bg-white shadow-card">
@@ -98,11 +97,6 @@ export default function AddCustomerPage() {
             icon={Users}
             title="No customers found."
             message="Add your first customer to start billing."
-            action={
-              <Button icon={UserPlus} onClick={() => manager.openAdd()} className="mt-2">
-                Add New Customer
-              </Button>
-            }
           />
         </div>
       ) : visible.length === 0 ? (
@@ -122,14 +116,7 @@ export default function AddCustomerPage() {
         />
       )}
 
-      <button
-        type="button"
-        onClick={() => manager.openAdd()}
-        aria-label="Add New Customer"
-        className="fixed right-4 bottom-24 z-30 flex size-14 items-center justify-center rounded-full bg-gold-sheen text-brand-900 shadow-gold ring-4 ring-white/80 transition hover:brightness-105 focus-visible:ring-gold-300 focus-visible:outline-none active:scale-95 sm:right-6"
-      >
-        <UserPlus className="size-6" aria-hidden />
-      </button>
+
 
       <CustomerFormSheet
         visible={manager.form.open}

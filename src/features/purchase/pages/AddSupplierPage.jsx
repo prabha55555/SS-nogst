@@ -3,6 +3,7 @@
  * Add form (the `?phone=` query pre-fills the phone), searchable supplier directory, edit sheet and delete (confirm).
  * Wide desktops (xl): add form as a side card; everything narrower: form on top, directory below.
  */
+import React from 'react';
 import { ListChecks, RefreshCw, Save, UserPlus, Users } from 'lucide-react';
 import {
   Badge,
@@ -10,12 +11,15 @@ import {
   Card,
   EmptyState,
   ErrorState,
+  IconButton,
   LoadingState,
   Modal,
   Page,
   SearchBar,
   SectionHeader,
+  TwoPane,
 } from '@/ui';
+import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { SupplierDirectory } from '../components/SupplierDirectory';
 import { SupplierFormFields } from '../components/SupplierFormFields';
 import { useSupplierDirectory } from '../hooks/useSupplierDirectory';
@@ -24,6 +28,9 @@ const EDIT_FORM_ID = 'edit-supplier-form';
 
 export default function AddSupplierPage() {
   const dir = useSupplierDirectory();
+
+  const { isExpanded } = useBreakpoint();
+  const [isAddOpen, setIsAddOpen] = React.useState(false);
 
   if (dir.loading && dir.suppliers.length === 0) {
     return (
@@ -40,76 +47,128 @@ export default function AddSupplierPage() {
     );
   }
 
-  const submitAdd = (e) => {
+  const submitAdd = async (e) => {
     e.preventDefault();
-    if (!dir.adding) dir.add();
+    if (dir.adding) return;
+    const success = await dir.add();
+    if (success) {
+      setIsAddOpen(false);
+    }
   };
   const submitEdit = (e) => {
     e.preventDefault();
     if (!dir.savingEdit) dir.saveEdit();
   };
 
+  const toolbar = (
+    <div className="mb-4 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+      <SearchBar
+        value={dir.query}
+        onChange={dir.setQuery}
+        placeholder="Search name, phone or address"
+        aria-label="Search suppliers"
+        className="min-w-0 flex-1"
+      />
+      <Badge tone="brand" className="self-start px-3 py-1 text-[13px] tabular-nums sm:self-auto">
+        {dir.query.trim()
+          ? `${dir.visible.length} of ${dir.suppliers.length} suppliers`
+          : `${dir.suppliers.length} suppliers`}
+      </Badge>
+    </div>
+  );
+
+  const listSection = (
+    <>
+      {toolbar}
+      <SupplierDirectory
+        suppliers={dir.visible}
+        onEdit={dir.startEdit}
+        onDelete={dir.remove}
+        empty={
+          <EmptyState
+            icon={Users}
+            title="No suppliers found."
+            message={dir.query.trim() ? 'No supplier matches your search.' : 'Add your first supplier.'}
+          />
+        }
+      />
+    </>
+  );
+
+  const formCard = (
+    <Card as="form" onSubmit={submitAdd} className="relative overflow-hidden">
+      <span className="absolute inset-x-0 top-0 h-[2px] hairline-gold" aria-hidden />
+      <SectionHeader title="Add New Supplier" icon={UserPlus} className="mb-1" />
+      <p className="mb-4 text-[13px] text-slate-500">
+        Phone number and name are required; address is optional.
+      </p>
+      <SupplierFormFields value={dir.newSupplier} onChange={dir.setNewSupplier} idPrefix="new-supplier" />
+      <Button type="submit" icon={UserPlus} fullWidth loading={dir.adding} className="mt-5">
+        Add Supplier
+      </Button>
+    </Card>
+  );
+
   return (
     <Page
       title="Add Supplier"
       icon={UserPlus}
       actions={
-        <Button variant="outline" icon={RefreshCw} loading={dir.refreshing} onClick={dir.refresh}>
-          Refresh
-        </Button>
+        !isExpanded ? (
+          <IconButton
+            variant="primary"
+            icon={UserPlus}
+            label="Add Supplier"
+            onClick={() => setIsAddOpen(true)}
+            className="rounded-full"
+          />
+        ) : null
       }
     >
-      <div className="grid items-start gap-4 xl:grid-cols-[22rem_minmax(0,1fr)]">
-        <Card as="form" onSubmit={submitAdd} className="relative overflow-hidden xl:sticky xl:top-20">
-          <span className="absolute inset-x-0 top-0 h-[2px] hairline-gold" aria-hidden />
-          <SectionHeader title="Add New Supplier" icon={UserPlus} className="mb-1" />
-          <p className="mb-4 text-[13px] text-slate-500">
-            Phone number and name are required; address is optional.
-          </p>
-          <SupplierFormFields
-            value={dir.newSupplier}
-            onChange={dir.setNewSupplier}
-            layout="row"
-            idPrefix="new-supplier"
-          />
-          <Button
-            type="submit"
-            icon={UserPlus}
-            fullWidth
-            loading={dir.adding}
-            className="mt-5 sm:w-auto xl:w-full"
-          >
-            Add Supplier
-          </Button>
-        </Card>
+      {isExpanded ? (
+        <TwoPane main={listSection} side={formCard} />
+      ) : (
+        <>
+          {listSection}
 
-        <section className="min-w-0 space-y-3.5" aria-label="Supplier Directory">
-          <SectionHeader
-            title="Supplier Directory"
-            icon={ListChecks}
-            className="mb-0"
-            right={<Badge tone="brand">{dir.suppliers.length}</Badge>}
-          />
-          <SearchBar
-            value={dir.query}
-            onChange={dir.setQuery}
-            placeholder="Search by name, phone or address..."
-            aria-label="Search suppliers"
-          />
-          <SupplierDirectory
-            suppliers={dir.visible}
-            onEdit={dir.startEdit}
-            onDelete={dir.remove}
-            empty={
-              <EmptyState
-                icon={Users}
-                title="No suppliers found."
-                message={dir.query.trim() ? 'No supplier matches your search.' : 'Add your first supplier.'}
-              />
+
+          <Modal
+            open={isAddOpen}
+            onClose={() => setIsAddOpen(false)}
+            title="Add New Supplier"
+            footer={
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsAddOpen(false)}
+                  disabled={dir.adding}
+                  className="flex-1 sm:flex-none"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  form="mobile-add-supplier"
+                  variant="primary"
+                  icon={UserPlus}
+                  loading={dir.adding}
+                  className="flex-1 sm:flex-none"
+                >
+                  Add Supplier
+                </Button>
+              </>
             }
-          />
-        </section>
-      </div>
+          >
+            <form id="mobile-add-supplier" onSubmit={submitAdd}>
+              <SupplierFormFields
+                value={dir.newSupplier}
+                onChange={dir.setNewSupplier}
+                idPrefix="mob-new-supplier"
+              />
+            </form>
+          </Modal>
+        </>
+      )}
 
       <Modal
         open={!!dir.editing}

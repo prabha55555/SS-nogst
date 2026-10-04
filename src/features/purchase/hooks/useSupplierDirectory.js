@@ -34,20 +34,22 @@ export function useSupplierDirectory() {
     const message = validateNewSupplier(newSupplier);
     if (message) {
       toast('Invalid Information', message, 'error');
-      return;
+      return false;
     }
     setAdding(true);
     try {
       if ((await addSupplier(newSupplier)) === 'duplicate') {
         toast('Duplicate Supplier', 'A supplier with this phone number already exists.', 'error');
-        return;
+        return false;
       }
       setNewSupplier(EMPTY_SUPPLIER);
       await reload();
       toast('Supplier Added', 'Supplier added successfully!', 'success');
+      return true;
     } catch (e) {
       console.error('Error adding supplier:', e);
       toast('Error', 'Failed to add supplier.', 'error');
+      return false;
     } finally {
       setAdding(false);
     }

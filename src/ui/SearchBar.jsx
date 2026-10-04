@@ -5,7 +5,7 @@ import { TextField } from './fields';
 export function SearchBar({ value, onChange, placeholder = 'Search…', className, ...rest }) {
   return (
     <TextField
-      type="search"
+      type="text"
       value={value}
       onChange={onChange}
       placeholder={placeholder}

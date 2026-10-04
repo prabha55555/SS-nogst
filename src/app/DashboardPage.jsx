@@ -189,20 +189,19 @@ export default function DashboardPage() {
         <div className="mt-6 flex justify-center sm:hidden">
           <InstallButton />
         </div>
-
       </main>
 
       {/* ------------------------------------------------------ full footer with watermark */}
       <footer className="relative mt-4 overflow-hidden rounded-t-[2.25rem] surface-ink text-white">
         {/* Watermark */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden opacity-[0.04] select-none">
-          <span className="whitespace-nowrap font-display text-[clamp(4rem,9vw,12rem)] leading-none font-black tracking-tighter">
+          <span className="font-display text-[clamp(4rem,9vw,12rem)] leading-none font-black tracking-tighter whitespace-nowrap">
             {COMPANY.name?.toUpperCase() || COMPANY.displayName.toUpperCase()}
           </span>
         </div>
 
         <GoldWaves className="absolute inset-0 opacity-40 mix-blend-overlay" />
-        
+
         <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
           <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
             {/* Brand & Info */}
@@ -259,13 +258,17 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="relative mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row pb-safe">
+          <div className="pb-safe relative mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row">
             <p className="text-xs font-medium text-brand-300">
               &copy; {new Date().getFullYear()} {COMPANY.displayName}. All rights reserved.
             </p>
             <div className="flex items-center gap-4 text-xs font-medium text-brand-400">
-              <a href="#" className="hover:text-gold-300 transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-gold-300 transition-colors">Terms of Service</a>
+              <a href="#" className="transition-colors hover:text-gold-300">
+                Privacy Policy
+              </a>
+              <a href="#" className="transition-colors hover:text-gold-300">
+                Terms of Service
+              </a>
             </div>
           </div>
         </div>
