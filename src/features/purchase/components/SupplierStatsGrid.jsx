@@ -1,0 +1,22 @@
+import { BadgeIndianRupee, CheckCircle2, Clock, FileText, Tag, Truck } from 'lucide-react';
+import { StatCard } from '@/ui';
+import { formatRupees } from '@/core/format';
+
+/** The six stat tiles at the top of Supplier Details, over ALL suppliers (the search does not change them). */
+export function SupplierStatsGrid({ stats }) {
+  const items = [
+    { icon: Truck, value: String(stats.totalSuppliers), label: 'Total Suppliers', tint: 'brand' },
+    { icon: FileText, value: String(stats.totalBills), label: 'Total Invoices', tint: 'sky' },
+    { icon: BadgeIndianRupee, value: formatRupees(stats.totalAmount), label: 'Total Amount', tint: 'brand' },
+    { icon: CheckCircle2, value: formatRupees(stats.totalPaid), label: 'Total Paid', tint: 'green' },
+    { icon: Tag, value: formatRupees(stats.totalDiscount), label: 'Total Discount', tint: 'violet' },
+    { icon: Clock, value: formatRupees(stats.totalBalance), label: 'Total Balance', tint: 'red' },
+  ];
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+      {items.map((item) => (
+        <StatCard key={item.label} {...item} />
+      ))}
+    </div>
+  );
+}

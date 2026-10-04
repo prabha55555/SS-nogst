@@ -1,0 +1,97 @@
+import { X } from 'lucide-react';
+import { useEffect, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { cn } from './cn';
+
+const SIZES = { sm: 'sm:max-w-md', md: 'sm:max-w-xl', lg: 'sm:max-w-3xl', xl: 'sm:max-w-5xl' };
+
+/**
+ * Dialog for forms and detail views. A bottom sheet on phones, a centred dialog from the `sm` breakpoint up.
+ * <Modal open onClose={…} title="Add payment" footer={<Button>Save</Button>}>…</Modal>
+ */
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  footer,
+  size = 'md',
+  dismissable = true,
+  className,
+  layer = 'z-50',
+}) {
+  const titleId = useId();
+  const panelRef = useRef(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const previouslyFocused = document.activeElement;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e) => {
+      if (e.key === 'Escape' && dismissable) closeRef.current?.();
+    };
+    document.addEventListener('keydown', onKey);
+    // move focus into the dialog (the panel itself, so no keyboard pops up on phones)
+    panelRef.current?.focus();
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener('keydown', onKey);
+      previouslyFocused?.focus?.();
+    };
+  }, [open, dismissable]);
+
+  if (!open) return null;
+  return createPortal(
+    <div className={cn('no-print fixed inset-0 flex items-end justify-center sm:items-center sm:p-4', layer)}>
+      <div
+        className="absolute inset-0 animate-fade-in bg-slate-900/50"
+        onClick={dismissable ? onClose : undefined}
+        aria-hidden
+      />
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
+        tabIndex={-1}
+        className={cn(
+          'relative flex max-h-[92dvh] w-full animate-sheet-in flex-col rounded-t-2xl bg-white shadow-pop outline-none',
+          'sm:max-h-[90dvh] sm:rounded-2xl',
+          SIZES[size],
+          className,
+        )}
+      >
+        {title ? (
+          <header className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 sm:px-5">
+            <h2 id={titleId} className="text-lg font-semibold text-slate-900">
+              {title}
+            </h2>
+            {dismissable ? (
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="-mr-1 rounded-lg p-1.5 text-slate-500 hover:bg-slate-100"
+              >
+                <X className="size-5" />
+              </button>
+            ) : null}
+          </header>
+        ) : null}
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">{children}</div>
+        {footer ? (
+          <footer className="pb-safe flex flex-wrap justify-end gap-2 border-t border-slate-200 px-4 py-3 sm:px-5">
+            {footer}
+          </footer>
+        ) : null}
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+/** Alias: a Modal used as a form / detail "sheet". */
+export const Sheet = Modal;

@@ -2,29 +2,28 @@
 node_modules/
 
 # Build outputs
-PR Fabrics-win32-x64
+dist/
+dev-dist/
+build/
+out/
+*.tsbuildinfo
 
-# Large files
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs / OS / editor
+*.log
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+
+# Large binaries / archives
 *.exe
 *.dmg
 *.deb
 *.rpm
 *.zip
 *.tar.gz
-
-# Electron build files
-dist/
-build/
-out/
-
-# Environment files
-.env
-.env.local
-
-
-# Logs
-dist
-
-
-
-#sabarish

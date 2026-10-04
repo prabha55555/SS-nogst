@@ -1,0 +1,183 @@
+import { forwardRef, useId } from 'react';
+import { cn } from './cn';
+
+const BASE =
+  'block w-full min-w-0 rounded-lg border bg-white px-3 py-2 text-slate-900 placeholder:text-slate-400 ' +
+  'transition focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:bg-slate-100 read-only:bg-slate-100 ' +
+  'min-h-11 sm:min-h-10';
+
+const fieldClass = (error) =>
+  cn(
+    BASE,
+    error
+      ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
+      : 'border-slate-300 focus:border-brand-500 focus:ring-brand-200',
+  );
+
+/** Label + control + hint/error wrapper shared by all fields. */
+export function Field({ label, error, hint, htmlFor, className, children, labelClassName }) {
+  return (
+    <div className={cn('min-w-0', className)}>
+      {label ? (
+        <label
+          htmlFor={htmlFor}
+          className={cn('mb-1 block text-sm font-medium text-slate-700', labelClassName)}
+        >
+          {label}
+        </label>
+      ) : null}
+      {children}
+      {error ? (
+        <p className="mt-1 text-xs text-red-600" role="alert">
+          {error}
+        </p>
+      ) : hint ? (
+        <p className="mt-1 text-xs text-slate-500">{hint}</p>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Text input. NOTE: `onChange` receives the new **string value**, not the event.
+ * Extra props (type, inputMode, placeholder, autoComplete, list, onKeyDown, …) go to the <input>.
+ * `leftIcon` = lucide component; `right` = node shown inside the field (e.g. a clear button).
+ */
+export const TextField = forwardRef(function TextField(
+  {
+    label,
+    error,
+    hint,
+    onChange,
+    leftIcon: LeftIcon,
+    right,
+    alignRight,
+    className,
+    inputClassName,
+    id,
+    ...rest
+  },
+  ref,
+) {
+  const auto = useId();
+  const inputId = id ?? auto;
+  return (
+    <Field label={label} error={error} hint={hint} htmlFor={inputId} className={className}>
+      <div className="relative">
+        {LeftIcon ? (
+          <LeftIcon
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
+            aria-hidden
+          />
+        ) : null}
+        <input
+          ref={ref}
+          id={inputId}
+          className={cn(
+            fieldClass(error),
+            LeftIcon && 'pl-9',
+            right && 'pr-10',
+            alignRight && 'text-right',
+            inputClassName,
+          )}
+          onChange={(e) => onChange?.(e.target.value)}
+          {...rest}
+        />
+        {right ? <div className="absolute top-1/2 right-2 -translate-y-1/2">{right}</div> : null}
+      </div>
+    </Field>
+  );
+});
+
+/** Keep digits and a single decimal point ("1,5" becomes "1.5"); optional leading minus. */
+export function sanitizeDecimal(text, allowNegative = false) {
+  let t = String(text).replace(',', '.');
+  const negative = allowNegative && t.trim().startsWith('-');
+  t = t.replace(/[^0-9.]/g, '');
+  const firstDot = t.indexOf('.');
+  if (firstDot !== -1) t = t.slice(0, firstDot + 1) + t.slice(firstDot + 1).replace(/\./g, '');
+  return (negative ? '-' : '') + t;
+}
+
+/** Decimal input that keeps its value as a *string* so partially typed numbers ("12.") are never mangled. */
+export const NumberField = forwardRef(function NumberField({ onChange, allowNegative, ...rest }, ref) {
+  return (
+    <TextField
+      ref={ref}
+      inputMode={allowNegative ? 'text' : 'decimal'}
+      placeholder="0.00"
+      alignRight
+      onFocus={(e) => e.target.select()}
+      onChange={(v) => onChange?.(sanitizeDecimal(v, allowNegative))}
+      {...rest}
+    />
+  );
+});
+
+/** <input type="date"> — value / onChange use 'YYYY-MM-DD' strings. */
+export const DateField = forwardRef(function DateField(props, ref) {
+  return <TextField ref={ref} type="date" {...props} />;
+});
+
+export const TextArea = forwardRef(function TextArea(
+  { label, error, hint, onChange, className, id, rows = 3, ...rest },
+  ref,
+) {
+  const auto = useId();
+  const areaId = id ?? auto;
+  return (
+    <Field label={label} error={error} hint={hint} htmlFor={areaId} className={className}>
+      <textarea
+        ref={ref}
+        id={areaId}
+        rows={rows}
+        className={cn(fieldClass(error), 'resize-y')}
+        onChange={(e) => onChange?.(e.target.value)}
+        {...rest}
+      />
+    </Field>
+  );
+});
+
+/** <SelectField options={[{value,label}]} value onChange(value)> */
+export const SelectField = forwardRef(function SelectField(
+  { label, error, hint, onChange, options = [], className, id, children, ...rest },
+  ref,
+) {
+  const auto = useId();
+  const selectId = id ?? auto;
+  return (
+    <Field label={label} error={error} hint={hint} htmlFor={selectId} className={className}>
+      <select
+        ref={ref}
+        id={selectId}
+        className={fieldClass(error)}
+        onChange={(e) => onChange?.(e.target.value)}
+        {...rest}
+      >
+        {children ??
+          options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+      </select>
+    </Field>
+  );
+});
+
+export function Checkbox({ label, onChange, className, ...rest }) {
+  return (
+    <label
+      className={cn('inline-flex min-h-9 items-center gap-2 text-sm text-slate-700 select-none', className)}
+    >
+      <input
+        type="checkbox"
+        className="size-4 rounded border-slate-300 accent-brand-600"
+        onChange={(e) => onChange?.(e.target.checked)}
+        {...rest}
+      />
+      {label}
+    </label>
+  );
+}
