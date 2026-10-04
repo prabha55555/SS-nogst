@@ -178,6 +178,7 @@
   body {
     @apply bg-canvas font-sans text-slate-800 antialiased;
     overscroll-behavior-y: none;
+    overflow-x: clip;
   }
   /* 16px inputs stop iOS Safari zooming the page on focus */
   input,

@@ -210,17 +210,37 @@ export default function DashboardPage() {
             </div>
             <ul className="space-y-3 text-sm text-brand-100">
               {[
-                [Phone, COMPANY.cell],
-                [Mail, COMPANY.email],
-                [Globe, COMPANY.website],
-                [MapPin, COMPANY.address],
-                [Clock, `Business hours: ${COMPANY.hours}`],
-              ].map(([Icon, text]) => (
-                <li key={text} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-gold-sheen text-brand-900">
-                    <Icon className="size-4" aria-hidden />
-                  </span>
-                  <span className="leading-snug">{text}</span>
+                [Phone, COMPANY.cell, `tel:${COMPANY.cell.replace(/[^\d+]/g, '')}`],
+                [Mail, COMPANY.email, `mailto:${COMPANY.email}`],
+                [Globe, COMPANY.website, `https://${COMPANY.website.replace(/^https?:\/\//, '')}`],
+                [
+                  MapPin,
+                  COMPANY.address,
+                  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(COMPANY.address)}`,
+                ],
+                [Clock, `Business hours: ${COMPANY.hours}`, null],
+              ].map(([Icon, text, href]) => (
+                <li key={text}>
+                  {href ? (
+                    <a
+                      href={href}
+                      target={href.startsWith('http') ? '_blank' : undefined}
+                      rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      className="group flex items-center gap-3 rounded-lg transition hover:text-gold-300 focus-visible:ring-2 focus-visible:ring-gold-300 focus-visible:outline-none"
+                    >
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-gold-sheen text-brand-900">
+                        <Icon className="size-4" aria-hidden />
+                      </span>
+                      <span className="min-w-0 leading-snug break-words group-hover:underline">{text}</span>
+                    </a>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-gold-sheen text-brand-900">
+                        <Icon className="size-4" aria-hidden />
+                      </span>
+                      <span className="leading-snug">{text}</span>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>

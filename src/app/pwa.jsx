@@ -5,7 +5,7 @@ import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { Button } from '@/ui';
 
-/** Banner shown when a new version of the app has been downloaded; the user decides when to reload. */
+/** Centred popup shown when a new version of the app has been downloaded; the user decides when to reload. */
 export function UpdatePrompt() {
   const {
     needRefresh: [needRefresh, setNeedRefresh],
@@ -18,15 +18,31 @@ export function UpdatePrompt() {
   });
   if (!needRefresh) return null;
   return (
-    <div className="no-print pb-safe fixed inset-x-3 bottom-20 z-[65] mx-auto flex max-w-md items-center gap-3 rounded-xl bg-slate-900 p-3 text-white shadow-pop lg:bottom-4">
-      <RefreshCw className="size-5 shrink-0 text-brand-300" aria-hidden />
-      <p className="flex-1 text-sm">A new version is available.</p>
-      <Button size="sm" variant="primary" onClick={() => updateServiceWorker(true)}>
-        Update
-      </Button>
-      <button type="button" className="px-1 text-sm text-slate-300" onClick={() => setNeedRefresh(false)}>
-        Later
-      </button>
+    <div
+      className="no-print fixed inset-0 z-[80] flex animate-fade-in items-center justify-center bg-brand-950/55 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="update-title"
+    >
+      <div className="w-full max-w-sm animate-sheet-in rounded-3xl border border-line bg-white p-6 text-center shadow-pop">
+        <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gold-sheen text-brand-900 shadow-gold">
+          <RefreshCw className="size-7" aria-hidden />
+        </span>
+        <h2 id="update-title" className="mt-4 font-display text-xl font-extrabold text-brand-800">
+          Update available
+        </h2>
+        <p className="mt-1.5 text-sm text-slate-500">
+          A new version of Brightlight Billing is ready. Update now to get the latest improvements.
+        </p>
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          <Button variant="outline" onClick={() => setNeedRefresh(false)}>
+            Later
+          </Button>
+          <Button variant="primary" icon={RefreshCw} onClick={() => updateServiceWorker(true)}>
+            Update
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -38,7 +38,7 @@ export function HistoryFilterBar({ value, onChange, onSearch, onClear, labels })
       }}
       className="space-y-3.5 rounded-2xl border border-line bg-white p-3.5 shadow-card sm:p-4"
     >
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)] lg:items-end">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)] lg:items-end">
         <SearchBar
           value={value.search}
           onChange={(search) => set({ search })}
@@ -92,7 +92,7 @@ export function HistoryFilterBar({ value, onChange, onSearch, onClear, labels })
       </div>
 
       {showRanges ? (
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)] lg:items-end">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)] lg:items-end">
           <RangeGroup label="Date range">
             <DateField
               className="flex-1"
@@ -142,7 +142,7 @@ export function HistoryFilterBar({ value, onChange, onSearch, onClear, labels })
 /** A labelled from–to pair (small-caps caption above the two fields). */
 function RangeGroup({ label, children }) {
   return (
-    <div>
+    <div className="min-w-0">
       <p className="mb-1.5 text-[11px] font-bold tracking-[0.08em] text-slate-400 uppercase">{label}</p>
       <div className="flex items-center gap-2">{children}</div>
     </div>
