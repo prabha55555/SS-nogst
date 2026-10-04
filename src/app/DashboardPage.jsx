@@ -3,10 +3,7 @@ import {
   Boxes,
   CalendarDays,
   Clock,
-  FilePlus2,
   Globe,
-  History,
-  LogOut,
   Mail,
   MapPin,
   PieChart,
@@ -17,14 +14,13 @@ import {
   Sparkles,
   TrendingUp,
   Users,
-  Wallet,
   Zap,
 } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { COMPANY, PRODUCT, SERVICES } from '@/core/branding';
 import { formatDateShort, todayISO } from '@/core/format';
-import { Button, cn, useFeedback } from '@/ui';
+import { cn } from '@/ui';
 import { useAuth } from './AuthProvider';
 import { BrandLockup } from './Brand';
 import { GoldWaves, Sparkle } from './Decor';
@@ -32,18 +28,18 @@ import { InstallButton, OfflineBanner, useInstallPrompt } from './pwa';
 
 const MODULE_CARDS = [
   {
-    to: '/sales/bill',
-    title: 'Sales',
-    text: 'Create invoices, collect payments and keep every customer ledger in order.',
-    icon: Receipt,
-    points: ['Sales bills & printing', 'History & statements', 'Customer details'],
-  },
-  {
     to: '/purchase/bill',
     title: 'Purchase',
     text: 'Record purchases, track supplier balances and acknowledge goods received.',
     icon: ShoppingCart,
     points: ['Purchase bills', 'Supplier ledger', 'Payments & returns'],
+  },
+  {
+    to: '/sales/bill',
+    title: 'Sales',
+    text: 'Create invoices, collect payments and keep every customer ledger in order.',
+    icon: Receipt,
+    points: ['Sales bills & printing', 'History & statements', 'Customer details'],
   },
   {
     to: '/overview/revenue',
@@ -54,36 +50,14 @@ const MODULE_CARDS = [
   },
 ];
 
-const QUICK_LINKS = [
-  { to: '/sales/bill', label: 'New Sales Bill', icon: FilePlus2 },
-  { to: '/purchase/bill', label: 'New Purchase Bill', icon: ShoppingCart },
-  { to: '/sales/history', label: 'Sales History', icon: History },
-  { to: '/sales/customers', label: 'Customers', icon: Users },
-  { to: '/overview/stocks', label: 'Stocks', icon: Boxes },
-  { to: '/overview/expenses', label: 'Expenses', icon: Wallet },
-  { to: '/overview/revenue', label: 'Revenue', icon: TrendingUp },
-  { to: '/overview/shortcuts', label: 'Shortcuts', icon: Zap },
-];
-
 function greeting() {
   const h = new Date().getHours();
   return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
 }
 
 export default function DashboardPage() {
-  const { logout, username } = useAuth();
-  const { confirm } = useFeedback();
+  const { username } = useAuth();
   const { showIosHint } = useInstallPrompt();
-
-  const onLogout = async () => {
-    const ok = await confirm({
-      title: 'Logout',
-      message: 'Are you sure you want to logout?',
-      tone: 'danger',
-      confirmText: 'Logout',
-    });
-    if (ok) await logout();
-  };
 
   return (
     <div className="min-h-dvh bg-canvas">
@@ -98,15 +72,6 @@ export default function DashboardPage() {
             <BrandLockup />
             <div className="flex items-center gap-2">
               <InstallButton className="hidden sm:inline-flex" />
-              <Button
-                variant="outline"
-                size="sm"
-                icon={LogOut}
-                onClick={onLogout}
-                className="border-white/20! bg-white/5! text-white! hover:bg-white/10!"
-              >
-                <span className="hidden sm:inline">Logout</span>
-              </Button>
             </div>
           </div>
 
@@ -158,29 +123,6 @@ export default function DashboardPage() {
           ))}
         </section>
 
-        <section aria-label="Quick access" className="mt-9">
-          <h2 className="mb-3 font-display text-sm font-bold tracking-[0.16em] text-slate-500 uppercase">
-            Quick access
-          </h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {QUICK_LINKS.map(({ to, label, icon: Icon }) => (
-              <Link
-                key={label}
-                to={to}
-                className={cn(
-                  'group flex items-center gap-3 rounded-2xl border border-line bg-white p-3.5 shadow-sm transition',
-                  'hover:border-gold-300 hover:bg-gold-50/60 hover:shadow-card focus-visible:ring-4 focus-visible:ring-gold-200 focus-visible:outline-none',
-                )}
-              >
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gold-100 text-gold-700 ring-1 ring-gold-200 transition group-hover:bg-gold-sheen group-hover:text-brand-900">
-                  <Icon className="size-[18px]" aria-hidden />
-                </span>
-                <span className="text-sm font-semibold text-slate-700">{label}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
         {showIosHint ? (
           <p className="mt-6 flex items-center justify-center gap-1.5 text-sm text-slate-500">
             Install this app: tap <Share className="size-4" aria-label="Share" /> then “Add to Home Screen”.
@@ -203,22 +145,22 @@ export default function DashboardPage() {
         <GoldWaves className="absolute inset-0 opacity-40 mix-blend-overlay" />
 
         <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-col gap-10 md:flex-row md:justify-between md:gap-8">
             {/* Brand & Info */}
-            <div className="space-y-4">
+            <div className="space-y-4 md:max-w-sm">
               <div className="inline-flex items-center gap-2">
                 <span className="flex size-10 items-center justify-center rounded-xl bg-gold-sheen text-brand-900 shadow-gold">
                   <Sparkles className="size-6" />
                 </span>
                 <h2 className="font-display text-2xl font-extrabold tracking-tight">{COMPANY.displayName}</h2>
               </div>
-              <p className="max-w-sm text-sm leading-relaxed text-brand-200">
+              <p className="text-sm leading-relaxed text-brand-200">
                 {COMPANY.tagline}. Elevating your business with premium solutions and unmatched dedication.
               </p>
             </div>
 
             {/* Services */}
-            <div>
+            <div className="md:max-w-xs">
               <h3 className="mb-4 font-display text-sm font-bold tracking-widest text-gold-400 uppercase">
                 Our Services
               </h3>
@@ -235,23 +177,29 @@ export default function DashboardPage() {
             </div>
 
             {/* Contact */}
-            <div>
+            <div className="md:max-w-xs">
               <h3 className="mb-4 font-display text-sm font-bold tracking-widest text-gold-400 uppercase">
                 Contact Us
               </h3>
               <ul className="space-y-4 text-sm text-brand-100">
                 {[
-                  [Phone, COMPANY.cell],
-                  [Mail, COMPANY.email],
-                  [Globe, COMPANY.website],
-                  [MapPin, COMPANY.address],
-                  [Clock, `Business hours: ${COMPANY.hours}`],
-                ].map(([Icon, text]) => (
+                  { Icon: Phone, text: COMPANY.cell, href: COMPANY.cell ? `tel:${COMPANY.cell.replace(/[^0-9+]/g, '')}` : null },
+                  { Icon: Mail, text: COMPANY.email, href: COMPANY.email ? `mailto:${COMPANY.email}` : null },
+                  { Icon: Globe, text: COMPANY.website, href: COMPANY.website ? (COMPANY.website.startsWith('http') ? COMPANY.website : `https://${COMPANY.website}`) : null },
+                  { Icon: MapPin, text: COMPANY.address, href: COMPANY.address ? `https://maps.google.com/?q=${encodeURIComponent(COMPANY.address)}` : null },
+                  { Icon: Clock, text: `Business hours: ${COMPANY.hours}` },
+                ].map(({ Icon, text, href }) => (
                   <li key={text} className="flex items-start gap-3 transition-colors hover:text-white">
                     <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-gold-300 ring-1 ring-white/20">
                       <Icon className="size-4" aria-hidden />
                     </span>
-                    <span className="mt-1 leading-snug">{text}</span>
+                    {href ? (
+                      <a href={href} target="_blank" rel="noreferrer" className="mt-1 leading-snug hover:underline hover:text-gold-300">
+                        {text}
+                      </a>
+                    ) : (
+                      <span className="mt-1 leading-snug">{text}</span>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -263,12 +211,12 @@ export default function DashboardPage() {
               &copy; {new Date().getFullYear()} {COMPANY.displayName}. All rights reserved.
             </p>
             <div className="flex items-center gap-4 text-xs font-medium text-brand-400">
-              <a href="#" className="transition-colors hover:text-gold-300">
+              <Link to="/privacy-policy" className="transition-colors hover:text-gold-300">
                 Privacy Policy
-              </a>
-              <a href="#" className="transition-colors hover:text-gold-300">
+              </Link>
+              <Link to="/terms-of-service" className="transition-colors hover:text-gold-300">
                 Terms of Service
-              </a>
+              </Link>
             </div>
           </div>
         </div>

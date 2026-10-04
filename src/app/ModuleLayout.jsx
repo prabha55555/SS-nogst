@@ -216,19 +216,19 @@ function MobileHeader({ module }) {
   const navigate = useNavigate();
   const onLogout = useLogout();
   return (
-    <header className="no-print pt-safe sticky top-0 z-30 flex items-center gap-2.5 surface-ink px-3 py-2.5 text-white lg:hidden">
+    <header className="no-print pt-safe sticky top-0 z-30 flex items-center gap-3 surface-ink px-4 py-3.5 text-white lg:hidden">
       <button
         type="button"
         onClick={() => navigate('/')}
         aria-label="Back to dashboard"
         className="rounded-xl p-2 text-brand-200 hover:bg-white/10"
       >
-        <ArrowLeft className="size-5" />
+        <ArrowLeft className="size-6" />
       </button>
-      <BrandMark size="sm" />
+      <BrandMark />
       <div className="min-w-0 flex-1 leading-tight">
-        <h1 className="truncate font-display text-[15px] font-bold">{module.title}</h1>
-        <p className="text-[10px] tracking-[0.2em] text-gold-400 uppercase">Brightlight Billing</p>
+        <h1 className="truncate font-display text-lg font-bold">{module.title}</h1>
+        <p className="text-[11px] tracking-[0.2em] text-gold-400 uppercase">Brightlight Billing</p>
       </div>
       <button
         type="button"
@@ -236,7 +236,7 @@ function MobileHeader({ module }) {
         aria-label="Logout"
         className="rounded-xl p-2 text-brand-200 hover:bg-white/10"
       >
-        <LogOut className="size-5" />
+        <LogOut className="size-6" />
       </button>
     </header>
   );

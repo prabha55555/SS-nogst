@@ -10,6 +10,8 @@ import { ModuleLayout } from './ModuleLayout';
 const LoginPage = lazy(() => import('./LoginPage'));
 const DashboardPage = lazy(() => import('./DashboardPage'));
 const NotFoundPage = lazy(() => import('./NotFoundPage'));
+const PrivacyPolicyPage = lazy(() => import('./PrivacyPolicyPage'));
+const TermsOfServicePage = lazy(() => import('./TermsOfServicePage'));
 
 const SalesBillPage = lazy(() => import('@/features/salesBill/SalesBillPage'));
 const SalesHistoryPage = lazy(() => import('@/features/history/sales/SalesHistoryPage'));
@@ -45,6 +47,8 @@ export function AppRoutes() {
 
           <Route element={<RequireAuth />}>
             <Route index element={<DashboardPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms-of-service" element={<TermsOfServicePage />} />
 
             <Route path="sales" element={<ModuleLayout module="sales" />}>
               <Route index element={<Navigate to="bill" replace />} />
