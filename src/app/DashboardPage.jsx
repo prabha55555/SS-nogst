@@ -190,46 +190,86 @@ export default function DashboardPage() {
           <InstallButton />
         </div>
 
-        {/* ------------------------------------------------------ company card */}
-        <footer className="relative mt-10 overflow-hidden rounded-3xl surface-ink p-6 text-white sm:p-8">
-          <GoldWaves className="opacity-60" />
-          <div className="relative grid gap-8 md:grid-cols-[1.1fr_1fr]">
+      </main>
+
+      {/* ------------------------------------------------------ full footer with watermark */}
+      <footer className="relative mt-4 overflow-hidden rounded-t-[2.25rem] surface-ink text-white">
+        {/* Watermark */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden opacity-[0.04] select-none">
+          <span className="whitespace-nowrap font-display text-[clamp(4rem,9vw,12rem)] leading-none font-black tracking-tighter">
+            {COMPANY.name?.toUpperCase() || COMPANY.displayName.toUpperCase()}
+          </span>
+        </div>
+
+        <GoldWaves className="absolute inset-0 opacity-40 mix-blend-overlay" />
+        
+        <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+            {/* Brand & Info */}
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2">
+                <span className="flex size-10 items-center justify-center rounded-xl bg-gold-sheen text-brand-900 shadow-gold">
+                  <Sparkles className="size-6" />
+                </span>
+                <h2 className="font-display text-2xl font-extrabold tracking-tight">{COMPANY.displayName}</h2>
+              </div>
+              <p className="max-w-sm text-sm leading-relaxed text-brand-200">
+                {COMPANY.tagline}. Elevating your business with premium solutions and unmatched dedication.
+              </p>
+            </div>
+
+            {/* Services */}
             <div>
-              <h2 className="font-display text-xl font-extrabold">{COMPANY.displayName}</h2>
-              <p className="mt-1 text-sm text-gold-300">{COMPANY.tagline}</p>
-              <ul className="mt-5 flex flex-wrap gap-2">
+              <h3 className="mb-4 font-display text-sm font-bold tracking-widest text-gold-400 uppercase">
+                Our Services
+              </h3>
+              <ul className="flex flex-wrap gap-2">
                 {SERVICES.map((s) => (
                   <li
                     key={s}
-                    className="rounded-full bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-brand-100 ring-1 ring-white/10"
+                    className="rounded-full bg-white/5 px-4 py-2 text-xs font-semibold text-brand-100 ring-1 ring-white/10 transition-colors hover:bg-white/10 hover:text-white"
                   >
                     {s}
                   </li>
                 ))}
               </ul>
             </div>
-            <ul className="space-y-3 text-sm text-brand-100">
-              {[
-                [Phone, COMPANY.cell],
-                [Mail, COMPANY.email],
-                [Globe, COMPANY.website],
-                [MapPin, COMPANY.address],
-                [Clock, `Business hours: ${COMPANY.hours}`],
-              ].map(([Icon, text]) => (
-                <li key={text} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-gold-sheen text-brand-900">
-                    <Icon className="size-4" aria-hidden />
-                  </span>
-                  <span className="leading-snug">{text}</span>
-                </li>
-              ))}
-            </ul>
+
+            {/* Contact */}
+            <div>
+              <h3 className="mb-4 font-display text-sm font-bold tracking-widest text-gold-400 uppercase">
+                Contact Us
+              </h3>
+              <ul className="space-y-4 text-sm text-brand-100">
+                {[
+                  [Phone, COMPANY.cell],
+                  [Mail, COMPANY.email],
+                  [Globe, COMPANY.website],
+                  [MapPin, COMPANY.address],
+                  [Clock, `Business hours: ${COMPANY.hours}`],
+                ].map(([Icon, text]) => (
+                  <li key={text} className="flex items-start gap-3 transition-colors hover:text-white">
+                    <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-gold-300 ring-1 ring-white/20">
+                      <Icon className="size-4" aria-hidden />
+                    </span>
+                    <span className="mt-1 leading-snug">{text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <p className="relative mt-7 border-t border-white/10 pt-4 text-center text-xs text-brand-300">
-            &copy; {new Date().getFullYear()} {COMPANY.displayName}. All rights reserved.
-          </p>
-        </footer>
-      </main>
+
+          <div className="relative mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row pb-safe">
+            <p className="text-xs font-medium text-brand-300">
+              &copy; {new Date().getFullYear()} {COMPANY.displayName}. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4 text-xs font-medium text-brand-400">
+              <a href="#" className="hover:text-gold-300 transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-gold-300 transition-colors">Terms of Service</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
