@@ -94,8 +94,7 @@ export default function PurchaseEditPage() {
 
   return (
     <PurchaseBillLayout
-      title={title}
-      subtitle={`Invoice ${form.invoiceNo}`}
+      title={form.invoiceNo ? `${title} #${form.invoiceNo}` : title}
       saveLabel="Update Purchase Bill"
       saving={edit.saving}
       onSave={edit.save}

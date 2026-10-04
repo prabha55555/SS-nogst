@@ -31,7 +31,7 @@ export default function AddCustomerPage() {
   const pager = usePagination(visible, { resetKey: query });
 
   const refreshButton = <RefreshButton onClick={() => void manager.refresh()} loading={manager.refreshing} />;
-  const pageProps = { title: 'Manage Customers', subtitle: 'Add, edit, or delete customers', icon: Users };
+  const pageProps = { title: 'Manage Customers', icon: Users };
 
   if (manager.loading) {
     return (

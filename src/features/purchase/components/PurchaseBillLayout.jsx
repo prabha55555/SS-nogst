@@ -6,7 +6,7 @@
  * Ctrl/Cmd + S saves on keyboards (the browser's "save page" is suppressed on this screen).
  *
  * Props
- *  - title: string · icon?: lucide component · subtitle?: string
+ *  - title: string · icon?: lucide component
  *  - main: ReactNode            invoice, supplier and product cards
  *  - summary: ReactNode         the totals card
  *  - saveLabel: string          "Save Purchase Bill" | "Update Purchase Bill"
@@ -75,7 +75,6 @@ function ActionButtons({ layout, saveLabel, saving, onSave, onShare }) {
 export function PurchaseBillLayout({
   title,
   icon = Receipt,
-  subtitle,
   main,
   summary,
   saveLabel,
@@ -105,7 +104,6 @@ export function PurchaseBillLayout({
   return (
     <Page
       title={title}
-      subtitle={subtitle}
       icon={icon}
       max="7xl"
       actions={

@@ -42,7 +42,6 @@ export default function CustomerDetailsPage() {
   );
   const head = {
     title: 'Sales Customer Details',
-    subtitle: 'Search and manage all customer information',
     icon: Users,
   };
 

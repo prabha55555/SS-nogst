@@ -230,23 +230,8 @@ export default function RecycleBinScreen({ kind, title }) {
   return (
     <Page
       title={title}
-      subtitle={config.headerText}
       icon={Trash2}
-      actions={
-        <>
-          <Button
-            variant="outlineDanger"
-            icon={Trash2}
-            onClick={onEmptyBin}
-            disabled={items.length === 0}
-            aria-label={config.emptyButton}
-            title={config.emptyButton}
-          >
-            <span className="max-sm:sr-only">{config.emptyButton}</span>
-          </Button>
-          <RefreshButton loading={refreshing} onClick={() => void refresh()} />
-        </>
-      }
+      actions={<RefreshButton loading={refreshing} onClick={() => void refresh()} />}
     >
       <div className="mb-5 grid grid-cols-3 gap-2.5 sm:gap-3.5">
         <StatTile icon={FileText} value={String(stats.totalItems)} label="Total Items" />
@@ -274,6 +259,15 @@ export default function RecycleBinScreen({ kind, title }) {
             { value: config.itemType, label: config.typeFilterLabel },
           ]}
         />
+        <Button
+          variant="outlineDanger"
+          icon={Trash2}
+          onClick={onEmptyBin}
+          disabled={items.length === 0}
+          className="lg:shrink-0"
+        >
+          {config.emptyButton}
+        </Button>
       </div>
 
       <div ref={pager.anchorRef} className="scroll-mt-32" />

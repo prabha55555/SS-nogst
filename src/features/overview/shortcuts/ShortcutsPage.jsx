@@ -192,7 +192,6 @@ export default function ShortcutsPage() {
   return (
     <Page
       title="Product Shortcuts"
-      subtitle="Create shortcuts for frequently used product descriptions"
       icon={Zap}
       actions={
         <>

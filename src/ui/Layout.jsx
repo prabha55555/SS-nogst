@@ -12,7 +12,7 @@ const WIDTHS = {
  * Page scaffold used inside the app shell: title row (with actions) + content, centred up to `max` width.
  * <Page title="Sales History" icon={History} actions={<Button/>}>…</Page>
  */
-export function Page({ title, subtitle, icon: Icon, actions, max = '6xl', className, children }) {
+export function Page({ title, icon: Icon, actions, max = '6xl', className, children }) {
   return (
     <div
       className={cn(
@@ -33,7 +33,6 @@ export function Page({ title, subtitle, icon: Icon, actions, max = '6xl', classN
               <h1 className="truncate font-display text-xl leading-tight font-extrabold text-brand-800 sm:text-[26px]">
                 {title}
               </h1>
-              {subtitle ? <p className="mt-0.5 hidden text-sm text-slate-500 lg:block">{subtitle}</p> : null}
               <span
                 className="mt-1.5 hidden h-[3px] w-10 rounded-full bg-gold-gradient lg:block"
                 aria-hidden
