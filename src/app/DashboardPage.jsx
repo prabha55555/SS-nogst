@@ -32,18 +32,18 @@ import { InstallButton, OfflineBanner, useInstallPrompt } from './pwa';
 
 const MODULE_CARDS = [
   {
-    to: '/sales/bill',
-    title: 'Sales',
-    text: 'Create invoices, collect payments and keep every customer ledger in order.',
-    icon: Receipt,
-    points: ['Sales bills & printing', 'History & statements', 'Customer details'],
-  },
-  {
     to: '/purchase/bill',
     title: 'Purchase',
     text: 'Record purchases, track supplier balances and acknowledge goods received.',
     icon: ShoppingCart,
     points: ['Purchase bills', 'Supplier ledger', 'Payments & returns'],
+  },
+  {
+    to: '/sales/bill',
+    title: 'Sales',
+    text: 'Create invoices, collect payments and keep every customer ledger in order.',
+    icon: Receipt,
+    points: ['Sales bills & printing', 'History & statements', 'Customer details'],
   },
   {
     to: '/overview/revenue',

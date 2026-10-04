@@ -133,7 +133,7 @@ export function ReturnSheet({
         />
       ))}
       <Button
-        variant="outline"
+        variant="warning"
         icon={Plus}
         fullWidth
         onClick={() => setItems((list) => [...list, makeItem()])}

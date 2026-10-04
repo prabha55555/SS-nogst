@@ -46,6 +46,7 @@ export function Field({ label, error, hint, htmlFor, className, children, labelC
  * Text input. NOTE: `onChange` receives the new **string value**, not the event.
  * Extra props (type, inputMode, placeholder, autoComplete, list, onKeyDown, …) go to the <input>.
  * `leftIcon` = lucide component; `right` = node shown inside the field (e.g. a clear button).
+ * `emptyHint` = text shown over an EMPTY field on touch screens (phones show a blank box for an empty date input).
  */
 export const TextField = forwardRef(function TextField(
   {
@@ -56,6 +57,7 @@ export const TextField = forwardRef(function TextField(
     leftIcon: LeftIcon,
     right,
     alignRight,
+    emptyHint,
     className,
     inputClassName,
     id,
@@ -87,6 +89,14 @@ export const TextField = forwardRef(function TextField(
           onChange={(e) => onChange?.(e.target.value)}
           {...rest}
         />
+        {emptyHint && !rest.value ? (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-3.5 hidden items-center text-slate-400 pointer-coarse:flex"
+          >
+            {emptyHint}
+          </span>
+        ) : null}
         {right ? <div className="absolute top-1/2 right-2 -translate-y-1/2">{right}</div> : null}
       </div>
     </Field>
@@ -120,7 +130,8 @@ export const NumberField = forwardRef(function NumberField({ onChange, allowNega
 
 /** <input type="date"> — value / onChange use 'YYYY-MM-DD' strings. */
 export const DateField = forwardRef(function DateField(props, ref) {
-  return <TextField ref={ref} type="date" {...props} />;
+  const hint = props.label ? 'Select date' : (props['aria-label'] ?? 'Select date');
+  return <TextField ref={ref} type="date" emptyHint={hint} {...props} />;
 });
 
 export const TextArea = forwardRef(function TextArea(

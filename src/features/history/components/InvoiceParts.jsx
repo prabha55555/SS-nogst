@@ -14,9 +14,7 @@
  */
 import {
   Banknote,
-  ChevronDown,
   ChevronRight,
-  ChevronUp,
   Download,
   FileText,
   MessageCircle,
@@ -26,7 +24,7 @@ import {
   SquarePen,
   Trash2,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { formatCurrency } from '@/core/format';
 import { Badge, Button, cn } from '@/ui';
 import { additionalPaymentsLabel, splitPayments } from '../lib/payments';
@@ -254,7 +252,6 @@ export function InvoiceHistoryLinks({ invoice, onViewPayments, onViewReturns }) 
 }
 
 export function InvoiceActionButtons({ invoice, actions, compact = false }) {
-  const [moreOpen, setMoreOpen] = useState(false);
   const no = invoice.invoiceNo;
   const cell = compact ? 'grow basis-[46%]' : 'grow basis-[46%] sm:basis-[30%]';
   const extras = (
@@ -286,20 +283,31 @@ export function InvoiceActionButtons({ invoice, actions, compact = false }) {
       ) : null}
     </>
   );
-  const hasExtras = !!(actions.whatsAppMessage || actions.printInvoice || actions.shareInvoicePdf);
 
   return (
     <div className="mt-3 flex flex-wrap gap-2 border-t border-line pt-3">
+      <Button variant="edit" icon={SquarePen} className={cell} onClick={() => actions.edit(no)}>
+        Edit
+      </Button>
+      <Button variant="outlineDanger" icon={Trash2} className={cell} onClick={() => actions.remove(no)}>
+        Delete
+      </Button>
       {invoice.canAddPayment ? (
         <Button variant="success" icon={Banknote} className={cell} onClick={() => actions.addPayment(no)}>
           Add Payment
         </Button>
       ) : null}
-      <Button variant="edit" icon={SquarePen} className={cell} onClick={() => actions.edit(no)}>
-        Edit
-      </Button>
-      <Button variant="outline" icon={RotateCcw} className={cell} onClick={() => actions.addReturn(no)}>
+      <Button variant="warning" icon={RotateCcw} className={cell} onClick={() => actions.addReturn(no)}>
         Add Return
+      </Button>
+      <Button
+        variant="purple"
+        icon={Share2}
+        className={cell}
+        aria-label="Share Statement"
+        onClick={() => actions.shareStatement(no)}
+      >
+        {compact ? 'Share' : 'Share Statement'}
       </Button>
       <Button
         variant="secondary"
@@ -310,36 +318,6 @@ export function InvoiceActionButtons({ invoice, actions, compact = false }) {
       >
         {compact ? 'Statement' : 'Download Statement'}
       </Button>
-      <Button
-        variant="whatsapp"
-        icon={Share2}
-        className={cell}
-        aria-label="Share Statement"
-        onClick={() => actions.shareStatement(no)}
-      >
-        {compact ? 'Share' : 'Share Statement'}
-      </Button>
-      <Button variant="outlineDanger" icon={Trash2} className={cell} onClick={() => actions.remove(no)}>
-        Delete
-      </Button>
-      {compact && hasExtras ? (
-        <>
-          <button
-            type="button"
-            aria-expanded={moreOpen}
-            onClick={() => setMoreOpen((v) => !v)}
-            className="flex min-h-10 w-full items-center justify-center gap-1 rounded-xl text-sm font-semibold text-gold-700 transition hover:bg-gold-50 focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:outline-none"
-          >
-            {moreOpen ? 'Fewer actions' : 'More actions'}
-            {moreOpen ? (
-              <ChevronUp className="size-4" aria-hidden />
-            ) : (
-              <ChevronDown className="size-4" aria-hidden />
-            )}
-          </button>
-          {moreOpen ? extras : null}
-        </>
-      ) : null}
       {!compact ? extras : null}
     </div>
   );

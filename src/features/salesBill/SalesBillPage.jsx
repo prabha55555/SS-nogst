@@ -64,7 +64,6 @@ export default function SalesBillPage() {
       onSave={bill.save}
       onGenerate={bill.generate}
       onShare={bill.share}
-      onReset={() => bill.reset(true)}
     />
   );
 
@@ -155,7 +154,7 @@ export default function SalesBillPage() {
     >
       <TwoPane main={main} side={side} />
       {isExpanded ? null : (
-        <div className="no-print sticky bottom-[calc(3.7rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-2xl border border-white/70 glass p-2 shadow-pop ring-1 ring-brand-900/5">
+        <div className="no-print sticky bottom-[calc(3.7rem+env(safe-area-inset-bottom))] z-20 mt-4 rounded-2xl border border-line bg-white p-2 shadow-pop ring-1 ring-brand-900/5">
           {actions('bar')}
         </div>
       )}

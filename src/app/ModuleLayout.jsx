@@ -245,7 +245,7 @@ function MobileHeader({ module }) {
 function BottomTabs({ module }) {
   return (
     <nav
-      className="no-print pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-line glass shadow-[0_-10px_30px_-18px_rgb(20_26_48/0.35)] lg:hidden"
+      className="no-print pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-white/10 surface-ink shadow-[0_-10px_30px_-12px_rgb(12_16_34/0.55)] lg:hidden"
       aria-label={`${module.title} navigation`}
     >
       <ul className="mx-auto flex max-w-2xl px-1">
@@ -256,7 +256,7 @@ function BottomTabs({ module }) {
               className={({ isActive }) =>
                 cn(
                   'flex min-h-[3.6rem] flex-col items-center justify-center gap-0.5 px-1 text-[11px] font-semibold transition',
-                  isActive ? 'text-brand-800' : 'text-slate-500',
+                  isActive ? 'text-gold-300' : 'text-brand-300',
                 )
               }
             >
