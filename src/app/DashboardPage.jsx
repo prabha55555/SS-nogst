@@ -1,11 +1,8 @@
 import {
   ArrowUpRight,
-  Boxes,
   CalendarDays,
   Clock,
-  FilePlus2,
   Globe,
-  History,
   LogOut,
   Mail,
   MapPin,
@@ -15,16 +12,12 @@ import {
   Share,
   ShoppingCart,
   Sparkles,
-  TrendingUp,
-  Users,
-  Wallet,
-  Zap,
 } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { COMPANY, PRODUCT, SERVICES } from '@/core/branding';
 import { formatDateShort, todayISO } from '@/core/format';
-import { Button, cn, useFeedback } from '@/ui';
+import { Button, useFeedback } from '@/ui';
 import { useAuth } from './AuthProvider';
 import { BrandLockup } from './Brand';
 import { GoldWaves, Sparkle } from './Decor';
@@ -52,17 +45,6 @@ const MODULE_CARDS = [
     icon: PieChart,
     points: ['Revenue & profit', 'Live stock levels', 'Expense tracking'],
   },
-];
-
-const QUICK_LINKS = [
-  { to: '/sales/bill', label: 'New Sales Bill', icon: FilePlus2 },
-  { to: '/purchase/bill', label: 'New Purchase Bill', icon: ShoppingCart },
-  { to: '/sales/history', label: 'Sales History', icon: History },
-  { to: '/sales/customers', label: 'Customers', icon: Users },
-  { to: '/overview/stocks', label: 'Stocks', icon: Boxes },
-  { to: '/overview/expenses', label: 'Expenses', icon: Wallet },
-  { to: '/overview/revenue', label: 'Revenue', icon: TrendingUp },
-  { to: '/overview/shortcuts', label: 'Shortcuts', icon: Zap },
 ];
 
 function greeting() {
@@ -156,29 +138,6 @@ export default function DashboardPage() {
               </ul>
             </Link>
           ))}
-        </section>
-
-        <section aria-label="Quick access" className="mt-9">
-          <h2 className="mb-3 font-display text-sm font-bold tracking-[0.16em] text-slate-500 uppercase">
-            Quick access
-          </h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {QUICK_LINKS.map(({ to, label, icon: Icon }) => (
-              <Link
-                key={label}
-                to={to}
-                className={cn(
-                  'group flex items-center gap-3 rounded-2xl border border-line bg-white p-3.5 shadow-sm transition',
-                  'hover:border-gold-300 hover:bg-gold-50/60 hover:shadow-card focus-visible:ring-4 focus-visible:ring-gold-200 focus-visible:outline-none',
-                )}
-              >
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gold-100 text-gold-700 ring-1 ring-gold-200 transition group-hover:bg-gold-sheen group-hover:text-brand-900">
-                  <Icon className="size-[18px]" aria-hidden />
-                </span>
-                <span className="text-sm font-semibold text-slate-700">{label}</span>
-              </Link>
-            ))}
-          </div>
         </section>
 
         {showIosHint ? (
