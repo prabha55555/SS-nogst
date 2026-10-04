@@ -61,13 +61,13 @@ export const StatsGrid = memo(function StatsGrid({ stats }) {
               >
                 <Icon className="size-[18px]" aria-hidden />
               </span>
-              <span className="min-w-0 truncate text-xs font-semibold tracking-wide text-slate-500">
+              <span className="min-w-0 text-xs leading-snug font-semibold tracking-wide text-slate-500">
                 {t.label}
               </span>
             </div>
             <div
               className={cn(
-                'mt-2.5 truncate font-display text-xl leading-tight font-extrabold tabular-nums sm:text-[22px]',
+                'mt-2.5 font-display text-lg leading-tight font-extrabold [overflow-wrap:anywhere] tabular-nums sm:text-[22px]',
                 VALUE[t.tone],
               )}
             >

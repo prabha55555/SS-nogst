@@ -3,7 +3,7 @@
  * Per-supplier totals built from the purchase bills: stats grid, search, table (desktop) / cards (phones, tablets),
  * revealable phone numbers and CSV export. `?phone=` opens the page already searching for that supplier.
  */
-import { Download, FileText, RefreshCw, Truck } from 'lucide-react';
+import { Download, FileText, Truck } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { db } from '@/core/db';
 import { useFocusLoad } from '@/hooks/useFocusLoad';
@@ -15,9 +15,12 @@ import {
   ErrorState,
   LoadingState,
   Page,
+  Pagination,
+  RefreshButton,
   SearchBar,
   SectionHeader,
   useFeedback,
+  usePagination,
 } from '@/ui';
 import { SupplierList } from '../components/SupplierList';
 import { SupplierStatsGrid } from '../components/SupplierStatsGrid';
@@ -38,6 +41,7 @@ export default function SupplierDetailsPage() {
   const suppliers = useMemo(() => aggregateSuppliers(bills), [bills]);
   const stats = useMemo(() => supplierStats(suppliers), [suppliers]);
   const visible = useMemo(() => filterSuppliers(suppliers, query), [suppliers, query]);
+  const pager = usePagination(visible, { resetKey: query });
 
   const onExport = async () => {
     if (suppliers.length === 0) {
@@ -88,21 +92,20 @@ export default function SupplierDetailsPage() {
           icon={FileText}
           className="mb-0"
           right={
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge tone="brand" className="mr-1 tabular-nums">
                 {visible.length}
               </Badge>
               <Button variant="secondary" icon={Download} loading={exporting} onClick={onExport}>
                 Export
               </Button>
-              <Button variant="outline" icon={RefreshCw} loading={refreshing} onClick={refresh}>
-                Refresh
-              </Button>
+              <RefreshButton loading={refreshing} onClick={refresh} />
             </div>
           }
         />
+        <div ref={pager.anchorRef} className="scroll-mt-32" />
         <SupplierList
-          suppliers={visible}
+          suppliers={pager.rows}
           empty={
             <EmptyState
               icon={Truck}
@@ -115,6 +118,7 @@ export default function SupplierDetailsPage() {
             />
           }
         />
+        <Pagination pager={pager} noun="suppliers" />
       </div>
     </Page>
   );

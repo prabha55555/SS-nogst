@@ -184,7 +184,7 @@ export default function ShortcutsPage() {
           )}
           empty={empty}
         />
-        <ShowMore remaining={paged.remaining} onClick={paged.showMore} />
+        <ShowMore pager={paged.pager} noun="shortcuts" />
       </>
     );
 

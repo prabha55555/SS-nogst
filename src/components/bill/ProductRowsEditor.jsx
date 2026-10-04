@@ -11,7 +11,7 @@
  *  - addLabel?: string                                               default "Add Product"
  * Removing the last row leaves one blank row. `EMPTY_ROW`, `matchShortcuts`, `isKnownProduct` are re-exported.
  */
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { rowAmount } from '@/core/billing';
 import { formatCurrency } from '@/core/format';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
@@ -78,7 +78,7 @@ export function ProductRowsEditor({ rows, onChange, shortcuts, readOnly, addLabe
               </div>
               <div className="mt-3 flex items-baseline justify-between gap-3 rounded-xl bg-gold-50/70 px-3 py-2 ring-1 ring-gold-200/70">
                 <span className="text-xs font-semibold tracking-wider text-slate-500 uppercase">Amount</span>
-                <span className="truncate font-display text-lg font-extrabold text-brand-800 tabular-nums">
+                <span className="text-right font-display text-lg font-extrabold [overflow-wrap:anywhere] text-brand-800 tabular-nums">
                   {rupees(rowAmount(row.qty, row.rate))}
                 </span>
               </div>
@@ -165,13 +165,7 @@ export function ProductRowsEditor({ rows, onChange, shortcuts, readOnly, addLabe
         </div>
       )}
       {!readOnly ? (
-        <Button
-          variant="outline"
-          icon={PlusCircle}
-          onClick={add}
-          fullWidth
-          className="mt-3 min-h-12 border-dashed border-gold-400 bg-gold-50/40 text-gold-800 hover:bg-gold-50"
-        >
+        <Button variant="primary" icon={Plus} onClick={add} fullWidth className="mt-3 min-h-12">
           {addLabel}
         </Button>
       ) : null}

@@ -141,7 +141,7 @@ export default function StocksPage() {
           empty={empty}
           dense
         />
-        <ShowMore remaining={paged.remaining} onClick={paged.showMore} />
+        <ShowMore pager={paged.pager} noun="products" />
       </>
     );
   }

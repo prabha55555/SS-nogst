@@ -5,11 +5,11 @@
  * Phones: stacked cards (product rows become cards) with a sticky action bar above the tab bar.
  * Logic lives in useSalesBill (session, lookup, save / generate / share / reset).
  */
-import { Box, Receipt, ReceiptText, RefreshCw, User, Zap } from 'lucide-react';
+import { Box, Receipt, ReceiptText, User, Zap } from 'lucide-react';
 import { useEffect } from 'react';
 import { InvoiceHeaderFields, ProductRowsEditor } from '@/components/bill';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { Card, ErrorState, IconButton, LoadingState, Page, SectionHeader, TwoPane } from '@/ui';
+import { Card, ErrorState, LoadingState, Page, RefreshButton, SectionHeader, TwoPane } from '@/ui';
 import { BillActionBar } from './BillActionBar';
 import { EditBanner, SaveBadge } from './BillStatusBar';
 import { CalculationSection } from './CalculationSection';
@@ -145,11 +145,11 @@ export default function SalesBillPage() {
       icon={ReceiptText}
       max="7xl"
       actions={
-        <IconButton
-          icon={RefreshCw}
-          label="Refresh customers and invoice numbers"
+        <RefreshButton
           onClick={bill.refresh}
-          disabled={bill.refreshing}
+          loading={bill.refreshing}
+          aria-label="Refresh customers and invoice numbers"
+          title="Refresh customers and invoice numbers"
         />
       }
     >

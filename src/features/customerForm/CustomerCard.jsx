@@ -29,7 +29,7 @@ export const CustomerCard = memo(function CustomerCard({ customer, onEdit, onDel
       </div>
       <div className="mt-3 flex gap-2.5" onClick={(e) => e.stopPropagation()}>
         <Button
-          variant="outline"
+          variant="edit"
           icon={Pencil}
           onClick={() => onEdit(customer)}
           aria-label={`Edit ${customer.name}`}

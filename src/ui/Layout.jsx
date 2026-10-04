@@ -22,7 +22,7 @@ export function Page({ title, subtitle, icon: Icon, actions, max = '6xl', classN
       )}
     >
       {title ? (
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 sm:mb-6">
+        <div className="top-app-header sticky z-20 -mx-3.5 mb-4 flex items-center justify-between gap-2 border-b border-line bg-canvas/95 px-3.5 py-2.5 backdrop-blur-md sm:-mx-6 sm:mb-6 sm:px-6 lg:static lg:mx-0 lg:flex-wrap lg:gap-3 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
           <div className="flex min-w-0 items-center gap-3.5">
             {Icon ? (
               <span className="hidden size-12 shrink-0 items-center justify-center rounded-2xl bg-gold-sheen text-brand-900 shadow-gold sm:flex">
@@ -30,14 +30,17 @@ export function Page({ title, subtitle, icon: Icon, actions, max = '6xl', classN
               </span>
             ) : null}
             <div className="min-w-0">
-              <h1 className="truncate font-display text-[22px] leading-tight font-extrabold text-brand-800 sm:text-[26px]">
+              <h1 className="truncate font-display text-xl leading-tight font-extrabold text-brand-800 sm:text-[26px]">
                 {title}
               </h1>
-              {subtitle ? <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p> : null}
-              <span className="mt-1.5 block h-[3px] w-10 rounded-full bg-gold-gradient" aria-hidden />
+              {subtitle ? <p className="mt-0.5 hidden text-sm text-slate-500 lg:block">{subtitle}</p> : null}
+              <span
+                className="mt-1.5 hidden h-[3px] w-10 rounded-full bg-gold-gradient lg:block"
+                aria-hidden
+              />
             </div>
           </div>
-          {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
+          {actions ? <div className="flex shrink-0 items-center gap-2 lg:flex-wrap">{actions}</div> : null}
         </div>
       ) : null}
       {children}

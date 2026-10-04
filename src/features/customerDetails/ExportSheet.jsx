@@ -16,7 +16,9 @@ const ALL_COLUMNS = EXPORT_COLUMN_OPTIONS.map((o) => o.value);
 function SummaryItem({ value, label }) {
   return (
     <div className="min-w-0 flex-1 rounded-xl bg-gold-50/60 p-3 text-center ring-1 ring-gold-200 ring-inset">
-      <div className="truncate font-display text-sm font-extrabold text-brand-800 tabular-nums">{value}</div>
+      <div className="font-display text-sm font-extrabold [overflow-wrap:anywhere] text-brand-800 tabular-nums">
+        {value}
+      </div>
       <div className="mt-0.5 text-xs font-medium text-slate-500">{label}</div>
     </div>
   );

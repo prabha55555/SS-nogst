@@ -216,7 +216,7 @@ function MobileHeader({ module }) {
   const navigate = useNavigate();
   const onLogout = useLogout();
   return (
-    <header className="no-print pt-safe sticky top-0 z-30 flex items-center gap-2.5 surface-ink px-3 py-2.5 text-white lg:hidden">
+    <header className="no-print pt-safe h-app-header fixed inset-x-0 top-0 z-40 flex items-center gap-2.5 surface-ink px-3 text-white shadow-lift lg:hidden">
       <button
         type="button"
         onClick={() => navigate('/')}
@@ -288,10 +288,12 @@ export function ModuleLayout({ module: key }) {
     <div className="flex min-h-dvh">
       <Sidebar module={module} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <OfflineBanner />
+        {/* the phone header is fixed: this spacer keeps the content below it */}
+        <div className="h-app-header lg:hidden" aria-hidden />
         <MobileHeader module={module} />
+        <OfflineBanner />
         <TopBar module={module} />
-        <main className="flex-1 pb-28 lg:pb-10">
+        <main className="flex-1 pb-40 lg:pb-10">
           <Outlet />
         </main>
         <BottomTabs module={module} />

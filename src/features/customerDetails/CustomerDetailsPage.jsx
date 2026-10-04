@@ -3,10 +3,20 @@
  * Search toolbar, stat tiles, customer list (table on desktop, cards on phones / tablets), export and WhatsApp
  * reminder dialogs. Customers are derived from the sales invoices (see aggregate.js).
  */
-import { Download, ListChecks, RefreshCw, Users } from 'lucide-react';
+import { Download, ListChecks, Users } from 'lucide-react';
 
 import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { Badge, Button, EmptyState, ErrorState, LoadingState, Page } from '@/ui';
+import {
+  Badge,
+  Button,
+  EmptyState,
+  ErrorState,
+  LoadingState,
+  Page,
+  Pagination,
+  RefreshButton,
+  usePagination,
+} from '@/ui';
 import { CustomerCard } from './CustomerCard';
 import { CustomerTable } from './CustomerTable';
 import { ExportSheet } from './ExportSheet';
@@ -19,15 +29,15 @@ export default function CustomerDetailsPage() {
   const model = useCustomerDetails();
   const { isExpanded, isMedium } = useBreakpoint();
   const { visible, stats, refreshing, refresh, setTerm, setReminderFor, openExport } = model;
+  // a new search / refreshed data starts again from page 1
+  const pager = usePagination(visible, { resetKey: visible });
 
   const actions = (
     <>
       <Button variant="secondary" icon={Download} onClick={openExport}>
         Export
       </Button>
-      <Button variant="outline" icon={RefreshCw} loading={refreshing} onClick={() => void refresh()}>
-        Refresh
-      </Button>
+      <RefreshButton loading={refreshing} onClick={() => void refresh()} />
     </>
   );
   const head = {
@@ -53,7 +63,7 @@ export default function CustomerDetailsPage() {
 
   let list;
   if (isExpanded) {
-    list = <CustomerTable rows={visible} onRemind={setReminderFor} />;
+    list = <CustomerTable rows={pager.rows} onRemind={setReminderFor} />;
   } else if (visible.length === 0) {
     list = (
       <div className="rounded-2xl border border-line bg-white shadow-card">
@@ -67,7 +77,7 @@ export default function CustomerDetailsPage() {
   } else {
     list = (
       <ul className={isMedium ? 'grid grid-cols-2 gap-3.5' : 'space-y-3'}>
-        {visible.map((c, i) => (
+        {pager.rows.map((c, i) => (
           <li key={c.name} className="animate-rise" style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}>
             <CustomerCard customer={c} onRemind={setReminderFor} />
           </li>
@@ -91,7 +101,9 @@ export default function CustomerDetailsPage() {
           {visible.length}
         </Badge>
       </div>
+      <div ref={pager.anchorRef} className="scroll-mt-32" />
       {list}
+      <Pagination pager={pager} noun="customers" />
 
       <ReminderSheet customer={model.reminderFor} onClose={() => setReminderFor(null)} />
       <ExportSheet

@@ -80,8 +80,7 @@ export function BinItemCard({ item, now, onView, onRestore, onDelete }) {
         {item.invoiceDate ? (
           <MetaLine icon={FileText} text={`Invoice date ${formatDateIN(item.invoiceDate)}`} />
         ) : null}
-        <MetaLine icon={User} text={partyName(item) || '-'} />
-        <MetaLine icon={Banknote} text={`₹${formatCurrency(item.grandTotal)}`} />
+        {partyName(item) ? <MetaLine icon={User} text={partyName(item)} /> : null}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
         <Button variant="outline" icon={Eye} onClick={onView} aria-label={`View ${name}`}>

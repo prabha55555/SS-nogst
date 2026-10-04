@@ -295,7 +295,7 @@ export function InvoiceActionButtons({ invoice, actions, compact = false }) {
           Add Payment
         </Button>
       ) : null}
-      <Button variant="outline" icon={SquarePen} className={cell} onClick={() => actions.edit(no)}>
+      <Button variant="edit" icon={SquarePen} className={cell} onClick={() => actions.edit(no)}>
         Edit
       </Button>
       <Button variant="outline" icon={RotateCcw} className={cell} onClick={() => actions.addReturn(no)}>

@@ -63,7 +63,8 @@
   --animate-sheet-in: sheet-in 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-fade-in: fade-in 0.18s ease-out;
   --animate-shake: shake 0.4s ease-in-out;
-  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  /* `backwards` (not `both`): a lingering transform would turn every position:fixed child (floating Add buttons) into a page-relative one */
+  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
   --animate-float: float 7s ease-in-out infinite;
 
   @keyframes toast-in {
@@ -211,6 +212,13 @@
   }
   .pt-safe {
     padding-top: env(safe-area-inset-top);
+  }
+  /* Height of the fixed mobile header (3.5rem + notch). Spacers and sticky offsets use the same value. */
+  .h-app-header {
+    height: calc(3.5rem + env(safe-area-inset-top));
+  }
+  .top-app-header {
+    top: calc(3.5rem + env(safe-area-inset-top));
   }
   .scrollbar-thin {
     scrollbar-width: thin;

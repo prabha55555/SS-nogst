@@ -15,5 +15,7 @@ export {
 } from './fields';
 export { ChoiceChips, Grid, Page, TwoPane } from './Layout';
 export { Modal, Sheet } from './Modal';
+export { DEFAULT_PAGE_SIZE, Pagination, usePagination } from './Pagination';
+export { RefreshButton } from './RefreshButton';
 export { SearchBar } from './SearchBar';
 export { EmptyState, ErrorState, LoadingState, Skeleton, Spinner } from './States';

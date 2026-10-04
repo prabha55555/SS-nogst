@@ -4,9 +4,9 @@
  * with view / edit / delete (→ Recycle Bin), payments, returns and statement PDFs / WhatsApp. ?search=<text> pre-fills
  * the search box. The shared UI lives in ../components, the rules in the purchase*.js services.
  */
-import { History, RefreshCw } from 'lucide-react';
+import { History } from 'lucide-react';
 import { useMemo } from 'react';
-import { Button, Page } from '@/ui';
+import { Page, RefreshButton } from '@/ui';
 import {
   AddPaymentSheet,
   DeleteInvoiceSheet,
@@ -52,11 +52,7 @@ export default function PurchaseHistoryPage() {
     <Page
       title="Purchase History"
       icon={History}
-      actions={
-        <Button variant="outline" icon={RefreshCw} loading={h.refreshing} onClick={() => void h.refresh()}>
-          Refresh
-        </Button>
-      }
+      actions={<RefreshButton loading={h.refreshing} onClick={() => void h.refresh()} />}
     >
       <div className="space-y-5">
         {h.error ? null : (

@@ -3,9 +3,21 @@
  * Desktop: directory table with the add / edit form card beside it. Phones & tablets: customer cards, a floating
  * "Add" button and the form in a bottom sheet. `?phone=` (sent by the Sales Bill) pre-fills the add form.
  */
-import { RefreshCw, Search, UserPlus, Users } from 'lucide-react';
+import { Search, UserPlus, Users } from 'lucide-react';
 
-import { Badge, Button, EmptyState, ErrorState, LoadingState, Page, SearchBar, TwoPane } from '@/ui';
+import {
+  Badge,
+  Button,
+  EmptyState,
+  ErrorState,
+  LoadingState,
+  Page,
+  Pagination,
+  RefreshButton,
+  SearchBar,
+  TwoPane,
+  usePagination,
+} from '@/ui';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { CustomerFormCard } from './CustomerFormCard';
 import { CustomerFormSheet } from './CustomerFormSheet';
@@ -16,17 +28,9 @@ export default function AddCustomerPage() {
   const manager = useCustomerManager();
   const { isExpanded } = useBreakpoint();
   const { customers, visible, query } = manager;
+  const pager = usePagination(visible, { resetKey: query });
 
-  const refreshButton = (
-    <Button
-      variant="outline"
-      icon={RefreshCw}
-      onClick={() => void manager.refresh()}
-      loading={manager.refreshing}
-    >
-      <span className="hidden sm:inline">Refresh</span>
-    </Button>
-  );
+  const refreshButton = <RefreshButton onClick={() => void manager.refresh()} loading={manager.refreshing} />;
   const pageProps = { title: 'Manage Customers', subtitle: 'Add, edit, or delete customers', icon: Users };
 
   if (manager.loading) {
@@ -68,12 +72,14 @@ export default function AddCustomerPage() {
           main={
             <>
               {toolbar}
+              <div ref={pager.anchorRef} className="scroll-mt-32" />
               <CustomerTable
-                customers={visible}
+                customers={pager.rows}
                 emptyText={customers.length === 0 ? 'No customers found.' : 'No matching customers.'}
                 onEdit={manager.openEdit}
                 onDelete={manager.remove}
               />
+              <Pagination pager={pager} noun="customers" />
             </>
           }
           side={
@@ -114,19 +120,25 @@ export default function AddCustomerPage() {
           />
         </div>
       ) : (
-        <CustomerTable
-          customers={visible}
-          emptyText="No matching customers."
-          onEdit={manager.openEdit}
-          onDelete={manager.remove}
-        />
+        <>
+          <div ref={pager.anchorRef} className="scroll-mt-32" />
+          <CustomerTable
+            customers={pager.rows}
+            emptyText="No matching customers."
+            onEdit={manager.openEdit}
+            onDelete={manager.remove}
+          />
+          <Pagination pager={pager} noun="customers" />
+        </>
       )}
 
+      {/* floating Add button: fixed bottom-right above the tab bar (Page leaves room below the list) */}
       <button
         type="button"
         onClick={() => manager.openAdd()}
-        aria-label="Add New Customer"
-        className="fixed right-4 bottom-24 z-30 flex size-14 items-center justify-center rounded-full bg-gold-sheen text-brand-900 shadow-gold ring-4 ring-white/80 transition hover:brightness-105 focus-visible:ring-gold-300 focus-visible:outline-none active:scale-95 sm:right-6"
+        aria-label="Add Customer"
+        title="Add Customer"
+        className="no-print fixed right-4 bottom-[calc(4.6rem+env(safe-area-inset-bottom))] z-30 flex size-14 items-center justify-center rounded-full bg-gold-sheen text-brand-900 shadow-gold ring-4 ring-white/80 transition hover:brightness-105 focus-visible:ring-gold-300 focus-visible:outline-none active:scale-95 sm:right-6"
       >
         <UserPlus className="size-6" aria-hidden />
       </button>

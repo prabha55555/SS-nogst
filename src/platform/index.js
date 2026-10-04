@@ -5,6 +5,7 @@
 export { copyText } from './clipboard';
 export { downloadFile } from './files';
 export { openExternal } from './links';
+export { sharePdfHtml } from './pdf';
 export { printHtml } from './print';
 export { shareFile, shareText } from './share';
 export { storage } from './storage';

@@ -2,7 +2,7 @@
  * Shared recycle-bin screen: list deleted bills, view, restore, delete permanently, empty the bin.
  * Configured per bin through `BIN_CONFIG[kind]` (sales = invoices, purchase = purchase bills).
  */
-import { Clock, Database, FileText, RefreshCw, Search, Trash2 } from 'lucide-react';
+import { Clock, Database, FileText, Search, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { formatCurrency, formatDateIN } from '@/core/format';
@@ -15,9 +15,12 @@ import {
   EmptyState,
   ErrorState,
   Page,
+  Pagination,
+  RefreshButton,
   SearchBar,
   Skeleton,
   useFeedback,
+  usePagination,
 } from '@/ui';
 import { BinDetailSheet } from './BinDetailSheet';
 import { BinItemCard, BinRowActions, BinTypeBadge, deletedAtText } from './BinItemCard';
@@ -32,7 +35,7 @@ import {
 import { emptyBin, loadBinItems, permanentlyDeleteBinItem, restoreBinItem } from './binService';
 
 const LOAD_ERROR = 'Failed to load recycle bin items. Please try again.';
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 10;
 
 function StatTile({ icon: Icon, value, label }) {
   return (
@@ -41,10 +44,10 @@ function StatTile({ icon: Icon, value, label }) {
       <span className="flex size-9 items-center justify-center rounded-xl bg-gold-100 text-gold-700 ring-1 ring-gold-200">
         <Icon className="size-[18px]" aria-hidden />
       </span>
-      <div className="mt-0.5 max-w-full truncate font-display text-lg font-extrabold text-brand-800 tabular-nums">
+      <div className="mt-0.5 max-w-full text-center font-display text-base font-extrabold [overflow-wrap:anywhere] text-brand-800 tabular-nums sm:text-lg">
         {value}
       </div>
-      <div className="max-w-full truncate text-xs font-medium text-slate-500">{label}</div>
+      <div className="max-w-full text-center text-xs leading-snug font-medium text-slate-500">{label}</div>
     </div>
   );
 }
@@ -58,7 +61,6 @@ export default function RecycleBinScreen({ kind, title }) {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [viewItem, setViewItem] = useState(null);
-  const [limit, setLimit] = useState(PAGE_SIZE);
 
   const { loading, refreshing, error, refresh, reload } = useFocusLoad(async () => {
     try {
@@ -76,17 +78,8 @@ export default function RecycleBinScreen({ kind, title }) {
     () => filterBinItems(items, typeFilter, search, now),
     [items, typeFilter, search, now],
   );
-  const shown = visible.slice(0, limit);
-  const remaining = visible.length - shown.length;
-
-  const changeSearch = (v) => {
-    setSearch(v);
-    setLimit(PAGE_SIZE);
-  };
-  const changeFilter = (v) => {
-    setTypeFilter(v);
-    setLimit(PAGE_SIZE);
-  };
+  const pager = usePagination(visible, { pageSize: PAGE_SIZE, resetKey: `${typeFilter}|${search}` });
+  const shown = pager.rows;
 
   const onRestore = async (item) => {
     const ok = await confirm({
@@ -229,13 +222,7 @@ export default function RecycleBinScreen({ kind, title }) {
             ))}
           </ul>
         )}
-        {remaining > 0 ? (
-          <div className="mt-4 text-center">
-            <Button variant="outline" onClick={() => setLimit((l) => l + PAGE_SIZE)}>
-              Show more ({remaining} more)
-            </Button>
-          </div>
-        ) : null}
+        <Pagination pager={pager} noun="deleted items" />
       </>
     );
   }
@@ -252,13 +239,12 @@ export default function RecycleBinScreen({ kind, title }) {
             icon={Trash2}
             onClick={onEmptyBin}
             disabled={items.length === 0}
-            className="max-sm:flex-1"
+            aria-label={config.emptyButton}
+            title={config.emptyButton}
           >
-            {config.emptyButton}
+            <span className="max-sm:sr-only">{config.emptyButton}</span>
           </Button>
-          <Button variant="outline" icon={RefreshCw} loading={refreshing} onClick={() => void refresh()}>
-            Refresh
-          </Button>
+          <RefreshButton loading={refreshing} onClick={() => void refresh()} />
         </>
       }
     >
@@ -275,14 +261,14 @@ export default function RecycleBinScreen({ kind, title }) {
       <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-line bg-white p-3 shadow-card lg:flex-row lg:items-center">
         <SearchBar
           value={search}
-          onChange={changeSearch}
+          onChange={setSearch}
           placeholder="Search deleted items..."
           aria-label="Search deleted items"
           className="lg:flex-1"
         />
         <ChoiceChips
           value={typeFilter}
-          onChange={changeFilter}
+          onChange={setTypeFilter}
           options={[
             { value: 'all', label: 'All Items' },
             { value: config.itemType, label: config.typeFilterLabel },
@@ -290,6 +276,7 @@ export default function RecycleBinScreen({ kind, title }) {
         />
       </div>
 
+      <div ref={pager.anchorRef} className="scroll-mt-32" />
       {body}
       <BinDetailSheet item={viewItem} config={config} onClose={() => setViewItem(null)} />
     </Page>

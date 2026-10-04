@@ -50,7 +50,7 @@ export function BillTotalsPanel({ title, form, totals, onChange, balanceLabel, n
           <div className="text-[11px] font-semibold tracking-[0.14em] text-gold-300 uppercase">
             Total Amount Due
           </div>
-          <div className="mt-1 truncate text-gold-gradient font-display text-3xl leading-tight font-extrabold tabular-nums sm:text-[34px]">
+          <div className="mt-1 text-gold-gradient font-display text-3xl leading-tight font-extrabold [overflow-wrap:anywhere] tabular-nums sm:text-[34px]">
             {rupees(totals.grandTotal)}
           </div>
         </div>
@@ -97,7 +97,7 @@ export function BillTotalsPanel({ title, form, totals, onChange, balanceLabel, n
           </div>
           <div
             className={cn(
-              'truncate font-display text-2xl font-extrabold tabular-nums',
+              'text-right font-display text-xl font-extrabold [overflow-wrap:anywhere] tabular-nums sm:text-2xl',
               due ? 'text-red-600' : 'text-emerald-600',
             )}
           >

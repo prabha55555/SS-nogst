@@ -1,13 +1,6 @@
-import { RefreshCw } from 'lucide-react';
+import { RefreshButton as UiRefreshButton } from '@/ui';
 
-import { Button } from '@/ui';
-
-/** Page-header refresh action (drops the in-memory cache, see useFocusLoad().refresh). */
+/** Page-header refresh action (drops the in-memory cache, see useFocusLoad().refresh) — the shared app-wide Refresh button. */
 export default function RefreshButton({ onClick, refreshing }) {
-  return (
-    <Button variant="outline" onClick={onClick} disabled={refreshing} aria-label="Refresh" title="Refresh">
-      <RefreshCw className={refreshing ? 'size-4 animate-spin text-gold-600' : 'size-4'} aria-hidden />
-      <span className="hidden sm:inline">Refresh</span>
-    </Button>
-  );
+  return <UiRefreshButton onClick={onClick} loading={refreshing} />;
 }

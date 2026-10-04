@@ -1,8 +1,7 @@
 /**
  * HistoryDateGroupList – the date-grouped invoice list: one heading per day (with the day's invoice count)
  * followed by that day's invoices (table on desktop, cards on phone/tablet – see HistoryInvoiceGroupBody).
- * Days are rendered progressively (first `pageDays`, then more as the user scrolls / presses "Show more days")
- * so thousands of invoices stay light.
+ * Days are paged (`pageDays` days per page, <Pagination> underneath) so thousands of invoices stay light.
  *
  * Props:
  *   groups       DateGroup[]  (from lib/grouping: { key, date, invoices, totalInvoices })
@@ -12,13 +11,12 @@
  *   error        string|null  -> error state with retry
  *   onRetry()    retry after an error
  *   onFilterDate(day)  click on a day heading: show only that day (headings of undated groups are inert)
- *   pageDays     number of days rendered per step (default 8)
+ *   pageDays     number of days per page (default 5)
  *   emptyTitle   text of the empty state (default "No invoices found.")
  */
 import { Calendar, FileSearch } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
 import { formatCurrency } from '@/core/format';
-import { Button, EmptyState, ErrorState } from '@/ui';
+import { EmptyState, ErrorState, Pagination, usePagination } from '@/ui';
 import { HistoryInvoiceGroupBody } from './HistoryInvoiceTable';
 import { InvoiceListSkeleton } from './Skeleton';
 
@@ -26,7 +24,7 @@ function DateHeading({ group, onClick }) {
   const count = `${group.totalInvoices} Invoice${group.totalInvoices > 1 ? 's' : ''}`;
   const dayTotal = group.invoices.reduce((sum, invoice) => sum + (Number(invoice.grandTotal) || 0), 0);
   return (
-    <div className="sticky top-14 z-10 -mx-1 bg-canvas/85 px-1 py-2 backdrop-blur-md">
+    <div className="sticky top-[calc(6.5rem+env(safe-area-inset-top))] z-10 -mx-1 bg-canvas/85 px-1 py-2 backdrop-blur-md lg:top-14">
       <button
         type="button"
         onClick={onClick}
@@ -69,26 +67,14 @@ export function HistoryDateGroupList({
   error,
   onRetry,
   onFilterDate,
-  pageDays = 8,
+  pageDays = 5,
   emptyTitle = 'No invoices found.',
 }) {
-  const [shownDays, setShownDays] = useState(pageDays);
-  const sentinel = useRef(null);
-  const more = groups.length > shownDays;
-
-  // infinite scroll: reveal the next days when the sentinel nears the viewport
-  useEffect(() => {
-    const node = sentinel.current;
-    if (!more || !node || typeof IntersectionObserver === 'undefined') return undefined;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) setShownDays((n) => n + pageDays);
-      },
-      { rootMargin: '400px' },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [more, pageDays, shownDays]);
+  // a new search / filter (different first day or day count) starts again from page 1
+  const pager = usePagination(groups, {
+    pageSize: pageDays,
+    resetKey: `${groups.length}|${groups[0]?.key ?? ''}`,
+  });
 
   if (loading) return <InvoiceListSkeleton />;
   if (error) {
@@ -113,7 +99,8 @@ export function HistoryDateGroupList({
 
   return (
     <div className="space-y-2">
-      {groups.slice(0, shownDays).map((group, index) => (
+      <div ref={pager.anchorRef} className="scroll-mt-40" />
+      {pager.rows.map((group, index) => (
         <section
           key={group.key || 'no-date'}
           aria-label={group.date}
@@ -126,13 +113,7 @@ export function HistoryDateGroupList({
           </div>
         </section>
       ))}
-      {more ? (
-        <div ref={sentinel} className="flex justify-center py-2">
-          <Button variant="outline" onClick={() => setShownDays((n) => n + pageDays)}>
-            Show more days ({groups.length - shownDays} left)
-          </Button>
-        </div>
-      ) : null}
+      <Pagination pager={pager} noun="days" />
     </div>
   );
 }

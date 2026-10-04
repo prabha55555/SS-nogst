@@ -61,13 +61,7 @@ export function StockActions({ row, onViewHistory, onEditOpening, onDeleteOpenin
       </Button>
       {hasOpening ? (
         <>
-          <Button
-            variant="outline"
-            size="sm"
-            icon={Pencil}
-            onClick={onEditOpening}
-            className="max-sm:min-h-11"
-          >
+          <Button variant="edit" size="sm" icon={Pencil} onClick={onEditOpening} className="max-sm:min-h-11">
             Edit Old Stock
           </Button>
           {compact ? (

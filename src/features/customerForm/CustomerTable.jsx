@@ -41,17 +41,12 @@ export function CustomerTable({ customers, emptyText, onEdit, onDelete }) {
         align: 'center',
         render: (c) => (
           <div className="flex items-center justify-center gap-1" onClick={(e) => e.stopPropagation()}>
-            <IconButton
-              icon={Pencil}
-              label={`Edit ${c.name}`}
-              className="hover:bg-gold-100 hover:text-gold-800"
-              onClick={() => onEdit(c)}
-            />
+            <IconButton icon={Pencil} label={`Edit ${c.name}`} variant="edit" onClick={() => onEdit(c)} />
             {c.phone ? (
               <IconButton
                 icon={Trash2}
                 label={`Delete ${c.name}`}
-                className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                variant="outlineDanger"
                 onClick={() => onDelete(c)}
               />
             ) : null}

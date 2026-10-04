@@ -14,22 +14,23 @@
  *  - onSave() · onShare()
  *  - onRefresh?() · refreshing?: boolean     adds a refresh button to the page header
  */
-import { MessageCircle, Receipt, RefreshCw, Save, Zap } from 'lucide-react';
+import { Receipt, Save, Share2, Zap } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { Button, Card, IconButton, Page, SectionHeader, TwoPane } from '@/ui';
+import { Button, Card, Page, RefreshButton, SectionHeader, TwoPane } from '@/ui';
 import { cn } from '@/ui/cn';
 
-const barBtn = 'min-h-14! flex-col! gap-0.5! px-1! text-xs!';
+// Save = green (confirm), Acknowledge = purple (share) so the two never look alike.
+const barBtn = 'min-h-14! flex-col! gap-0.5! rounded-xl! px-1! text-xs!';
 
 function ActionButtons({ layout, saveLabel, saving, onSave, onShare }) {
   if (layout === 'panel') {
     return (
       <div className="space-y-2.5">
-        <Button fullWidth size="lg" icon={Save} loading={saving} onClick={onSave}>
+        <Button fullWidth size="lg" variant="success" icon={Save} loading={saving} onClick={onSave}>
           {saveLabel}
         </Button>
-        <Button fullWidth size="lg" variant="whatsapp" icon={MessageCircle} onClick={onShare}>
+        <Button fullWidth size="lg" variant="purple" icon={Share2} onClick={onShare}>
           Share Acknowledgement
         </Button>
         <p className="pt-0.5 text-center text-xs text-slate-400">
@@ -50,6 +51,7 @@ function ActionButtons({ layout, saveLabel, saving, onSave, onShare }) {
     <div className="flex gap-2">
       <Button
         className={cn(barBtn, 'flex-1')}
+        variant="success"
         icon={Save}
         loading={saving}
         aria-label={saveLabel}
@@ -59,12 +61,12 @@ function ActionButtons({ layout, saveLabel, saving, onSave, onShare }) {
       </Button>
       <Button
         className={cn(barBtn, 'flex-[1.4]')}
-        variant="whatsapp"
-        icon={MessageCircle}
+        variant="purple"
+        icon={Share2}
         aria-label="Share Acknowledgement"
         onClick={onShare}
       >
-        Share Acknowledgement
+        Acknowledge
       </Button>
     </div>
   );
@@ -108,11 +110,11 @@ export function PurchaseBillLayout({
       max="7xl"
       actions={
         onRefresh ? (
-          <IconButton
-            icon={RefreshCw}
-            label="Refresh suppliers and invoice numbers"
+          <RefreshButton
             onClick={onRefresh}
-            disabled={refreshing}
+            loading={refreshing}
+            aria-label="Refresh suppliers and invoice numbers"
+            title="Refresh suppliers and invoice numbers"
           />
         ) : null
       }

@@ -8,9 +8,9 @@
  * All business rules live in useSalesHistory / useSalesStatement; the UI parts are in ../components (shared with
  * Purchase History).
  */
-import { History, RefreshCw } from 'lucide-react';
+import { History } from 'lucide-react';
 import { useMemo } from 'react';
-import { Button, Page } from '@/ui';
+import { Page, RefreshButton } from '@/ui';
 import { AddPaymentSheet } from '../components/AddPaymentSheet';
 import { DeleteInvoiceSheet } from '../components/DeleteInvoiceSheet';
 import { HistoryDateGroupList } from '../components/HistoryDateGroupList';
@@ -50,11 +50,7 @@ export default function SalesHistoryPage() {
       title="Sales History"
       icon={History}
       max="7xl"
-      actions={
-        <Button variant="outline" icon={RefreshCw} loading={h.refreshing} onClick={() => void h.refresh()}>
-          Refresh
-        </Button>
-      }
+      actions={<RefreshButton loading={h.refreshing} onClick={() => void h.refresh()} />}
     >
       <div className="space-y-5">
         {h.error ? null : (

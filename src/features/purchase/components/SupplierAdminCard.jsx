@@ -24,7 +24,7 @@ export function SupplierAdminCard({ supplier, onEdit, onDelete }) {
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2.5">
         <Button
-          variant="outline"
+          variant="edit"
           icon={Pencil}
           onClick={() => onEdit(supplier)}
           aria-label={`Edit ${supplier.name}`}

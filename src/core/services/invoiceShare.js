@@ -6,7 +6,7 @@
 import logoUrl from '@/assets/brand/logo.png';
 import { calculateTotalReturns } from '@/core/billing';
 import { db } from '@/core/db';
-import { printHtml } from '@/platform';
+import { printHtml, sharePdfHtml } from '@/platform';
 import { buildCombinedInvoiceHtml } from './invoiceHtml';
 import { normalizeWhatsAppPhone, openWhatsApp } from './whatsapp';
 
@@ -52,11 +52,17 @@ export async function printInvoice(invoice) {
 }
 
 /**
- * "Share BILL": print dialog (save as PDF) and open the customer's WhatsApp chat to attach it.
- * Returns 'fallback' (kept from the mobile port so callers can word their toast).
+ * "Share BILL": builds the invoice PDF and opens the device's share sheet with it ('shared'). Where the browser cannot
+ * share files: print dialog (save as PDF) and the customer's WhatsApp chat to attach it ('fallback').
  */
 export async function shareInvoicePdf(invoice) {
-  await printInvoice(invoice);
+  const html = buildCombinedInvoiceHtml(await buildContext(invoice));
+  if (
+    (await sharePdfHtml(html, `Invoice-${invoice.invoiceNo}.pdf`, `Invoice #${invoice.invoiceNo}`)) ===
+    'shared'
+  )
+    return 'shared';
+  await printHtml(html);
   if (normalizeWhatsAppPhone(invoice.customerPhone)) await openWhatsApp(invoice.customerPhone);
   return 'fallback';
 }

@@ -83,37 +83,43 @@ const TINTS = {
   violet: 'bg-violet-50 text-violet-600 ring-violet-200',
 };
 
-/** KPI tile: tinted icon, big value, small label, gold hairline on top. */
+/**
+ * KPI tile: tinted icon, big value, small label, gold hairline on top.
+ * Container-query layout: in a narrow tile (2-up on phones, 6-up grids) the icon sits above the figure so the whole
+ * amount (₹10,00,000 …) stays readable; from 15rem wide it is icon-left / figure-right. Figures wrap instead of truncating.
+ */
 export function StatCard({ icon: Icon, value, label, tint = 'brand', valueClassName, className }) {
   return (
     <div
       className={cn(
-        'group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border border-line bg-white p-4 shadow-card',
+        'group @container relative overflow-hidden rounded-2xl border border-line bg-white shadow-card',
         'transition duration-200 hover:-translate-y-0.5 hover:shadow-lift',
         className,
       )}
     >
       <span className="absolute inset-x-0 top-0 h-px hairline-gold opacity-0 transition group-hover:opacity-100" />
-      {Icon ? (
-        <span
-          className={cn(
-            'flex size-11 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset',
-            TINTS[tint],
-          )}
-        >
-          <Icon className="size-5" aria-hidden />
-        </span>
-      ) : null}
-      <div className="min-w-0">
-        <div
-          className={cn(
-            'truncate font-display text-xl leading-tight font-extrabold text-brand-800 tabular-nums',
-            valueClassName,
-          )}
-        >
-          {value}
+      <div className="flex h-full flex-col items-start gap-2.5 p-3.5 @[15rem]:flex-row @[15rem]:items-center @[15rem]:gap-3.5 @[15rem]:p-4">
+        {Icon ? (
+          <span
+            className={cn(
+              'flex size-10 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset @[15rem]:size-11',
+              TINTS[tint],
+            )}
+          >
+            <Icon className="size-5" aria-hidden />
+          </span>
+        ) : null}
+        <div className="max-w-full min-w-0">
+          <div
+            className={cn(
+              'font-display text-lg leading-tight font-extrabold [overflow-wrap:anywhere] text-brand-800 tabular-nums @[15rem]:text-xl',
+              valueClassName,
+            )}
+          >
+            {value}
+          </div>
+          <div className="mt-0.5 text-xs leading-snug font-medium text-slate-500">{label}</div>
         </div>
-        <div className="truncate text-xs font-medium text-slate-500">{label}</div>
       </div>
     </div>
   );

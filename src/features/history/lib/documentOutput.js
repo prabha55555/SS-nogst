@@ -1,16 +1,17 @@
 /**
- * Turning statement HTML into something the user can use: the browser print dialog ("Save as PDF" / print).
+ * Turning statement HTML into something the user can use: a PDF handed to the device's share sheet where the browser
+ * supports file sharing (phones, tablets), otherwise the browser print dialog ("Save as PDF" / print).
  */
-import { printHtml } from '@/platform';
+import { printHtml, sharePdfHtml } from '@/platform';
 
 /** Opens the print dialog for the statement. */
 export async function printStatementHtml(html) {
   await printHtml(html);
 }
 
-/** The browser has no silent PDF-file step: callers fall back to printing ('unavailable'). */
-export async function shareStatementPdf() {
-  return 'unavailable';
+/** Builds the PDF and opens the share sheet: 'shared' (sent or closed by the user) | 'unavailable' (print instead). */
+export async function shareStatementPdf(html, fileName, title) {
+  return sharePdfHtml(html, fileName, title);
 }
 
 /** Kept for API parity with the mobile build; the browser prints directly. */

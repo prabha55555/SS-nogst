@@ -170,7 +170,7 @@ export default function ExpensesPage() {
             />
           }
         />
-        <ShowMore remaining={paged.remaining} onClick={paged.showMore} />
+        <ShowMore pager={paged.pager} noun="expenses" />
       </>
     );
 

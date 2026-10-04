@@ -3,7 +3,7 @@
  * Add form (the `?phone=` query pre-fills the phone), searchable supplier directory, edit sheet and delete (confirm).
  * Wide desktops (xl): add form as a side card; everything narrower: form on top, directory below.
  */
-import { ListChecks, RefreshCw, Save, UserPlus, Users } from 'lucide-react';
+import { ListChecks, Save, UserPlus, Users } from 'lucide-react';
 import {
   Badge,
   Button,
@@ -13,17 +13,24 @@ import {
   LoadingState,
   Modal,
   Page,
+  Pagination,
+  RefreshButton,
   SearchBar,
   SectionHeader,
+  usePagination,
 } from '@/ui';
+import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { SupplierDirectory } from '../components/SupplierDirectory';
 import { SupplierFormFields } from '../components/SupplierFormFields';
 import { useSupplierDirectory } from '../hooks/useSupplierDirectory';
 
 const EDIT_FORM_ID = 'edit-supplier-form';
+const ADD_FORM_ID = 'add-supplier-form';
 
 export default function AddSupplierPage() {
   const dir = useSupplierDirectory();
+  const { isExpanded } = useBreakpoint();
+  const pager = usePagination(dir.visible, { resetKey: dir.query });
 
   if (dir.loading && dir.suppliers.length === 0) {
     return (
@@ -53,14 +60,15 @@ export default function AddSupplierPage() {
     <Page
       title="Add Supplier"
       icon={UserPlus}
-      actions={
-        <Button variant="outline" icon={RefreshCw} loading={dir.refreshing} onClick={dir.refresh}>
-          Refresh
-        </Button>
-      }
+      actions={<RefreshButton loading={dir.refreshing} onClick={dir.refresh} />}
     >
       <div className="grid items-start gap-4 xl:grid-cols-[22rem_minmax(0,1fr)]">
-        <Card as="form" onSubmit={submitAdd} className="relative overflow-hidden xl:sticky xl:top-20">
+        <Card
+          as="form"
+          id={ADD_FORM_ID}
+          onSubmit={submitAdd}
+          className="relative overflow-hidden xl:sticky xl:top-20"
+        >
           <span className="absolute inset-x-0 top-0 h-[2px] hairline-gold" aria-hidden />
           <SectionHeader title="Add New Supplier" icon={UserPlus} className="mb-1" />
           <p className="mb-4 text-[13px] text-slate-500">
@@ -72,15 +80,17 @@ export default function AddSupplierPage() {
             layout="row"
             idPrefix="new-supplier"
           />
-          <Button
-            type="submit"
-            icon={UserPlus}
-            fullWidth
-            loading={dir.adding}
-            className="mt-5 sm:w-auto xl:w-full"
-          >
-            Add Supplier
-          </Button>
+          {isExpanded ? (
+            <Button
+              type="submit"
+              icon={UserPlus}
+              fullWidth
+              loading={dir.adding}
+              className="mt-5 sm:w-auto xl:w-full"
+            >
+              Add Supplier
+            </Button>
+          ) : null}
         </Card>
 
         <section className="min-w-0 space-y-3.5" aria-label="Supplier Directory">
@@ -96,8 +106,9 @@ export default function AddSupplierPage() {
             placeholder="Search by name, phone or address..."
             aria-label="Search suppliers"
           />
+          <div ref={pager.anchorRef} className="scroll-mt-32" />
           <SupplierDirectory
-            suppliers={dir.visible}
+            suppliers={pager.rows}
             onEdit={dir.startEdit}
             onDelete={dir.remove}
             empty={
@@ -108,8 +119,23 @@ export default function AddSupplierPage() {
               />
             }
           />
+          <Pagination pager={pager} noun="suppliers" />
         </section>
       </div>
+
+      {isExpanded ? null : (
+        // floating Add button (submits the form above); fixed bottom-right above the tab bar
+        <button
+          type="submit"
+          form={ADD_FORM_ID}
+          disabled={dir.adding}
+          aria-label="Add Supplier"
+          title="Add Supplier"
+          className="no-print fixed right-4 bottom-[calc(4.6rem+env(safe-area-inset-bottom))] z-30 flex size-14 items-center justify-center rounded-full bg-gold-sheen text-brand-900 shadow-gold ring-4 ring-white/80 transition hover:brightness-105 focus-visible:ring-gold-300 focus-visible:outline-none active:scale-95 disabled:opacity-60 sm:right-6"
+        >
+          <UserPlus className="size-6" aria-hidden />
+        </button>
+      )}
 
       <Modal
         open={!!dir.editing}

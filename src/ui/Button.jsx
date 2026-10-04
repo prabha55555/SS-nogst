@@ -38,13 +38,23 @@ const VARIANTS = {
     'bg-linear-to-b from-[#2fe07a] to-whatsapp-dark text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25)]',
     'hover:brightness-95 focus-visible:ring-green-400',
   ),
+  // Refresh / reload — soft sky, clearly secondary
+  refresh: cn(
+    'border border-sky-200 bg-sky-50 text-sky-700 shadow-sm',
+    'hover:border-sky-300 hover:bg-sky-100 focus-visible:ring-sky-300',
+  ),
+  // Edit — blue
+  edit: cn(
+    'border border-blue-200 bg-blue-50 text-blue-700 shadow-sm',
+    'hover:border-blue-300 hover:bg-blue-100 focus-visible:ring-blue-300',
+  ),
   outline: cn(
     'border border-slate-300 bg-white text-slate-800 shadow-sm',
     'hover:border-gold-400 hover:bg-gold-50 focus-visible:ring-gold-300',
   ),
   outlineDanger: cn(
-    'border border-red-300 bg-white text-red-600 shadow-sm',
-    'hover:border-red-400 hover:bg-red-50 focus-visible:ring-red-300',
+    'border border-red-200 bg-red-50 text-red-600 shadow-sm',
+    'hover:border-red-300 hover:bg-red-100 focus-visible:ring-red-300',
   ),
   ghost: 'text-slate-700 hover:bg-slate-100 hover:text-brand-800 focus-visible:ring-gold-300',
   subtle: 'bg-slate-100 text-slate-700 hover:bg-slate-200 focus-visible:ring-slate-300',
@@ -59,7 +69,11 @@ const SIZES = {
 /**
  * <Button variant="primary" icon={Save} onClick={...}>Save</Button>
  * `icon` is a lucide-react component; `loading` shows a spinner and disables the button.
- * Variants: primary (gold CTA) secondary (ink) success danger warning info purple whatsapp outline outlineDanger ghost subtle.
+ * Variants (action-based colour system):
+ *  primary (gold) Add / Create / Generate · success (green) Save / Submit / Restore · edit (blue) Edit · purple Share / Acknowledge
+ *  info (sky) neutral info actions
+ *  warning (amber) Reset / Clear · danger / outlineDanger (red) Delete · refresh (soft blue) Refresh · outline / ghost / subtle Cancel & neutral
+ *  secondary (ink) Export / neutral dark · whatsapp (WhatsApp green) WhatsApp-only actions.
  */
 export function Button({
   variant = 'primary',

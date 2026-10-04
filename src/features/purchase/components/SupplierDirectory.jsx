@@ -37,7 +37,7 @@ export function SupplierDirectory({ suppliers, empty, onEdit, onDelete }) {
         <div className="flex justify-end gap-2">
           <Button
             size="sm"
-            variant="outline"
+            variant="edit"
             icon={Pencil}
             onClick={() => onEdit(s)}
             aria-label={`Edit ${s.name}`}

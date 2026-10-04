@@ -168,7 +168,7 @@ export default function RevenuePage() {
           }
           footer={showTotal && isExpanded ? <TotalLine total={totals.profit} ink /> : undefined}
         />
-        <ShowMore remaining={paged.remaining} onClick={paged.showMore} />
+        <ShowMore pager={paged.pager} noun="records" />
         {showTotal ? (
           <StickyBar>
             <TotalLine total={totals.profit} />
