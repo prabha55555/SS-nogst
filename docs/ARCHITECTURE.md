@@ -1,7 +1,7 @@
 # Santhamani Textiles — Architecture
 
 React 19 (JSX) + Tailwind CSS 4 + Vite 8, installable as a **PWA** (Android / iOS / desktop). One codebase, one
-Firestore project (`ssjeeva-f5679`) shared with the original HTML site that is kept in `legacy/`.
+Firestore project (`billing-56b7b`) used by this application.
 
 ```
 src/

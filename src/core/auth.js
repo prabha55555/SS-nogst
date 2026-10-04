@@ -7,9 +7,9 @@
  */
 export const SESSION_HOURS = 24;
 
-// btoa(username) / btoa(password) — identical constants to the original site, so the same login still works.
-export const USER_B64 = 'U1NKU05Z';
-export const PASS_B64 = 'MjcxODE1';
+// btoa(username) / btoa(password) — intentionally matches the requested application login.
+export const USER_B64 = 'SlNQ';
+export const PASS_B64 = 'MTIzNDU2';
 
 export const SESSION_KEYS = { auth: 'isAuthenticated', username: 'username', loginTime: 'loginTime' };
 

@@ -1,4 +1,5 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
 import {
   getFirestore,
   initializeFirestore,
@@ -11,21 +12,35 @@ import {
  * Firestore rules). Can be overridden with VITE_FIREBASE_* variables in a `.env.local` file.
  */
 const env = import.meta.env ?? {};
+const FIREBASE_PROJECT_ID = 'billing-56b7b';
 export const firebaseConfig = {
-  apiKey: env.VITE_FIREBASE_API_KEY ?? 'AIzaSyAHrsyRqHvPROtRCfMpb_TRH8XhXGR83DE',
-  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN ?? 'ssjeeva-f5679.firebaseapp.com',
-  projectId: env.VITE_FIREBASE_PROJECT_ID ?? 'ssjeeva-f5679',
-  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET ?? 'ssjeeva-f5679.firebasestorage.app',
-  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? '1001926126226',
-  appId: env.VITE_FIREBASE_APP_ID ?? '1:1001926126226:web:9fa81b949c20544eccd44b',
+  apiKey: env.VITE_FIREBASE_API_KEY ?? 'AIzaSyDNtPr3I8GUk9_oSwi_N4K1Yqxuffpf0K8',
+  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN ?? 'billing-56b7b.firebaseapp.com',
+  projectId: FIREBASE_PROJECT_ID,
+  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET ?? 'billing-56b7b.firebasestorage.app',
+  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? '478502228096',
+  appId: env.VITE_FIREBASE_APP_ID ?? '1:478502228096:web:a79de765991d3522321665',
+  measurementId: env.VITE_FIREBASE_MEASUREMENT_ID ?? 'G-711NDDPSHM',
 };
+
+if (env.VITE_FIREBASE_PROJECT_ID && env.VITE_FIREBASE_PROJECT_ID !== FIREBASE_PROJECT_ID) {
+  throw new Error(
+    `Invalid Firebase project "${env.VITE_FIREBASE_PROJECT_ID}". This application must use "${FIREBASE_PROJECT_ID}".`,
+  );
+}
 
 let app = null;
 let firestore = null;
+let analytics = null;
 
 export function getFirebaseApp() {
   if (!app) app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   return app;
+}
+
+export function getFirebaseAnalytics() {
+  if (!analytics) analytics = getAnalytics(getFirebaseApp());
+  return analytics;
 }
 
 export function getDb() {

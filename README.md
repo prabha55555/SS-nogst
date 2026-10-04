@@ -54,10 +54,11 @@ legacy/         the original HTML / JS / CSS site, untouched (reference only)
 
 ## Configuration
 
-Firebase settings default to the production project. Override with `VITE_FIREBASE_API_KEY`,
-`VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`,
-`VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID` in `.env.local` (point them at a separate Firebase
-project for experiments).
+Firebase uses the `billing-56b7b` project. The remaining Firebase settings can be overridden with
+`VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_STORAGE_BUCKET`,
+`VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`, and `VITE_FIREBASE_MEASUREMENT_ID` in `.env.local`.
+`VITE_FIREBASE_PROJECT_ID` is intentionally rejected if it is not `billing-56b7b`, preventing accidental writes to
+the old database.
 
 ## Security (inherited from the original — please read)
 
