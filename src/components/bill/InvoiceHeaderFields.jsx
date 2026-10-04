@@ -60,7 +60,7 @@ export function InvoiceHeaderFields({
             </div>
           </div>
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             icon={Sparkles}
             disabled={noSuggestion}
